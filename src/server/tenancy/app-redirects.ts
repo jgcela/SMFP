@@ -39,7 +39,7 @@ export function appPathFor(rest: string): string | null {
 /** Sign-in pages (school and platform) open the app's sign-in, keeping where to go next. */
 export function appRedirect(pathname: string, search: URLSearchParams): string | null {
   let target: string | null = null;
-  if (pathname === '/login') target = '/sign-in';
+  if (pathname === '/login' || pathname === '/school-login') target = '/sign-in';
   else {
     const m = /^\/s\/[^/]+(\/.*)?$/.exec(pathname);
     if (m) target = appPathFor(m[1] ?? '');

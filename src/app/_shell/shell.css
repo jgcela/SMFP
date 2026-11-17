@@ -326,3 +326,42 @@
 .shell .switch:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .shell .mod-toggle { display: grid; gap: 6px; justify-items: start; }
 @media (prefers-reduced-motion: reduce) { .shell .switch, .shell .switch-knob { transition: none; } }
+
+/* ---------- St. Mary app look (mobile/src/theme/tokens.ts) ----------
+   Same neutrals, system font, tint and 12px corners as the family app, and a
+   sidebar that behaves like the app's web sidebar (white, tint on the active
+   item, grouped grey behind it). Comes last so it wins over the rules above. */
+.shell {
+  --ink: #111418;
+  --ink-soft: #111418;
+  --ink-2: #5b6470;
+  --hair: #d8dce1;
+  --hair-strong: #c4c9d0;
+  --canvas: #ffffff;
+  --canvas-deep: #f2f2f7;
+  --slate-2: #f2f2f7;
+  --side: #ffffff;
+  --r-card: 12px;
+  --r-sheet: 12px;
+  --shadow-card: none;
+  --font-heading: var(--app-font);
+  --font-body: var(--app-font);
+  --radius: 12px;
+  letter-spacing: normal;
+  font-feature-settings: normal;
+  font-size: 1rem;
+}
+.shell-tone-ink { --accent: #16335b; --accent-on: #ffffff; }
+.shell-body { background: #f2f2f7; }
+.shell-top { background: rgb(242 242 247 / 0.92); }
+.shell-side-item { min-height: 44px; border-radius: 10px; font-size: 1rem; font-weight: 400; color: #5b6470; gap: 12px; }
+.shell-side-item:hover { background: #f2f2f7; color: #111418; }
+.shell-side-item[aria-current='page'] { background: #f2f2f7; color: var(--accent); font-weight: 600; }
+.shell-side-item[aria-current='page']::before { display: none; }
+.shell-side-title { font-size: 13px; font-weight: 600; letter-spacing: normal; text-transform: none; color: #5b6470; }
+.shell h1, .shell h2, .shell h3 { letter-spacing: normal; }
+.shell .admin-head h1 { font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: normal; }
+.shell .btn { border-radius: 12px; }
+/* Stat values use the app's title size (22px) so words do not split. */
+.shell .stat > dd { font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: normal; overflow-wrap: normal; }
+.shell .stat-icon { border-radius: 12px; }

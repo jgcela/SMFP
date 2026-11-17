@@ -54,8 +54,8 @@ export default async function InvitePage({ params }: Props) {
   }
 
   return (
-    <div className="auth-wrap">
-      <div className="auth-card card">
+    <>
+      <div className="card">
         <h1>Join {school}</h1>
         {inv.state === 'valid' && (
           <p>
@@ -64,6 +64,6 @@ export default async function InvitePage({ params }: Props) {
         )}
         {body}
       </div>
-    </div>
+    </>
   );
 }

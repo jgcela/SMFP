@@ -1,0 +1,71 @@
+/* The St. Mary app's look for every server page (office admin, platform,
+   invitations, account security): the app's system font, neutrals, tint,
+   12px radius and type scale (mobile/src/theme/tokens.ts). `html:root` wins
+   over the per-school `:root` tokens, except the school's own colours. */
+
+html:root {
+  --app-font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --app-bg: #ffffff;
+  --app-grouped: #f2f2f7;
+  --app-text: #111418;
+  --app-text-2: #5b6470;
+  --app-separator: #d8dce1;
+  --app-tint: #16335b;
+
+  --font-heading: var(--app-font);
+  --font-body: var(--app-font);
+  --color-background: var(--app-grouped);
+  --color-surface: var(--app-bg);
+  --color-text: var(--app-text);
+  --color-text-muted: var(--app-text-2);
+  --radius: 12px;
+  --border: var(--app-separator);
+  --border-strong: color-mix(in srgb, var(--app-text) 22%, transparent);
+  --surface-sunken: var(--app-grouped);
+  --success: #1e7f4f;
+  --warning: #a15c00;
+  --danger: #b42318;
+}
+
+body {
+  font-family: var(--app-font);
+  letter-spacing: normal;
+}
+
+/* Type scale: largeTitle / title / headline. */
+h1 { font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: normal; }
+h2 { font-size: 22px; line-height: 28px; font-weight: 600; }
+h3 { font-size: 17px; line-height: 22px; font-weight: 600; }
+
+/* Sign-in style pages (invitations, account security): a card on the grouped background. */
+.app-page {
+  min-height: 100dvh;
+  background: var(--app-grouped);
+  display: grid;
+  place-items: start center;
+  padding: 48px 16px;
+}
+.app-page .card,
+.app-page .auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--app-bg);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+.app-page h1 { font-size: 28px; line-height: 34px; }
+.app-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.app-mark {
+  width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+  background: var(--color-primary, var(--app-tint)); color: var(--color-accent, #fcbc40); font-weight: 800; font-size: 15px;
+}
+.app-brand-name { font-size: 17px; font-weight: 600; }
+
+.btn { border-radius: 12px; min-height: 44px; font-weight: 600; }
+.field input,
+.field textarea,
+.field select { border-radius: 12px; }
