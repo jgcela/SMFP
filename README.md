@@ -1,12 +1,29 @@
-# Family Portal — plataforma multi-escuela
+# Portal del Colegio St Mary
 
-Una sola aplicación que da a cada colegio su propio portal de familias, su panel de administración y, al dueño de la plataforma, un panel para gestionar todos los colegios. St. Mary Catholic Virtue School es el primer colegio.
+El portal de familias de St. Mary Catholic Virtue School, con datos reales.
 
-Documentación:
+- **Familias**: la misma app en la web (escritorio y móvil) y en iOS/Android. Es la app Expo de `mobile/`. En la web se publica en la raíz del portal; en el móvil se instala como app.
+- **Oficina del colegio**: el panel de administración en `/s/stmary/admin` (anuncios, calendario, documentos, bandeja de ausencias y peticiones, familias, alumnos).
+- **Servidor**: Next.js con Neon Postgres, Better Auth y Cloudflare R2. La app habla con él por la API `/api/app/v1` (cookie de sesión en la web, token en el llavero del móvil).
+- **FACTS**: las fichas de alumnos pueden venir de FACTS SIS (`src/server/sis/facts.ts`). Está desactivado; se activa en el panel del colegio cuando haya claves de FACTS.
 
-- [`docs/01-auditoria.md`](docs/01-auditoria.md): auditoría del portal actual y checklist de migración.
-- [`docs/02-arquitectura.md`](docs/02-arquitectura.md): arquitectura, aislamiento entre colegios, permisos, módulos y temas.
-- [`docs/03-estado.md`](docs/03-estado.md): qué está hecho, probado y pendiente.
+### Despliegue (Vercel)
+
+`npm run vercel-build` aplica migraciones y el seed (idempotente), exporta la app web a `public/` y compila Next. Producción usa la base de datos principal de Neon; las previews de la rama de trabajo usan la rama `preview` de Neon (variables `DATABASE_URL` y `DB_SETUP_ON_PREVIEW` limitadas a esa rama).
+
+Variables: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `APP_TENANT_KEY=stmary`, `PLATFORM_ROOT_DOMAIN`, `AUTH_EXTRA_HOSTS`, `ALLOW_PATH_TENANTS=true`, `CRON_SECRET`, `SEED_OWNER_*` (solo para crear la primera cuenta). Pendientes: `R2_*` (documentos) y `ANTHROPIC_API_KEY` (asistente Ask). Sin correo todavía: las contraseñas olvidadas las resuelve la oficina.
+
+### App móvil
+
+```
+cd mobile
+npm install
+EXPO_PUBLIC_API_URL=https://<dominio-del-portal> npx expo start
+```
+
+Documentación heredada de family-portal:
+
+- [`docs/01-auditoria.md`](docs/01-auditoria.md), [`docs/02-arquitectura.md`](docs/02-arquitectura.md), [`docs/03-estado.md`](docs/03-estado.md).
 
 ## Probarlo en tu Mac (paso a paso)
 
@@ -39,7 +56,8 @@ Necesitas Node.js 22 o superior (nodejs.org, versión LTS) y el proyecto clonado
    npm run dev
    ```
 5. En el navegador:
-   - Portal de familias: http://stmary.localhost:3000
+   - App de familias: http://localhost:3000 (antes ejecuta `npm run build:app` una vez)
+   - Portal web clásico: http://stmary.localhost:3000
    - Administración del colegio: http://stmary.localhost:3000/admin (entra con el email y contraseña del paso 2)
    - Panel de plataforma: http://localhost:3000/platform
 
