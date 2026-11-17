@@ -1,8 +1,8 @@
 // Families use one interface everywhere: the St. Mary app (Expo), served at the
 // site root on the web. The older portal pages under /s/<school>/… send people
 // to the matching app screen instead of showing a second, different design.
-// Kept on the server: the office admin, staff invitations, the family join form,
-// file links (/d/…) and calendar downloads (…/ics).
+// Kept on the server: the office admin, staff invitations, file links (/d/…)
+// and calendar downloads (…/ics). Families join through an office invitation.
 
 const FIXED: Record<string, string> = {
   '': '/',
@@ -20,6 +20,7 @@ const FIXED: Record<string, string> = {
   assistant: '/ask',
   absence: '/report-absence',
   requests: '/inbox',
+  join: '/',
 };
 
 /** The app path for a portal path after /s/<school>, or null to keep the page. */
