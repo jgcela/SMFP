@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "St. Mary",
+    "slug": "smfp",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "stmaryportal",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.smfp.stmary",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Use Face ID to unlock the St. Mary portal."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#16335B",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.smfp.stmary"
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Portal del Colegio St Mary",
+      "shortName": "St. Mary",
+      "themeColor": "#16335B",
+      "backgroundColor": "#F2F2F7"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFFFFF",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 96,
+          "dark": {
+            "backgroundColor": "#000000"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false,
+      "reactCompiler": true
+    }
+  }
+}
