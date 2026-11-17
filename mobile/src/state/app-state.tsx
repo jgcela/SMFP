@@ -61,8 +61,24 @@ function saveRead(ids: ReadonlySet<string>) {
   }
 }
 
+/**
+ * Web only: where a staff account goes after signing in here. The office admin
+ * (or the platform) is part of the same site, so the session carries over.
+ */
+let staffNext: string | null = null;
+/** Remembers ?next= from the sign-in page; the two-step screen has its own URL. */
+function rememberNext() {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+  const next = new URLSearchParams(window.location.search).get('next');
+  if (next && next.startsWith('/') && !next.startsWith('//')) staffNext = next;
+}
+function staffDestination(): string | null {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
+  return staffNext ?? `/s/${process.env.EXPO_PUBLIC_TENANT_KEY ?? 'stmary'}/admin`;
+}
+
 function accessMessage(err: unknown): string {
-  if (err instanceof ApiError && err.code === 'staff') return 'This app is for St. Mary families. Staff sign in to the school admin on the website.';
+  if (err instanceof ApiError && err.code === 'staff') return 'This app is for St. Mary families. Staff: sign in on the website to open the school admin.';
   if (err instanceof ApiError && err.code === 'not_family') return "This account isn't linked to a St. Mary family yet. Ask the school office for an invitation.";
   if (err instanceof ApiError) return err.message;
   return "We couldn't reach the school portal. Check your connection and try again.";
@@ -84,7 +100,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   }, [qc]);
 
   /** Loads the family; a signed-out or non-family account goes back to sign-in. */
-  const loadFamily = useCallback(async (): Promise<Result> => {
+  const loadFamily = useCallback(async (opts: { afterSignIn?: boolean } = {}): Promise<Result> => {
     try {
       const me = await api.me();
       qc.setQueryData(['me'], me);
@@ -94,6 +110,11 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       return { ok: true };
     } catch (err) {
       if (err instanceof ApiError && (err.kind === 'signed_out' || err.kind === 'forbidden')) {
+        const staffTo = opts.afterSignIn && err.code === 'staff' ? staffDestination() : null;
+        if (staffTo) {
+          window.location.assign(staffTo);
+          return { ok: true };
+        }
         if (err.kind === 'forbidden') await authApi.signOut();
         reset();
         return err.kind === 'forbidden' ? { ok: false, message: accessMessage(err) } : { ok: false, message: 'Sign in again to continue.' };
@@ -105,7 +126,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const boot = useCallback(() => {
     setBootError(null);
     setAuth('loading');
-    loadFamily().catch((err) => {
+    loadFamily({}).catch((err) => {
       setBootError(accessMessage(err));
       setAuth('signed_out');
     });
@@ -138,13 +159,14 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     async (email: string, password: string) => {
       if (!email.includes('@')) return { ok: false as const, message: 'Enter the email you use for the school portal.' };
       if (!password) return { ok: false as const, message: 'Enter your password.' };
+      rememberNext();
       try {
         const r = await authApi.signIn(email, password);
         if (r.stage === 'two_step') {
           setAuth('two_step');
           return { ok: true as const, twoStep: true };
         }
-        return await loadFamily();
+        return await loadFamily({ afterSignIn: true });
       } catch (err) {
         return { ok: false as const, message: accessMessage(err) };
       }
@@ -158,7 +180,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       if (!/^\d{6}$/.test(clean) && !/^[a-z0-9-]{10,11}$/i.test(clean)) return { ok: false, message: 'Enter the 6-digit code from your authenticator app.' };
       try {
         await authApi.verifyTwoStep(clean);
-        return await loadFamily();
+        return await loadFamily({ afterSignIn: true });
       } catch (err) {
         return { ok: false, message: accessMessage(err) };
       }

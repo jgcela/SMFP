@@ -7,6 +7,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { resolveHost } from './server/tenancy/resolve';
 import { pathTenantsAllowed, rootDomain } from './server/tenancy/config';
+import { appRedirect } from './server/tenancy/app-redirects';
 
 export const TENANT_BASE_HEADER = 'x-fp-tenant-base';
 
@@ -20,6 +21,9 @@ export function proxy(request: NextRequest) {
 
   if (res.kind === 'root') {
     if (isTenantPath && !pathTenantsAllowed()) return new NextResponse('Not found', { status: 404 });
+    // Family pages and sign-in live in the app (one design on web, phone and desktop).
+    const to = appRedirect(url.pathname, url.searchParams);
+    if (to) return NextResponse.redirect(new URL(to, request.url), 307);
     if (isTenantPath) {
       const slug = url.pathname.split('/')[2] ?? '';
       headers.set(TENANT_BASE_HEADER, `/s/${slug}`);
