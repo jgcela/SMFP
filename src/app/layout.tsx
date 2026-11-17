@@ -9,6 +9,7 @@ import '@fontsource-variable/libre-franklin';
 import '@fontsource/atkinson-hyperlegible/400.css';
 import '@fontsource/atkinson-hyperlegible/700.css';
 import './globals.css';
+import './app-look.css';
 
 export const metadata: Metadata = {
   title: { default: process.env.PLATFORM_NAME ?? 'School Portal', template: '%s' },

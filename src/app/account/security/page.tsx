@@ -18,9 +18,9 @@ export default async function AccountSecurity({ searchParams }: { searchParams: 
   const required = await isTwoFactorRequired(session.user.id);
   const enabled = !!session.user.twoFactorEnabled;
   return (
-    <main id="main" className="container" style={{ paddingBlock: 'var(--space-8)', maxWidth: 560 }}>
-      <div className="card" style={{ display: 'grid', gap: 'var(--space-4)' }}>
-        <h1 style={{ fontSize: '1.6rem' }}>Two-step sign-in</h1>
+    <main id="main" className="app-page">
+      <div className="card">
+        <h1>Two-step sign-in</h1>
         <p className="muted" style={{ margin: 0 }}>
           Signed in as <strong>{session.user.email}</strong>
         </p>
