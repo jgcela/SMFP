@@ -18,6 +18,7 @@ import { aiQuestions, inboxItems, assistantActions, assistantConversations, assi
 import { audit } from '../audit/log';
 import { consume, QuotaExceededError } from '../billing/entitlements';
 import { getAssistantModel, type ToolSpec } from '../ai/assistant-model';
+import { isMockModel } from '../ai/mock';
 import { addDays, toDateStr } from '../calendar/time';
 import { formatRange } from '@/lib/when';
 import { ValidationError } from '../errors';
@@ -431,7 +432,7 @@ export async function getConversation(tenantId: string, viewer: Viewer, id: stri
       const [conv] = await tx.select().from(assistantConversations).where(and(eq(assistantConversations.id, id), eq(assistantConversations.userId, v.userId)));
       if (!conv) throw new ValidationError('Conversation not found.');
       const messages = await tx
-        .select({ id: assistantMessages.id, role: assistantMessages.role, content: assistantMessages.content, cards: assistantMessages.cards, createdAt: assistantMessages.createdAt })
+        .select({ id: assistantMessages.id, role: assistantMessages.role, content: assistantMessages.content, cards: assistantMessages.cards, model: assistantMessages.model, createdAt: assistantMessages.createdAt })
         .from(assistantMessages)
         .where(eq(assistantMessages.conversationId, id))
         .orderBy(asc(assistantMessages.createdAt));
@@ -442,7 +443,8 @@ export async function getConversation(tenantId: string, viewer: Viewer, id: stri
       const now = Date.now();
       return {
         conversation: { id: conv.id, title: conv.title },
-        messages,
+        // "simulated": written by the test-mode model, not a real AI.
+        messages: messages.map(({ model, ...m }) => ({ ...m, simulated: isMockModel(model) })),
         actions: Object.fromEntries(actions.map((a) => [a.id, { ...a, expired: a.status === 'proposed' && now - a.createdAt.getTime() > ACTION_TTL_MS }])),
       };
     },

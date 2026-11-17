@@ -7,7 +7,8 @@
 // back as drafts the family confirms on the page.
 import Anthropic from '@anthropic-ai/sdk';
 import type { BetaMessageContentParam, BetaMessageParam, BetaToolResultBlockParam } from '@anthropic-ai/sdk/resources/beta/messages/messages';
-import { costMicroUsd } from './provider';
+import { aiMode, costMicroUsd } from './provider';
+import { MockAssistantModel } from './mock';
 
 export type ToolSpec = { name: string; description: string; input_schema: { type: 'object'; [k: string]: unknown } };
 export type Turn = { role: 'user' | 'assistant'; text: string };
@@ -98,6 +99,6 @@ export function setAssistantModelForTests(m: AssistantModel | null | undefined) 
 
 export function getAssistantModel(): AssistantModel | null {
   if (override !== undefined) return override;
-  const key = process.env.ANTHROPIC_API_KEY;
-  return key ? new AnthropicAssistantModel(key) : null;
+  const mode = aiMode();
+  return mode === 'live' ? new AnthropicAssistantModel(process.env.ANTHROPIC_API_KEY!) : mode === 'mock' ? new MockAssistantModel() : null;
 }

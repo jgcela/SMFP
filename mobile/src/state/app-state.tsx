@@ -35,6 +35,8 @@ type AppState = {
 
   /** The school turned on the family assistant and it is set up. */
   askAvailable: boolean;
+  /** Assistant answers are simulated (server in test mode). */
+  askTestMode: boolean;
 };
 
 const Ctx = createContext<AppState | null>(null);
@@ -219,6 +221,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       calendarChildIds,
       setCalendarChildIds,
       askAvailable: !!family?.features.ask,
+      askTestMode: !!family?.features.askTestMode,
     }),
     [auth, bootError, boot, signIn, verifyTwoStep, signOut, family, readIds, markRead, calendarChildIds],
   );
