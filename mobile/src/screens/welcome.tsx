@@ -2,18 +2,19 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, SampleDataBanner, Text } from '@/components/primitives';
-import { schools } from '@/data/sample';
+import { Button, Text } from '@/components/primitives';
 import { spacing } from '@/theme/tokens';
+import { useAppState } from '@/state/app-state';
 import { useAppTheme } from '@/theme/use-app-theme';
 
-const school = schools[0]!;
+/** Shown before sign-in; after sign-in the school's details come from the portal. */
+const school = { name: 'St. Mary Catholic Virtue School', primary: '#16335B', accent: '#FCBC40' };
 
 export default function Welcome() {
   const { colors } = useAppTheme();
+  const { bootError, retryBoot } = useAppState();
   return (
     <SafeAreaView style={[s.root, { backgroundColor: colors.bg }]}>
-      <SampleDataBanner />
       <View style={s.body}>
         <View style={s.center}>
           <View style={[s.mark, { backgroundColor: school.primary }]} accessibilityElementsHidden importantForAccessibility="no">
@@ -27,9 +28,17 @@ export default function Welcome() {
           </Text>
         </View>
         <View style={s.actions}>
+          {bootError ? (
+            <View style={{ gap: spacing.sm }}>
+              <Text variant="subhead" tone="danger" style={{ textAlign: 'center' }} accessibilityRole="alert">
+                {bootError}
+              </Text>
+              <Button label="Try again" variant="secondary" onPress={retryBoot} />
+            </View>
+          ) : null}
           <Button label="Sign in" onPress={() => router.push('/sign-in')} />
           <Text variant="footnote" tone="secondary" style={{ textAlign: 'center' }}>
-            Use the email and password you use for the St. Mary family portal. New to St. Mary? Ask the front office for access.
+            Use the email and password of your St. Mary family account. New to St. Mary? Ask the front office for an invitation.
           </Text>
         </View>
       </View>

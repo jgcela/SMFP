@@ -1,34 +1,34 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { ChoiceField, Field } from '@/components/form';
 import { Icon } from '@/components/icon';
-import { Button, haptic, SampleDataBanner, Text, TextButton, webColumn } from '@/components/primitives';
-import { children, schools } from '@/data/sample';
-import type { OfficeRequest } from '@/data/types';
+import { Button, haptic, Text, TextButton, webColumn } from '@/components/primitives';
 import { useCreateRequest } from '@/services/queries';
 import { useAppState } from '@/state/app-state';
 import { spacing } from '@/theme/tokens';
-import { schoolColors, useAppTheme } from '@/theme/use-app-theme';
+import { useAppTheme } from '@/theme/use-app-theme';
 
-const TYPES: OfficeRequest['type'][] = ['General question', 'Pickup change', 'Records request', 'Other'];
+const TYPES = [
+  { value: 'question', label: 'A question' },
+  { value: 'request', label: 'A request (pickup change, records…)' },
+] as const;
+type Kind = (typeof TYPES)[number]['value'];
 
 export default function NewRequest() {
-  const params = useLocalSearchParams<{ schoolId?: string }>();
-  const { colors, scheme } = useAppTheme();
-  const { schoolFilter } = useAppState();
+  const { colors } = useAppTheme();
+  const { family } = useAppState();
   const create = useCreateRequest();
-  const [schoolId, setSchoolId] = useState<string | null>(params.schoolId ?? (schoolFilter !== 'all' ? schoolFilter : schools.length === 1 ? schools[0]!.id : null));
   const [childId, setChildId] = useState<string>('none');
-  const [type, setType] = useState<OfficeRequest['type']>('General question');
+  const [type, setType] = useState<Kind>('question');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState<number | null>(null);
 
-  const kids = children.filter((c) => c.schoolId === schoolId);
+  const kids = family?.children ?? [];
 
-  if (sent) {
+  if (sent !== null) {
     return (
       <View style={[s.done, { backgroundColor: colors.bg }]}>
         <Icon name="check" size={56} color={colors.success} />
@@ -36,7 +36,7 @@ export default function NewRequest() {
           Sent to the office.
         </Text>
         <Text variant="body" tone="secondary" style={{ textAlign: 'center' }}>
-          You'll find the answer in Inbox → Requests.
+          Your request is R-{sent}. You'll find the answer in Inbox → Requests.
         </Text>
         <View style={{ alignSelf: 'stretch', marginTop: spacing.lg }}>
           <Button label="Done" onPress={() => router.back()} />
@@ -55,16 +55,6 @@ export default function NewRequest() {
         <View style={{ width: 56 }} />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[s.body, webColumn]}>
-        <SampleDataBanner />
-        <ChoiceField
-          label="School"
-          value={schoolId}
-          onChange={(v) => {
-            setSchoolId(v);
-            setChildId('none');
-          }}
-          options={schools.map((sc) => ({ value: sc.id, label: sc.shortName, dotColor: schoolColors(sc.id, scheme).tint }))}
-        />
         {kids.length > 0 && (
           <ChoiceField
             label="About"
@@ -73,26 +63,26 @@ export default function NewRequest() {
             options={[{ value: 'none', label: 'The whole family' }, ...kids.map((c) => ({ value: c.id, label: c.firstName }))]}
           />
         )}
-        <ChoiceField label="Type" value={type} onChange={setType} options={TYPES.map((t) => ({ value: t, label: t }))} />
-        <Field label="Subject" value={subject} onChangeText={setSubject} maxLength={120} />
-        <Field label="Message" value={body} onChangeText={setBody} multiline hint="Goes to the school office, not to a teacher." />
+        <ChoiceField label="Type" value={type} onChange={setType} options={TYPES.map((t) => ({ value: t.value, label: t.label }))} />
+        <Field label="Subject" value={subject} onChangeText={setSubject} maxLength={150} />
+        <Field label="Message" value={body} onChangeText={setBody} multiline maxLength={3000} hint="Goes to the school office, not to a teacher." />
         {create.isError && (
           <Text variant="subhead" tone="danger" accessibilityRole="alert">
-            We couldn't send it. Your message is still here. Try again.
+            {create.error.message} Your message is still here.
           </Text>
         )}
         <Button
           label="Send to the office"
           icon="send"
           loading={create.isPending}
-          disabled={!schoolId || !subject.trim() || !body.trim()}
+          disabled={!subject.trim() || !body.trim()}
           onPress={() =>
             create.mutate(
-              { schoolId: schoolId!, childId: childId === 'none' ? undefined : childId, type, subject: subject.trim(), body: body.trim() },
+              { kind: type, childId: childId === 'none' ? undefined : childId, subject: subject.trim(), body: body.trim() },
               {
-                onSuccess: () => {
+                onSuccess: (r) => {
                   haptic('success');
-                  setSent(true);
+                  setSent(r.number);
                 },
                 onError: () => haptic('error'),
               },

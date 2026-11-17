@@ -4,67 +4,90 @@ import { View } from 'react-native';
 
 import { StatusLabel } from '@/components/family-ui';
 import { Button, Group, haptic, Row, Screen, Section, Separator, Text, TextButton } from '@/components/primitives';
-import { QueryView } from '@/components/states';
+import { EmptyState, LoadingSkeleton } from '@/components/states';
+import type { AbsenceStatus } from '@/data/types';
 import { relative } from '@/lib/dates';
-import { absenceStatusLabel, absenceTypeLabel, absenceWhen, childById, schoolById } from '@/lib/lookup';
+import { absenceCancellable, absenceReasonLabel, absenceStatusLabel, absenceTone, absenceTypeLabel, absenceWhen } from '@/lib/lookup';
+import { useOpen } from '@/lib/nav';
 import { useAbsence, useCancelAbsence } from '@/services/queries';
 import { spacing } from '@/theme/tokens';
 
-const steps = ['received', 'in_review', 'recorded'] as const;
-const stepText: Record<(typeof steps)[number], string> = {
-  received: 'The office received your report.',
-  in_review: 'The office is reviewing it.',
-  recorded: 'The office recorded it in the school system.',
-};
+const steps = [
+  { label: 'Received', text: 'The office received your report.' },
+  { label: 'In review', text: 'The office is reviewing it.' },
+  { label: 'Recorded', text: 'The office recorded it.' },
+];
+
+/** How far along the notice is: 0 received, 1 in review, 2 recorded. */
+function progress(s: AbsenceStatus): number {
+  if (s === 'pending_review') return 1;
+  if (s === 'approved' || s === 'sis_sync_pending' || s === 'sis_synced' || s === 'sync_failed') return 2;
+  return 0;
+}
 
 export default function AbsenceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const q = useAbsence(id);
   const cancel = useCancelAbsence();
   const [confirming, setConfirming] = useState(false);
+  const open = useOpen();
+  const a = q.data;
 
   return (
     <>
       <Stack.Screen options={{ title: 'Absence report' }} />
-      <Screen>
-        <QueryView query={q}>
-          {(a) => {
-            const child = childById(a.childId);
-            const school = schoolById(a.schoolId);
-            const reached = steps.indexOf(a.status as (typeof steps)[number]);
-            const canCancel = a.status === 'received' || a.status === 'in_review';
+      <Screen refreshing={q.isRefetching} onRefresh={() => void q.refetch()}>
+        {!a ? (
+          q.notFound ? (
+            <EmptyState icon="error" title="This report is no longer available" />
+          ) : q.isError ? (
+            <EmptyState icon="error" title="We couldn't load this" action={{ label: 'Try again', onPress: () => void q.refetch() }} />
+          ) : (
+            <LoadingSkeleton />
+          )
+        ) : (
+          (() => {
+            const reached = progress(a.status);
+            const canCancel = absenceCancellable(a.status);
+            const stopped = a.status === 'cancelled' || a.status === 'rejected';
             return (
               <>
                 <View style={{ paddingHorizontal: spacing.lg, marginTop: spacing.xl, gap: spacing.xs }}>
                   <Text variant="title" accessibilityRole="header">
-                    {child?.firstName}: {absenceTypeLabel[a.type]}
+                    {a.childName.split(' ')[0]}: {absenceTypeLabel[a.type]}
                   </Text>
-                  <StatusLabel status={a.status} label={absenceStatusLabel[a.status]} />
+                  <StatusLabel tone={absenceTone(a.status)} label={absenceStatusLabel[a.status]} />
                 </View>
                 <Section>
                   <Group>
-                    <Row icon="calendar" title={absenceWhen(a)} />
+                    <Row icon="calendar" title={absenceWhen(a)} showChevron={false} />
                     <Separator inset={50} />
-                    <Row icon="school" title={school?.name ?? ''} />
-                    {a.reason ? (
+                    <Row icon="document" title={absenceReasonLabel[a.reason]} subtitle={a.comment || undefined} showChevron={false} />
+                    {a.requestId ? (
                       <>
                         <Separator inset={50} />
-                        <Row icon="document" title={a.reason} />
+                        <Row icon="mail" title={a.number ? `Request R-${a.number}` : 'Request'} subtitle="Messages with the office" onPress={() => open(`request/${a.requestId}`)} />
                       </>
                     ) : null}
                   </Group>
                 </Section>
-                {a.status !== 'cancelled' && (
+                {a.reviewNote ? (
+                  <Section title="Note from the office">
+                    <Text variant="body">{a.reviewNote}</Text>
+                  </Section>
+                ) : null}
+                {!stopped && (
                   <Section title="Progress">
                     <Group>
                       {steps.map((st, i) => (
-                        <View key={st}>
+                        <View key={st.label}>
                           {i > 0 && <Separator inset={50} />}
                           <Row
                             icon={i <= reached ? 'check' : 'clock'}
-                            title={absenceStatusLabel[st]}
-                            subtitle={i <= reached ? stepText[st] : undefined}
-                            accessibilityLabel={`${absenceStatusLabel[st]}, ${i <= reached ? 'done' : 'not yet'}`}
+                            title={st.label}
+                            subtitle={i <= reached ? st.text : undefined}
+                            showChevron={false}
+                            accessibilityLabel={`${st.label}, ${i <= reached ? 'done' : 'not yet'}`}
                           />
                         </View>
                       ))}
@@ -104,8 +127,8 @@ export default function AbsenceScreen() {
                 </Section>
               </>
             );
-          }}
-        </QueryView>
+          })()
+        )}
       </Screen>
     </>
   );

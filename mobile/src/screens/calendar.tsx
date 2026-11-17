@@ -5,44 +5,42 @@ import { EventRow } from '@/components/family-ui';
 import { Icon } from '@/components/icon';
 import { Chip, ChipRow, Group, Screen, Section, Separator, Text } from '@/components/primitives';
 import { EmptyState, QueryView } from '@/components/states';
-import { children as allChildren } from '@/data/sample';
 import type { SchoolEvent } from '@/data/types';
-import { dayLabel, longDate, monthName, sameDay, startOfDay } from '@/lib/dates';
+import { dayLabel, fromIsoDate, isoDate, longDate, monthName, sameDay, startOfDay } from '@/lib/dates';
 import { useOpen } from '@/lib/nav';
 import { useEvents } from '@/services/queries';
 import { useAppState } from '@/state/app-state';
 import { spacing, touchTarget } from '@/theme/tokens';
-import { schoolColors, useAppTheme } from '@/theme/use-app-theme';
+import { useAppTheme } from '@/theme/use-app-theme';
 
 type Mode = 'agenda' | 'month';
 
 /** True if the event covers the given day. */
 function onDay(e: SchoolEvent, day: Date): boolean {
-  const d = startOfDay(day).getTime();
-  return startOfDay(new Date(e.start)).getTime() <= d && startOfDay(new Date(e.end)).getTime() >= d;
+  const d = isoDate(day);
+  return e.date <= d && (e.endDate ?? e.date) >= d;
 }
 
 export default function Calendar() {
-  const { schoolFilter, calendarChildIds, setCalendarChildIds } = useAppState();
-  const { colors, scheme } = useAppTheme();
+  const { calendarChildIds, setCalendarChildIds, family } = useAppState();
+  const { colors } = useAppTheme();
   const open = useOpen();
-  const q = useEvents();
   const [mode, setMode] = useState<Mode>('agenda');
   const [month, setMonth] = useState(() => startOfDay(new Date(new Date().getFullYear(), new Date().getMonth(), 1)));
   const [selected, setSelected] = useState(() => startOfDay(new Date()));
+  const range = useMemo(
+    () => (mode === 'month' ? { from: isoDate(month), to: isoDate(new Date(month.getFullYear(), month.getMonth() + 1, 0)) } : undefined),
+    [mode, month],
+  );
+  const q = useEvents(range);
 
-  const kids = allChildren.filter((c) => schoolFilter === 'all' || c.schoolId === schoolFilter);
+  const kids = family?.children ?? [];
 
   const filtered = useMemo(() => {
-    const list = q.data ?? [];
+    const list = q.data?.events ?? [];
     if (calendarChildIds.length === 0) return list;
-    // A child's events plus whole-school events of that child's school.
-    return list.filter((e) =>
-      calendarChildIds.some((cid) => {
-        const c = allChildren.find((x) => x.id === cid);
-        return e.childIds.includes(cid) || (e.childIds.length === 0 && c?.schoolId === e.schoolId);
-      }),
-    );
+    // A child's events plus whole-school events.
+    return list.filter((e) => e.childIds.length === 0 || calendarChildIds.some((cid) => e.childIds.includes(cid)));
   }, [q.data, calendarChildIds]);
 
   const toggleChild = (id: string) =>
@@ -50,21 +48,16 @@ export default function Calendar() {
 
   // Agenda: today onward, grouped by day.
   const agenda = useMemo(() => {
-    const today = startOfDay(new Date()).getTime();
+    const today = q.data?.today ?? isoDate(new Date());
     const groups = new Map<string, { day: Date; items: SchoolEvent[] }>();
     for (const e of filtered) {
-      const start = startOfDay(new Date(e.start));
-      const end = startOfDay(new Date(e.end));
-      if (end.getTime() < today) continue;
-      const day = start.getTime() < today ? new Date(today) : start;
-      const key = day.toDateString();
-      if (!groups.has(key)) groups.set(key, { day, items: [] });
+      if ((e.endDate ?? e.date) < today) continue;
+      const key = e.date < today ? today : e.date;
+      if (!groups.has(key)) groups.set(key, { day: fromIsoDate(key), items: [] });
       groups.get(key)!.items.push(e);
     }
-    return [...groups.values()].sort((a, b) => a.day.getTime() - b.day.getTime());
-  }, [filtered]);
-
-  const showSchool = schoolFilter === 'all';
+    return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, g]) => g);
+  }, [filtered, q.data?.today]);
 
   return (
     <Screen refreshing={q.isRefetching} onRefresh={() => void q.refetch()}>
@@ -92,7 +85,6 @@ export default function Calendar() {
               label={c.firstName}
               selected={calendarChildIds.includes(c.id)}
               onPress={() => toggleChild(c.id)}
-              dotColor={schoolColors(c.schoolId, scheme).tint}
             />
           ))}
         </ChipRow>
@@ -114,7 +106,7 @@ export default function Calendar() {
                     {g.items.map((e, i) => (
                       <View key={e.id}>
                         {i > 0 && <Separator />}
-                        <EventRow event={e} showSchool={showSchool} onPress={() => open(`event/${e.id}`)} />
+                        <EventRow event={e} onPress={() => open(`event/${e.id}`)} />
                       </View>
                     ))}
                   </Group>
@@ -128,7 +120,7 @@ export default function Calendar() {
               selected={selected}
               onSelect={setSelected}
               events={filtered}
-              showSchool={showSchool}
+             
               onOpen={(id) => open(`event/${id}`)}
             />
           )
@@ -144,7 +136,6 @@ function MonthView({
   selected,
   onSelect,
   events,
-  showSchool,
   onOpen,
 }: {
   month: Date;
@@ -152,10 +143,9 @@ function MonthView({
   selected: Date;
   onSelect: (d: Date) => void;
   events: SchoolEvent[];
-  showSchool: boolean;
   onOpen: (id: string) => void;
 }) {
-  const { colors, scheme } = useAppTheme();
+  const { colors } = useAppTheme();
   const first = new Date(month.getFullYear(), month.getMonth(), 1);
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const cells: (Date | null)[] = [...Array<null>(first.getDay()).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => new Date(month.getFullYear(), month.getMonth(), i + 1))];
@@ -191,7 +181,7 @@ function MonthView({
           const evs = events.filter((e) => onDay(e, d));
           const isSel = sameDay(d, selected);
           const isToday = sameDay(d, today);
-          const schoolIds = [...new Set(evs.map((e) => e.schoolId))].slice(0, 3);
+          const dotColors = [...new Set(evs.map((e) => e.calendar.color || colors.tint))].slice(0, 3);
           return (
             <Pressable
               key={i}
@@ -206,8 +196,8 @@ function MonthView({
                 </Text>
               </View>
               <View style={s.dots}>
-                {schoolIds.map((sid) => (
-                  <View key={sid} style={[s.dot, { backgroundColor: schoolColors(sid, scheme).tint }]} />
+                {dotColors.map((c) => (
+                  <View key={c} style={[s.dot, { backgroundColor: c }]} />
                 ))}
               </View>
             </Pressable>
@@ -226,7 +216,7 @@ function MonthView({
             {dayEvents.map((e, i) => (
               <View key={e.id}>
                 {i > 0 && <Separator />}
-                <EventRow event={e} showSchool={showSchool} onPress={() => onOpen(e.id)} />
+                <EventRow event={e} onPress={() => onOpen(e.id)} />
               </View>
             ))}
           </Group>

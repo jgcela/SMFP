@@ -9,10 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.smfp.stmary",
-      "supportsTablet": false,
-      "infoPlist": {
-        "NSFaceIDUsageDescription": "Use Face ID to unlock the St. Mary portal."
-      }
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {

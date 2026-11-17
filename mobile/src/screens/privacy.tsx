@@ -6,15 +6,11 @@ import { spacing } from '@/theme/tokens';
 const ITEMS: { title: string; body: string }[] = [
   {
     title: 'Your sign-in',
-    body: "Your session is kept in the phone's secure storage (the iOS Keychain or Android's encrypted storage). Signing out removes it.",
+    body: "In the app, your session is kept in the phone's secure storage (the iOS Keychain or Android's encrypted storage). On the web it is a secure cookie. Signing out removes it.",
   },
   {
     title: 'What is saved on this phone',
-    body: "Only recent announcements and calendar events, so you can read them without a connection. Your children's details, requests and documents are loaded each time and are not saved.",
-  },
-  {
-    title: 'Notifications',
-    body: "Lock-screen notifications show only the school and the kind of update, never your child's name.",
+    body: "Only your session and which announcements you have read. Everything else is loaded from the school portal each time you open the app.",
   },
   {
     title: 'The assistant',
@@ -38,7 +34,7 @@ export default function Privacy() {
             </Group>
           </Section>
         ))}
-        <Section footer="Prototype: the app's final privacy policy will be linked here." >
+        <Section>
           <Text variant="footnote" tone="secondary">
             This portal is operated for St. Mary Catholic Virtue School.
           </Text>

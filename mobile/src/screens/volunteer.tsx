@@ -1,52 +1,47 @@
 import { Stack } from 'expo-router';
-import { useState } from 'react';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 
-import { Button, Group, haptic, Screen, Section, Tag, Text } from '@/components/primitives';
+import { Markdown } from '@/components/markdown';
+import { Button, Group, Screen, Section, Tag, Text } from '@/components/primitives';
 import { EmptyState, QueryView } from '@/components/states';
-import { dayLabel, time } from '@/lib/dates';
-import { schoolById } from '@/lib/lookup';
 import { useVolunteer } from '@/services/queries';
 import { spacing } from '@/theme/tokens';
-import { schoolColors, useAppTheme } from '@/theme/use-app-theme';
+import { useAppTheme } from '@/theme/use-app-theme';
 
 export default function Volunteer() {
   const q = useVolunteer();
-  const { scheme } = useAppTheme();
-  const [joined, setJoined] = useState<Set<string>>(new Set());
+  const { colors } = useAppTheme();
   return (
     <>
       <Stack.Screen options={{ title: 'Volunteer' }} />
-      <Screen>
+      <Screen refreshing={q.isRefetching} onRefresh={() => void q.refetch()}>
         <QueryView query={q} skeletonRows={3}>
           {(items) =>
             items.length === 0 ? (
-              <EmptyState icon="volunteer" title="No open opportunities right now." body="Check back soon. Your school posts new ones during the year." />
+              <EmptyState icon="volunteer" title="No open opportunities right now." body="Check back soon. The school posts new ones during the year." />
             ) : (
               items.map((v) => {
-                const d = new Date(v.date);
-                const isJoined = joined.has(v.id);
+                const meta = [v.schedule, v.location, v.commitment].filter(Boolean).join(' · ');
                 return (
                   <Section key={v.id}>
                     <Group style={{ padding: spacing.lg, gap: spacing.sm }}>
                       <Text variant="headline">{v.title}</Text>
-                      <Text variant="subhead" tone="secondary">
-                        {dayLabel(d)}, {time(d)} · {v.spotsLeft} spot{v.spotsLeft === 1 ? '' : 's'} left
-                      </Text>
-                      <Tag label={schoolById(v.schoolId)?.shortName ?? ''} color={schoolColors(v.schoolId, scheme).tint} />
-                      <Text variant="body">{v.description}</Text>
-                      <View style={{ marginTop: spacing.xs }}>
-                        <Button
-                          label={isJoined ? "You're signed up" : 'Sign up'}
-                          variant={isJoined ? 'secondary' : 'primary'}
-                          icon={isJoined ? 'check' : undefined}
-                          disabled={isJoined}
-                          onPress={() => {
-                            haptic('success');
-                            setJoined(new Set([...joined, v.id]));
-                          }}
-                        />
+                      {meta ? (
+                        <Text variant="subhead" tone="secondary">
+                          {meta}
+                        </Text>
+                      ) : null}
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                        {v.category ? <Tag label={v.category} color={colors.tint} /> : null}
+                        {v.organizer ? <Tag label={`Organizer: ${v.organizer}`} color={colors.accent} /> : null}
                       </View>
+                      {v.summary ? <Text variant="body">{v.summary}</Text> : null}
+                      {v.body ? <Markdown text={v.body} /> : null}
+                      {v.actions.map((a) => (
+                        <View key={a.url} style={{ marginTop: spacing.xs }}>
+                          <Button label={a.label} variant="secondary" icon="link" onPress={() => void Linking.openURL(a.url)} />
+                        </View>
+                      ))}
                     </Group>
                   </Section>
                 );

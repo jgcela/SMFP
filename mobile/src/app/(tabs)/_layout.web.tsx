@@ -10,7 +10,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from '@/components/icon';
 import { Text } from '@/components/primitives';
-import { schools } from '@/data/sample';
 import { useAnnouncements } from '@/services/queries';
 import { useAppState } from '@/state/app-state';
 import { spacing } from '@/theme/tokens';
@@ -77,10 +76,10 @@ export default function TabsLayout() {
   const wide = width >= WIDE_BREAKPOINT;
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
-  const { askAvailable, readIds } = useAppState();
+  const { askAvailable, readIds, family } = useAppState();
   const announcements = useAnnouncements();
   const unread = (announcements.data ?? []).filter((a) => !readIds.has(a.id)).length;
-  const school = schools[0]!;
+  const school = { name: family?.school.name ?? 'St. Mary', primary: family?.school.primary || '#16335B', accent: family?.school.accent || '#FCBC40' };
 
   const triggers = TABS.map((t) => (
     <TabTrigger key={t.name} name={t.name} href={t.href} asChild>

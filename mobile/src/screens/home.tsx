@@ -1,46 +1,54 @@
 import { router, Stack } from 'expo-router';
 import { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { AnnouncementRow, ChildChip, EventRow, QuickAction } from '@/components/family-ui';
-import { Icon } from '@/components/icon';
 import { Group, Screen, Section, Separator, Text } from '@/components/primitives';
 import { EmptyState, QueryView } from '@/components/states';
-import { daysBetween, greeting, isoDate } from '@/lib/dates';
+import { addDaysIso, greeting, isoDate } from '@/lib/dates';
 import { useOpen } from '@/lib/nav';
 import { useAbsences, useAnnouncements, useEvents, useFamily } from '@/services/queries';
 import { useAppState } from '@/state/app-state';
-import { spacing, touchTarget } from '@/theme/tokens';
-import { useAppTheme } from '@/theme/use-app-theme';
+import { spacing } from '@/theme/tokens';
 
 export default function Home() {
-  const { colors } = useAppTheme();
-  const { schoolFilter, readIds, askAvailable } = useAppState();
+  const { readIds, askAvailable } = useAppState();
   const open = useOpen();
   const family = useFamily();
   const events = useEvents();
   const announcements = useAnnouncements();
   const absences = useAbsences();
 
-  const now = new Date();
+  const features = family.data?.features;
+  const todayIso = events.data?.today ?? isoDate(new Date());
   const { today, week } = useMemo(() => {
-    const list = (events.data ?? []).filter((e) => !e.cancelled || daysBetween(now, new Date(e.start)) >= 0);
+    const list = events.data?.events ?? [];
+    const weekEnd = addDaysIso(todayIso, 7);
     return {
-      today: list.filter((e) => daysBetween(now, new Date(e.start)) <= 0 && daysBetween(now, new Date(e.end)) >= 0),
-      week: list.filter((e) => {
-        const d = daysBetween(now, new Date(e.start));
-        return d >= 1 && d <= 7;
-      }),
+      today: list.filter((e) => e.date <= todayIso && (e.endDate ?? e.date) >= todayIso),
+      week: list.filter((e) => e.date > todayIso && e.date <= weekEnd),
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [events.data]);
+  }, [events.data, todayIso]);
 
   const important = (announcements.data ?? []).find((a) => a.important && !readIds.has(a.id));
-  const kids = (family.data?.children ?? []).filter((c) => schoolFilter === 'all' || c.schoolId === schoolFilter);
-  const todayIso = isoDate(now);
-  const absentToday = new Set((absences.data ?? []).filter((a) => a.status !== 'cancelled' && a.dateFrom <= todayIso && a.dateTo >= todayIso).map((a) => a.childId));
+  const kids = family.data?.children ?? [];
+  const absentToday = new Set(
+    (absences.data ?? []).filter((a) => a.status !== 'cancelled' && a.status !== 'rejected' && a.dateFrom <= todayIso && (a.dateTo ?? a.dateFrom) >= todayIso).map((a) => a.childId),
+  );
+  const firstName = family.data?.user.name.split(' ')[0] ?? '';
+
+  const actions = [
+    features?.absences && { icon: 'absence' as const, label: 'Report absence', onPress: () => router.push('/report-absence') },
+    askAvailable && { icon: 'ask' as const, label: 'Ask a question', onPress: () => router.push('/ask') },
+    features?.calendar && !askAvailable && { icon: 'calendar' as const, label: 'Calendar', onPress: () => router.push('/calendar') },
+    features?.documents && { icon: 'document' as const, label: 'Documents', onPress: () => router.push('/family/documents') },
+    { icon: 'phone' as const, label: 'Contact school', onPress: () => router.push('/family/contact') },
+    features?.requests && { icon: 'mail' as const, label: 'Ask the office', onPress: () => router.push('/new-request') },
+    features?.volunteer && { icon: 'volunteer' as const, label: 'Volunteer', onPress: () => router.push('/family/volunteer') },
+  ].filter((a): a is { icon: 'absence' | 'ask' | 'calendar' | 'document' | 'phone' | 'mail' | 'volunteer'; label: string; onPress: () => void } => !!a);
 
   const refresh = () => {
+    void family.refetch();
     void events.refetch();
     void announcements.refetch();
     void absences.refetch();
@@ -50,24 +58,14 @@ export default function Home() {
     <>
       <Stack.Screen
         options={{
-          title: `${greeting()}, ${family.data?.greetingName ?? ''}`.trim(),
-          headerRight: () => (
-            <Pressable
-              onPress={() => open('notifications')}
-              accessibilityRole="button"
-              accessibilityLabel="Notifications"
-              hitSlop={8}
-              style={{ minWidth: touchTarget, minHeight: touchTarget, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="bell" color={colors.tint} />
-            </Pressable>
-          ),
+          title: firstName ? `${greeting()}, ${firstName}` : greeting(),
         }}
       />
       <Screen refreshing={events.isRefetching} onRefresh={refresh}>
         {important && (
           <Section>
             <Group>
-              <AnnouncementRow item={important} showSchool={schoolFilter === 'all'} onPress={() => open(`announcement/${important.id}`)} />
+              <AnnouncementRow item={important} onPress={() => open(`announcement/${important.id}`)} />
             </Group>
           </Section>
         )}
@@ -77,7 +75,9 @@ export default function Home() {
             {() =>
               kids.length === 0 ? (
                 <Text variant="subhead" tone="secondary">
-                  No children are linked to your account at this school. Contact the office to link them.
+                  {family.data?.childrenError
+                    ? "We couldn't load your children's records right now. Try again later."
+                    : 'No children are linked to your account yet. Contact the office to link them.'}
                 </Text>
               ) : kids.length === 1 ? (
                 <ChildChip wide child={kids[0]!} indicator={absentToday.has(kids[0]!.id) ? 'Absence reported today' : undefined} onPress={() => open(`child/${kids[0]!.id}`)} />
@@ -92,6 +92,8 @@ export default function Home() {
           </QueryView>
         </Section>
 
+        {features?.calendar ? (
+        <>
         <Section title="Today">
           <QueryView query={events} skeletonRows={2}>
             {() =>
@@ -106,7 +108,7 @@ export default function Home() {
                   {today.map((e, i) => (
                     <View key={e.id}>
                       {i > 0 && <Separator />}
-                      <EventRow event={e} showSchool={schoolFilter === 'all'} onPress={() => open(`event/${e.id}`)} />
+                      <EventRow event={e} onPress={() => open(`event/${e.id}`)} />
                     </View>
                   ))}
                 </Group>
@@ -127,7 +129,7 @@ export default function Home() {
                   {week.slice(0, 5).map((e, i) => (
                     <View key={e.id}>
                       {i > 0 && <Separator />}
-                      <EventRow event={e} showSchool={schoolFilter === 'all'} onPress={() => open(`event/${e.id}`)} />
+                      <EventRow event={e} onPress={() => open(`event/${e.id}`)} />
                     </View>
                   ))}
                 </Group>
@@ -135,26 +137,30 @@ export default function Home() {
             }
           </QueryView>
         </Section>
+        </>
+        ) : null}
 
         <Section title="Quick actions">
-          <View style={s.grid}>
-            <QuickAction icon="absence" label="Report absence" onPress={() => router.push('/report-absence')} />
-            {askAvailable ? (
-              <QuickAction icon="ask" label="Ask a question" onPress={() => router.push('/ask')} />
-            ) : (
-              <QuickAction icon="calendar" label="Calendar" onPress={() => router.push('/calendar')} />
-            )}
-            <QuickAction icon="document" label="Documents" onPress={() => router.push('/family/documents')} />
-          </View>
-          <View style={[s.grid, { marginTop: spacing.sm }]}>
-            <QuickAction icon="phone" label="Contact school" onPress={() => router.push('/family/contact')} />
-            <QuickAction icon="mail" label="Ask the office" onPress={() => router.push('/new-request')} />
-            <QuickAction icon="volunteer" label="Volunteer" onPress={() => router.push('/family/volunteer')} />
-          </View>
+          {chunk(actions, 3).map((row, i) => (
+            <View key={i} style={[s.grid, i > 0 && { marginTop: spacing.sm }]}>
+              {row.map((a) => (
+                <QuickAction key={a.label} icon={a.icon} label={a.label} onPress={a.onPress} />
+              ))}
+              {Array.from({ length: 3 - row.length }, (_, k) => (
+                <View key={`pad-${k}`} style={{ flex: 1 }} />
+              ))}
+            </View>
+          ))}
         </Section>
       </Screen>
     </>
   );
+}
+
+function chunk<T>(list: T[], n: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < list.length; i += n) out.push(list.slice(i, i + n));
+  return out;
 }
 
 const s = StyleSheet.create({

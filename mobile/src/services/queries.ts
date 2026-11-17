@@ -2,93 +2,69 @@
 // live here so screens only render.
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
 
+import type { CommunityKind } from '@/data/types';
 import { useAppState } from '@/state/app-state';
 
-import { api } from './api';
-import type { AskContext } from './assistant';
+import { api, type AbsenceInput, type RequestInput } from './api';
 
 export const keys = {
-  family: ['family'] as const,
-  events: ['events'] as const,
-  event: (id: string) => ['events', id] as const,
+  me: ['me'] as const,
+  events: (range?: { from: string; to: string }) => (range ? (['events', range.from, range.to] as const) : (['events'] as const)),
+  event: (id: string) => ['event', id] as const,
   announcements: ['announcements'] as const,
   announcement: (id: string) => ['announcements', id] as const,
   documents: ['documents'] as const,
-  document: (id: string) => ['documents', id] as const,
   requests: ['requests'] as const,
   request: (id: string) => ['requests', id] as const,
   absences: ['absences'] as const,
-  absence: (id: string) => ['absences', id] as const,
   volunteer: ['volunteer'] as const,
-  wishlists: ['wishlists'] as const,
+  community: (kind: CommunityKind) => ['community', kind] as const,
   links: ['links'] as const,
-  notifications: ['notifications'] as const,
   conversations: ['conversations'] as const,
   conversation: (id: string) => ['conversations', id] as const,
 };
 
-/** Keeps only items of the selected school ("All schools" keeps everything). */
-function useBySchool<T extends { schoolId: string }>(items: T[] | undefined): T[] | undefined {
-  const { schoolFilter } = useAppState();
-  return useMemo(() => (items && schoolFilter !== 'all' ? items.filter((i) => i.schoolId === schoolFilter) : items), [items, schoolFilter]);
-}
-
-function withFilter<T extends { schoolId: string }, Q extends { data: T[] | undefined }>(q: Q, data: T[] | undefined): Q {
-  return { ...q, data } as Q;
-}
-
+/** The signed-in family: school, children and which features the school turned on. */
 export function useFamily() {
-  return useQuery({ queryKey: keys.family, queryFn: api.family, staleTime: 10 * 60_000 });
+  const { family } = useAppState();
+  return useQuery({ queryKey: keys.me, queryFn: api.me, initialData: family ?? undefined, staleTime: 5 * 60_000 });
 }
 
-export function useEvents() {
-  const q = useQuery({ queryKey: keys.events, queryFn: api.events });
-  return withFilter(q, useBySchool(q.data));
-}
+export const useEvents = (range?: { from: string; to: string }) => {
+  const { family } = useAppState();
+  return useQuery({ queryKey: keys.events(range), queryFn: () => api.events(range), enabled: !!family?.features.calendar });
+};
 export const useEvent = (id: string) => useQuery({ queryKey: keys.event(id), queryFn: () => api.event(id) });
 
-export function useAnnouncements() {
-  const q = useQuery({ queryKey: keys.announcements, queryFn: api.announcements });
-  return withFilter(q, useBySchool(q.data));
-}
+export const useAnnouncements = () => {
+  const { family } = useAppState();
+  return useQuery({ queryKey: keys.announcements, queryFn: api.announcements, enabled: !!family?.features.announcements });
+};
 export const useAnnouncement = (id: string) => useQuery({ queryKey: keys.announcement(id), queryFn: () => api.announcement(id) });
 
-export function useDocuments() {
-  const q = useQuery({ queryKey: keys.documents, queryFn: api.documents });
-  return withFilter(q, useBySchool(q.data));
-}
-export const useDocument = (id: string) => useQuery({ queryKey: keys.document(id), queryFn: () => api.document(id) });
+export const useDocuments = () => useQuery({ queryKey: keys.documents, queryFn: api.documents });
 
-export function useRequests() {
-  const q = useQuery({ queryKey: keys.requests, queryFn: api.requests });
-  return withFilter(q, useBySchool(q.data));
-}
+export const useRequests = () => {
+  const { family } = useAppState();
+  return useQuery({ queryKey: keys.requests, queryFn: api.requests, enabled: !!family?.features.requests });
+};
 export const useRequest = (id: string) => useQuery({ queryKey: keys.request(id), queryFn: () => api.request(id) });
 
-export function useAbsences() {
-  const q = useQuery({ queryKey: keys.absences, queryFn: api.absences });
-  return withFilter(q, useBySchool(q.data));
+export const useAbsences = () => {
+  const { family } = useAppState();
+  return useQuery({ queryKey: keys.absences, queryFn: api.absences, enabled: !!family?.features.absences });
+};
+/** One notice, read from the family's list (there is no separate endpoint). */
+export function useAbsence(id: string) {
+  const q = useAbsences();
+  const found = q.data?.find((a) => a.id === id);
+  return { ...q, data: q.data ? found : undefined, notFound: !!q.data && !found };
 }
-export const useAbsence = (id: string) => useQuery({ queryKey: keys.absence(id), queryFn: () => api.absence(id) });
 
-export function useVolunteer() {
-  const q = useQuery({ queryKey: keys.volunteer, queryFn: api.volunteer });
-  return withFilter(q, useBySchool(q.data));
-}
-export function useWishlists() {
-  const q = useQuery({ queryKey: keys.wishlists, queryFn: api.wishlists });
-  return withFilter(q, useBySchool(q.data));
-}
-export function useLinks() {
-  const q = useQuery({ queryKey: keys.links, queryFn: api.links });
-  return withFilter(q, useBySchool(q.data));
-}
-export function useNotifications() {
-  const q = useQuery({ queryKey: keys.notifications, queryFn: api.notifications });
-  return withFilter(q, useBySchool(q.data));
-}
+export const useVolunteer = () => useQuery({ queryKey: keys.volunteer, queryFn: api.volunteer });
+export const useCommunity = (kind: CommunityKind) => useQuery({ queryKey: keys.community(kind), queryFn: () => api.community(kind) });
+export const useLinks = () => useQuery({ queryKey: keys.links, queryFn: api.links });
 
 export const useConversations = () => useQuery({ queryKey: keys.conversations, queryFn: api.conversations });
 export const useConversation = (id: string | null) =>
@@ -98,17 +74,29 @@ export const useConversation = (id: string | null) =>
 
 export function useSubmitAbsence() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: api.submitAbsence, onSuccess: () => qc.invalidateQueries({ queryKey: keys.absences }) });
+  return useMutation({
+    mutationFn: (v: AbsenceInput & { idempotencyKey: string }) => api.submitAbsence(v),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: keys.absences });
+      void qc.invalidateQueries({ queryKey: keys.requests });
+    },
+  });
 }
 
 export function useCancelAbsence() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: api.cancelAbsence, onSuccess: () => qc.invalidateQueries({ queryKey: keys.absences }) });
+  return useMutation({
+    mutationFn: api.cancelAbsence,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: keys.absences });
+      void qc.invalidateQueries({ queryKey: keys.requests });
+    },
+  });
 }
 
 export function useCreateRequest() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: api.createRequest, onSuccess: () => qc.invalidateQueries({ queryKey: keys.requests }) });
+  return useMutation({ mutationFn: (v: RequestInput) => api.createRequest(v), onSuccess: () => qc.invalidateQueries({ queryKey: keys.requests }) });
 }
 
 export function useReplyToRequest(id: string) {
@@ -116,24 +104,33 @@ export function useReplyToRequest(id: string) {
   return useMutation({ mutationFn: (body: string) => api.replyToRequest(id, body), onSuccess: () => qc.invalidateQueries({ queryKey: keys.requests }) });
 }
 
+export function useCancelRequest(id: string) {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: () => api.cancelRequest(id), onSuccess: () => qc.invalidateQueries({ queryKey: keys.requests }) });
+}
+
 export function useAsk() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (v: { conversationId: string | null; text: string; context?: AskContext }) => api.ask(v.conversationId, v.text, v.context),
+    mutationFn: async (v: { conversationId: string | null; text: string }) => {
+      const r = await api.ask(v.conversationId, v.text);
+      return api.conversation(r.conversationId);
+    },
     onSuccess: (convo) => {
-      qc.setQueryData(keys.conversation(convo.id), convo);
+      qc.setQueryData(keys.conversation(convo.conversation.id), convo);
       void qc.invalidateQueries({ queryKey: keys.conversations, exact: true });
     },
   });
 }
 
-export function useResolveDraft() {
+export function useDecideAction(conversationId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (v: { conversationId: string; messageId: string; action: 'send' | 'discard' }) => api.resolveDraft(v.conversationId, v.messageId, v.action),
-    onSuccess: (convo) => {
-      qc.setQueryData(keys.conversation(convo.id), convo);
+    mutationFn: (v: { actionId: string; decision: 'confirm' | 'dismiss' }) => api.decideAction(v.actionId, v.decision),
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: keys.conversation(conversationId) });
       void qc.invalidateQueries({ queryKey: keys.absences });
+      void qc.invalidateQueries({ queryKey: keys.requests });
     },
   });
 }

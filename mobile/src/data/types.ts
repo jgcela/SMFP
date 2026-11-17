@@ -1,158 +1,211 @@
-// Data contracts for the mobile app. In the prototype they are filled with
-// sample data (src/data/sample.ts). In Phase 4 the same shapes come from the
-// mobile API, so screens do not change.
-
-export type Plan = 'essential' | 'smart' | 'autonomous';
+// Data contracts for the app. They mirror the portal's app API
+// (/api/app/v1, src/server/app-api in the repo root), so screens render
+// exactly what the server sends.
 
 export type School = {
-  id: string;
+  /** The school's web portal path, e.g. /s/stmary. */
+  portalPath: string;
   name: string;
   shortName: string;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  officeHours: string | null;
+  websiteUrl: string | null;
+  timezone: string;
   primary: string;
   accent: string;
-  radius: 'sharp' | 'soft' | 'round';
-  plan: Plan;
-  /** The school turned on the family assistant (only counts on plans with AI). */
-  assistantEnabled: boolean;
-  phone: string;
-  email: string;
-  address: string;
-  officeHours: string;
-  attendanceContact: string;
 };
 
 export type Child = {
+  /** Stable key from the student records (e.g. "manual:<id>" or "facts:<id>"). */
   id: string;
+  name: string;
   firstName: string;
-  lastName: string;
-  grade: string;
-  schoolId: string;
+  grade: string | null;
+  gradeId: string | null;
   canReportAbsence: boolean;
 };
 
+export type Features = {
+  calendar: boolean;
+  announcements: boolean;
+  documents: boolean;
+  absences: boolean;
+  requests: boolean;
+  volunteer: boolean;
+  community: boolean;
+  links: boolean;
+  ask: boolean;
+};
+
+export type Family = {
+  user: { name: string; email: string };
+  school: School;
+  children: Child[];
+  /** Set when the student records could not be read; children is then empty. */
+  childrenError: string | null;
+  features: Features;
+};
+
 export type SchoolEvent = {
+  /** `${eventId}_${date}`: one occurrence of a (possibly repeating) event. */
   id: string;
-  schoolId: string;
+  eventId: string;
   title: string;
-  /** ISO date-time; for all-day events, the day at 00:00 local time. */
-  start: string;
-  end: string;
+  /** School-local date, YYYY-MM-DD. */
+  date: string;
+  endDate: string | null;
   allDay: boolean;
-  location?: string;
+  /** ISO date-time for timed events. */
+  start: string | null;
+  end: string | null;
+  location: string | null;
+  description: string | null;
+  category: string | null;
+  important: boolean;
+  registrationUrl: string | null;
+  calendar: { name: string; color: string | null };
   /** Children this event is for; empty means the whole school. */
   childIds: string[];
-  category: 'event' | 'no-school' | 'early-dismissal' | 'trip' | 'mass' | 'meeting';
-  description: string;
-  cancelled?: boolean;
-  links?: { title: string; url: string }[];
 };
 
 export type Announcement = {
   id: string;
-  schoolId: string;
   title: string;
+  summary: string | null;
   body: string;
-  publishedAt: string;
   important: boolean;
-  attachmentIds: string[];
+  pinned: boolean;
+  publishedAt: string;
 };
 
 export type SchoolDocument = {
+  /** The document's slug. */
   id: string;
-  schoolId: string;
   title: string;
   category: string;
+  description: string | null;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
   updatedAt: string;
-  pages: number;
-  excerpt: string;
 };
 
-export type RequestMessage = { from: 'family' | 'school'; author: string; body: string; at: string };
+export type RequestKind = 'attendance' | 'question' | 'request';
+export type RequestStatus = 'new' | 'in_progress' | 'waiting' | 'resolved' | 'cancelled';
 
-export type RequestStatus = 'received' | 'in_review' | 'answered' | 'closed';
-
-export type OfficeRequest = {
+export type OfficeRequestSummary = {
   id: string;
-  schoolId: string;
-  childId?: string;
-  type: 'General question' | 'Pickup change' | 'Records request' | 'Other';
+  number: number;
+  kind: RequestKind;
   subject: string;
   status: RequestStatus;
+  noticeStatus: AbsenceStatus | null;
+  student: string | null;
   createdAt: string;
-  messages: RequestMessage[];
+  updatedAt: string;
 };
 
-export type AbsenceType = 'absent' | 'late' | 'early_pickup';
-export type AbsenceStatus = 'received' | 'in_review' | 'recorded' | 'cancelled';
+export type RequestEvent = {
+  kind: 'created' | 'status' | 'assigned' | 'priority' | 'note' | 'reply' | 'escalated' | 'automation';
+  body: string | null;
+  toValue: string | null;
+  /** 'family', 'staff' or 'system'. */
+  actorKind: string;
+  createdAt: string;
+};
+
+export type OfficeRequest = {
+  item: { id: string; number: number; kind: RequestKind; subject: string; body: string; status: RequestStatus; createdAt: string };
+  events: RequestEvent[];
+  student: string | null;
+  notice: {
+    id: string;
+    type: AbsenceType;
+    dateFrom: string;
+    dateTo: string | null;
+    time: string | null;
+    reason: AbsenceReason;
+    comment: string | null;
+    status: AbsenceStatus;
+    reviewNote: string | null;
+  } | null;
+};
+
+export type AbsenceType = 'absent' | 'late' | 'early_dismissal';
+export type AbsenceReason = 'illness' | 'medical_appointment' | 'family' | 'other';
+export type AbsenceStatus =
+  | 'draft'
+  | 'submitted'
+  | 'received'
+  | 'pending_review'
+  | 'approved'
+  | 'rejected'
+  | 'sis_sync_pending'
+  | 'sis_synced'
+  | 'sync_failed'
+  | 'cancelled';
 
 export type AbsenceNotice = {
   id: string;
-  schoolId: string;
+  requestId: string | null;
+  number: number | null;
   childId: string;
+  childName: string;
   type: AbsenceType;
   dateFrom: string;
-  dateTo: string;
-  time?: string;
-  reason: string;
+  dateTo: string | null;
+  time: string | null;
+  reason: AbsenceReason;
+  comment: string | null;
   status: AbsenceStatus;
+  reviewNote: string | null;
   createdAt: string;
 };
 
 export type VolunteerOpportunity = {
   id: string;
-  schoolId: string;
   title: string;
-  date: string;
-  spotsLeft: number;
-  description: string;
+  category: string | null;
+  organizer: string | null;
+  location: string | null;
+  schedule: string | null;
+  commitment: string | null;
+  summary: string | null;
+  body: string | null;
+  actions: { label: string; url: string }[];
 };
 
-export type Wishlist = { id: string; schoolId: string; name: string; role: string; items: string[] };
+export type CommunityKind = 'favorites' | 'wishlist';
+export type CommunityItem = { id: string; group: string | null; name: string; role: string | null; url: string | null; details: { label: string; value: string }[] };
 
-export type QuickLink = { id: string; schoolId: string; title: string; description: string; url: string };
+export type QuickLink = { id: string; title: string; description: string | null; url: string };
 
-export type AppNotification = {
+// ---------- Family assistant ----------
+
+export type AssistantCard =
+  | { kind: 'source'; title: string; section: string | null; url: string | null; quote: string }
+  | { kind: 'request'; id: string; number: number; subject: string; status: string }
+  | { kind: 'action'; actionId: string };
+
+export type AssistantMessage = { id: string; role: 'user' | 'assistant'; content: string; cards: AssistantCard[]; createdAt: string };
+
+export type AssistantAction = {
   id: string;
-  schoolId: string;
-  kind: 'announcement' | 'urgent' | 'absence' | 'request' | 'calendar';
-  /** Lock-screen text: school and kind only, never a child's name. */
-  title: string;
-  at: string;
-  target: { type: 'announcement' | 'absence' | 'request' | 'event'; id: string };
+  kind: 'absence_notice' | 'office_request';
+  summary: string;
+  status: 'proposed' | 'confirmed' | 'dismissed' | 'failed';
+  /** What was created ("R-1042") or why it failed. */
+  result: string | null;
+  expired: boolean;
+  createdAt: string;
 };
 
-export type Source =
-  | { type: 'event'; id: string; title: string }
-  | { type: 'announcement'; id: string; title: string }
-  | { type: 'document'; id: string; title: string }
-  | { type: 'contact'; id: string; title: string };
-
-export type AskDraft = {
-  kind: 'absence';
-  childId: string;
-  type: AbsenceType;
-  dateFrom: string;
-  reason: string;
-  state: 'pending' | 'sent' | 'discarded';
+export type Conversation = {
+  conversation: { id: string; title: string };
+  messages: AssistantMessage[];
+  actions: Record<string, AssistantAction>;
 };
 
-export type AskMessage =
-  | { id: string; role: 'user'; text: string; contextTitle?: string }
-  | {
-      id: string;
-      role: 'assistant';
-      status: 'verified' | 'not_found' | 'error';
-      text: string;
-      sources: Source[];
-      followUps: string[];
-      draft?: AskDraft;
-    };
-
-export type Conversation = { id: string; title: string; updatedAt: string; messages: AskMessage[] };
-
-export type Family = {
-  greetingName: string;
-  email: string;
-  schools: School[];
-  children: Child[];
-};
+export type ConversationSummary = { id: string; title: string; updatedAt: string };

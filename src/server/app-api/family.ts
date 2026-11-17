@@ -14,6 +14,7 @@ import { listMenuLinks } from '../services/links';
 import { listPublicVolunteer } from '../services/volunteer';
 import { listPublicCommunity, type CommunityKind } from '../services/community';
 import { familyAssistantAvailable } from '../services/family-assistant';
+import { getAssistantModel } from '../ai/assistant-model';
 import { getPrivateStorage, StorageNotConfiguredError } from '../storage/storage';
 import { ApiError, requireModule, type FamilyContext } from './context';
 
@@ -41,6 +42,8 @@ export async function me(c: FamilyContext) {
   return {
     user: { name: c.session.user.name, email: c.session.user.email },
     school: {
+      /** The school's web portal, e.g. /s/stmary (for links the app opens in the browser). */
+      portalPath: `/s/${c.tenant.slug}`,
       name: p.displayName,
       shortName: p.shortName ?? p.displayName,
       phone: p.phone,
@@ -62,7 +65,8 @@ export async function me(c: FamilyContext) {
       volunteer: c.modules.has('volunteer'),
       community: c.modules.has('community'),
       links: c.modules.has('quick_links'),
-      ask: await familyAssistantAvailable(c.tenant.id, c.viewer),
+      // On only when the school turned it on and the portal has an AI key.
+      ask: (await familyAssistantAvailable(c.tenant.id, c.viewer)) && getAssistantModel() !== null,
     },
   };
 }

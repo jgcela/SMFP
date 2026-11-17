@@ -4,13 +4,10 @@ import { View } from 'react-native';
 
 import { Group, Row, Screen, Section, Separator } from '@/components/primitives';
 import { EmptyState, QueryView } from '@/components/states';
-import { schoolById } from '@/lib/lookup';
 import { useLinks } from '@/services/queries';
-import { useAppState } from '@/state/app-state';
 
 export default function Links() {
   const q = useLinks();
-  const { schoolFilter } = useAppState();
   return (
     <>
       <Stack.Screen options={{ title: 'Quick links' }} />
@@ -30,7 +27,7 @@ export default function Links() {
                       <Row
                         icon="link"
                         title={l.title}
-                        subtitle={schoolFilter === 'all' ? `${l.description} · ${schoolById(l.schoolId)?.shortName}` : l.description}
+                        subtitle={l.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                         onPress={() => void WebBrowser.openBrowserAsync(l.url)}
                       />
                     </View>

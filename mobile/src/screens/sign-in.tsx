@@ -10,26 +10,25 @@ import { useAppTheme } from '@/theme/use-app-theme';
 
 export default function SignIn() {
   const { colors } = useAppTheme();
-  const { signIn, options } = useAppState();
-  const [email, setEmail] = useState('ana.rivera@example.com');
+  const { signIn } = useAppState();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [help, setHelp] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
+    if (busy) return;
     setBusy(true);
-    setTimeout(() => {
-      const r = signIn(email.trim(), password);
-      setBusy(false);
-      if (!r.ok) {
-        haptic('error');
-        setError(r.message);
-        return;
-      }
-      if (options.requireTwoStep) router.push('/two-step');
-    }, 500);
+    const r = await signIn(email.trim(), password);
+    setBusy(false);
+    if (!r.ok) {
+      haptic('error');
+      setError(r.message);
+      return;
+    }
+    if (r.twoStep) router.push('/two-step');
   };
 
   return (
@@ -59,17 +58,16 @@ export default function SignIn() {
           autoComplete="current-password"
           textContentType="password"
           returnKeyType="go"
-          onSubmitEditing={submit}
-          hint="Prototype: any password works. Type “wrong” to see the error."
+          onSubmitEditing={() => void submit()}
           error={error ?? undefined}
           trailing={<TextButton label={show ? 'Hide' : 'Show'} onPress={() => setShow((v) => !v)} />}
         />
-        <Button label="Sign in" onPress={submit} loading={busy} disabled={!email || !password} />
+        <Button label="Sign in" onPress={() => void submit()} loading={busy} disabled={!email || !password} />
         <View style={{ alignItems: 'center' }}>
           <TextButton label="Forgot your password?" onPress={() => setHelp((v) => !v)} />
           {help && (
             <Text variant="subhead" tone="secondary" style={{ textAlign: 'center' }}>
-              Contact your school office. They can send you a link to set a new password.
+              Contact the school office. They can send you a new invitation to set your password.
             </Text>
           )}
         </View>

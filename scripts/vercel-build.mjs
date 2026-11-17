@@ -15,4 +15,5 @@ if (process.env.VERCEL_ENV === 'production') {
 } else {
   console.log(`Skipping migrations (VERCEL_ENV=${process.env.VERCEL_ENV ?? 'unset'}).`);
 }
+run('node scripts/build-app-web.mjs');
 run('npx next build');

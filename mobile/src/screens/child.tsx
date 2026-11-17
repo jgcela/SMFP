@@ -4,16 +4,18 @@ import { View } from 'react-native';
 import { EventRow, Initial, StatusRow } from '@/components/family-ui';
 import { Button, Group, Row, Screen, Section, Separator, Text } from '@/components/primitives';
 import { EmptyState, QueryView } from '@/components/states';
-import { daysBetween } from '@/lib/dates';
-import { absenceStatusLabel, absenceTypeLabel, absenceWhen, childById, schoolById } from '@/lib/lookup';
+import { addDaysIso, isoDate } from '@/lib/dates';
+import { absenceStatusLabel, absenceTone, absenceTypeLabel, absenceWhen, childById } from '@/lib/lookup';
 import { useOpen } from '@/lib/nav';
 import { useAbsences, useEvents } from '@/services/queries';
+import { useAppState } from '@/state/app-state';
 import { spacing } from '@/theme/tokens';
 
 export default function ChildScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const open = useOpen();
-  const child = childById(id);
+  const { family } = useAppState();
+  const child = childById(family, id);
   const events = useEvents();
   const absences = useAbsences();
 
@@ -25,14 +27,13 @@ export default function ChildScreen() {
     );
   }
 
-  const school = schoolById(child.schoolId);
-  const now = new Date();
-  const upcoming = (events.data ?? [])
-    .filter((e) => e.schoolId === child.schoolId && (e.childIds.length === 0 || e.childIds.includes(child.id)))
-    .filter((e) => {
-      const d = daysBetween(now, new Date(e.start));
-      return d >= 0 && d <= 14;
-    });
+  const today = events.data?.today ?? isoDate(new Date());
+  const until = addDaysIso(today, 14);
+  const upcoming = (events.data?.events ?? [])
+    .filter((e) => e.childIds.length === 0 || e.childIds.includes(child.id))
+    .filter((e) => (e.endDate ?? e.date) >= today && e.date <= until);
+  const features = family?.features;
+  const linksOn = !!features?.links;
   const mine = (absences.data ?? []).filter((a) => a.childId === child.id);
 
   return (
@@ -42,19 +43,20 @@ export default function ChildScreen() {
         <View style={{ alignItems: 'center', gap: spacing.sm, marginTop: spacing.xl, paddingHorizontal: spacing.lg }}>
           <Initial child={child} size={72} />
           <Text variant="title" accessibilityRole="header">
-            {child.firstName} {child.lastName}
+            {child.name}
           </Text>
           <Text variant="subhead" tone="secondary">
-            {child.grade} · {school?.name}
+            {[child.grade, family?.school.name].filter(Boolean).join(' · ')}
           </Text>
         </View>
 
-        {child.canReportAbsence && (
+        {child.canReportAbsence && features?.absences && (
           <Section>
             <Button label="Report absence" icon="absence" onPress={() => router.push({ pathname: '/report-absence', params: { childId: child.id } })} />
           </Section>
         )}
 
+        {features?.calendar ? (
         <Section title="Coming up">
           <QueryView query={events} skeletonRows={2}>
             {() =>
@@ -67,7 +69,7 @@ export default function ChildScreen() {
                   {upcoming.map((e, i) => (
                     <View key={e.id}>
                       {i > 0 && <Separator />}
-                      <EventRow event={e} showSchool={false} onPress={() => open(`event/${e.id}`)} />
+                      <EventRow event={e} onPress={() => open(`event/${e.id}`)} />
                     </View>
                   ))}
                 </Group>
@@ -75,7 +77,9 @@ export default function ChildScreen() {
             }
           </QueryView>
         </Section>
+        ) : null}
 
+        {features?.absences ? (
         <Section title="Absences you reported">
           <QueryView query={absences} skeletonRows={1}>
             {() =>
@@ -93,7 +97,7 @@ export default function ChildScreen() {
                       <StatusRow
                         title={absenceTypeLabel[a.type]}
                         subtitle={absenceWhen(a)}
-                        status={a.status}
+                        tone={absenceTone(a.status)}
                         statusLabel={absenceStatusLabel[a.status]}
                         onPress={() => open(`absence/${a.id}`)}
                       />
@@ -104,12 +108,15 @@ export default function ChildScreen() {
             }
           </QueryView>
         </Section>
+        ) : null}
 
-        <Section footer={`Grades, homework and attendance history are kept in FACTS by ${school?.shortName ?? 'the school'}.`}>
-          <Group>
-            <Row icon="link" title="Open FACTS" onPress={() => router.push('/family/links')} />
-          </Group>
-        </Section>
+        {linksOn ? (
+          <Section footer={`Grades, homework and attendance history are kept in FACTS by ${family?.school.shortName ?? 'the school'}.`}>
+            <Group>
+              <Row icon="link" title="Quick links" subtitle="FACTS and other school sites" onPress={() => router.push('/family/links')} />
+            </Group>
+          </Section>
+        ) : null}
       </Screen>
     </>
   );

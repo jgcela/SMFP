@@ -8,6 +8,6 @@ next-env.d.ts
 coverage/
 .storage/
 .expo/
-# Expo web export copied into Next's public folder at build time
-public/app-web/
+# The family app's web export (scripts/build-app-web.mjs) is built into public/
+/public/
 .vercel/

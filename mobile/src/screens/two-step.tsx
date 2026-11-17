@@ -13,9 +13,13 @@ export default function TwoStep() {
   const [code, setCode] = useState('');
   const [backup, setBackup] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const submit = () => {
-    const r = verifyTwoStep(code);
+  const submit = async () => {
+    if (busy) return;
+    setBusy(true);
+    const r = await verifyTwoStep(code);
+    setBusy(false);
     if (!r.ok) {
       haptic('error');
       setError(r.message);
@@ -44,9 +48,9 @@ export default function TwoStep() {
           maxLength={backup ? 12 : 6}
           autoFocus
           error={error ?? undefined}
-          hint={backup ? undefined : 'Prototype: any 6 digits work except 000000.'}
+          onSubmitEditing={() => void submit()}
         />
-        <Button label="Verify" onPress={submit} disabled={code.length < 6} />
+        <Button label="Verify" onPress={() => void submit()} loading={busy} disabled={code.length < 6} />
         <TextButton
           label={backup ? 'Use the authenticator app instead' : 'Use a backup code'}
           onPress={() => {

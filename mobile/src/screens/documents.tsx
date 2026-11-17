@@ -6,21 +6,18 @@ import { Field } from '@/components/form';
 import { Group, Row, Screen, Section, Separator } from '@/components/primitives';
 import { EmptyState, QueryView } from '@/components/states';
 import { relative } from '@/lib/dates';
-import { schoolById } from '@/lib/lookup';
 import { useOpen } from '@/lib/nav';
 import { useDocuments } from '@/services/queries';
-import { useAppState } from '@/state/app-state';
 import { spacing } from '@/theme/tokens';
 
 export default function Documents() {
   const q = useDocuments();
   const open = useOpen();
-  const { schoolFilter } = useAppState();
   const [search, setSearch] = useState('');
 
   const groups = useMemo(() => {
     const term = search.trim().toLowerCase();
-    const list = (q.data ?? []).filter((d) => !term || `${d.title} ${d.category} ${d.excerpt}`.toLowerCase().includes(term));
+    const list = (q.data ?? []).filter((d) => !term || `${d.title} ${d.category} ${d.description ?? ''} ${d.fileName}`.toLowerCase().includes(term));
     const m = new Map<string, typeof list>();
     for (const d of list) m.set(d.category, [...(m.get(d.category) ?? []), d]);
     return [...m.entries()];
@@ -51,7 +48,7 @@ export default function Documents() {
                         <Row
                           icon="document"
                           title={d.title}
-                          subtitle={`${schoolFilter === 'all' ? `${schoolById(d.schoolId)?.shortName} · ` : ''}Updated ${relative(new Date(d.updatedAt)).toLowerCase()}`}
+                          subtitle={`Updated ${relative(new Date(d.updatedAt)).toLowerCase()}`}
                           onPress={() => open(`document/${d.id}`)}
                         />
                       </View>

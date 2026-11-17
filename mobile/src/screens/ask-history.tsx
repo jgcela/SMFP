@@ -13,7 +13,7 @@ export default function AskHistory() {
     <>
       <Stack.Screen options={{ title: 'History' }} />
       <Screen>
-        <Section footer="Your questions are private. School staff can't read them unless the school owner reviews them for quality, and that is recorded.">
+        <Section footer="Your questions are private to your account.">
           <QueryView query={q}>
             {(items) =>
               items.length === 0 ? (

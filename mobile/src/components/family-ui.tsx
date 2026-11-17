@@ -3,12 +3,12 @@
 
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import type { AbsenceStatus, Announcement, Child, RequestStatus, SchoolEvent, Source } from '@/data/types';
+import type { Announcement, AssistantCard, Child, SchoolEvent } from '@/data/types';
 import { relative, time } from '@/lib/dates';
-import { childById, eventAudience, schoolById } from '@/lib/lookup';
+import { childById, eventAudience, type StatusTone } from '@/lib/lookup';
 import { useAppState } from '@/state/app-state';
 import { spacing, touchTarget } from '@/theme/tokens';
-import { schoolColors, useAppTheme } from '@/theme/use-app-theme';
+import { useAppTheme } from '@/theme/use-app-theme';
 
 import { Icon, type IconName } from './icon';
 import { Tag, Text } from './primitives';
@@ -16,8 +16,8 @@ import { Tag, Text } from './primitives';
 // ---------- Children ----------
 
 export function Initial({ child, size = 44 }: { child: Child; size?: number }) {
-  const { scheme } = useAppTheme();
-  const { tint } = schoolColors(child.schoolId, scheme);
+  const { colors } = useAppTheme();
+  const tint = colors.tint;
   return (
     <View style={[s.initial, { width: size, height: size, borderRadius: size / 2, backgroundColor: tint }]}>
       <Text variant={size > 50 ? 'title' : 'headline'} style={{ color: '#FFFFFF' }}>
@@ -29,12 +29,11 @@ export function Initial({ child, size = 44 }: { child: Child; size?: number }) {
 
 export function ChildChip({ child, indicator, onPress, wide }: { child: Child; indicator?: string; onPress: () => void; wide?: boolean }) {
   const { colors, radius } = useAppTheme();
-  const school = schoolById(child.schoolId);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${child.firstName}, ${child.grade}, ${school?.shortName ?? ''}${indicator ? `, ${indicator}` : ''}`}
+      accessibilityLabel={`${child.firstName}${child.grade ? `, ${child.grade}` : ''}${indicator ? `, ${indicator}` : ''}`}
       style={({ pressed }) => [
         s.childChip,
         { backgroundColor: colors.surface, borderRadius: radius, opacity: pressed ? 0.7 : 1 },
@@ -45,12 +44,11 @@ export function ChildChip({ child, indicator, onPress, wide }: { child: Child; i
         <Text variant="headline" numberOfLines={1}>
           {child.firstName}
         </Text>
-        <Text variant="footnote" tone="secondary" numberOfLines={1}>
-          {child.grade}
-        </Text>
-        <Text variant="footnote" tone="secondary" numberOfLines={1}>
-          {school?.shortName}
-        </Text>
+        {child.grade ? (
+          <Text variant="footnote" tone="secondary" numberOfLines={1}>
+            {child.grade}
+          </Text>
+        ) : null}
         {indicator ? (
           <Text variant="caption" tone="warning" numberOfLines={1}>
             {indicator}
@@ -63,35 +61,31 @@ export function ChildChip({ child, indicator, onPress, wide }: { child: Child; i
 
 // ---------- Events ----------
 
-export function EventRow({ event, onPress, showSchool }: { event: SchoolEvent; onPress: () => void; showSchool: boolean }) {
-  const { colors, scheme } = useAppTheme();
-  const start = new Date(event.start);
-  const { tint } = schoolColors(event.schoolId, scheme);
-  const audience = event.childIds.length ? eventAudience(event) : showSchool ? (schoolById(event.schoolId)?.shortName ?? '') : '';
-  const noSchool = event.category === 'no-school';
+export function EventRow({ event, onPress }: { event: SchoolEvent; onPress: () => void }) {
+  const { colors } = useAppTheme();
+  const { family } = useAppState();
+  const timed = !event.allDay && !!event.start;
+  const tint = event.calendar.color || colors.tint;
+  const audience = event.childIds.length ? eventAudience(event, family) : '';
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${event.cancelled ? 'Cancelled. ' : ''}${event.title}, ${event.allDay ? 'all day' : time(start)}${audience ? `, for ${audience}` : ''}`}
+      accessibilityLabel={`${event.important ? 'Important. ' : ''}${event.title}, ${timed ? time(new Date(event.start!)) : 'all day'}${audience ? `, for ${audience}` : ''}`}
       style={({ pressed }) => [s.eventRow, pressed && { backgroundColor: colors.surfaceMuted }]}>
-      <View style={[s.eventBar, { backgroundColor: noSchool ? colors.warning : tint }]} />
+      <View style={[s.eventBar, { backgroundColor: event.important ? colors.warning : tint }]} />
       <View style={{ width: 64 }}>
-        <Text variant="subhead" tone={event.cancelled ? 'secondary' : 'primary'} style={{ fontWeight: '600' }}>
-          {event.allDay ? 'All day' : time(start)}
+        <Text variant="subhead" style={{ fontWeight: '600' }}>
+          {timed ? time(new Date(event.start!)) : 'All day'}
         </Text>
       </View>
       <View style={{ flex: 1, gap: 3 }}>
-        <Text
-          variant="body"
-          tone={event.cancelled ? 'secondary' : 'primary'}
-          style={event.cancelled ? { textDecorationLine: 'line-through' } : undefined}
-          numberOfLines={2}>
+        <Text variant="body" numberOfLines={2}>
           {event.title}
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {event.cancelled && <Text variant="caption" tone="danger">Cancelled</Text>}
-          {audience ? <Tag label={audience} color={tint} /> : null}
+          {event.important && <Text variant="caption" tone="warning">Important</Text>}
+          {audience ? <Tag label={audience} color={colors.tint} /> : null}
         </View>
       </View>
     </Pressable>
@@ -100,17 +94,16 @@ export function EventRow({ event, onPress, showSchool }: { event: SchoolEvent; o
 
 // ---------- Announcements ----------
 
-export function AnnouncementRow({ item, onPress, showSchool }: { item: Announcement; onPress: () => void; showSchool: boolean }) {
-  const { colors, scheme } = useAppTheme();
+export function AnnouncementRow({ item, onPress }: { item: Announcement; onPress: () => void }) {
+  const { colors } = useAppTheme();
   const { readIds } = useAppState();
   const unread = !readIds.has(item.id);
-  const school = schoolById(item.schoolId);
-  const { accent } = schoolColors(item.schoolId, scheme);
+  const accent = colors.accent;
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${unread ? 'Unread. ' : ''}${item.important ? 'Important. ' : ''}${item.title}, ${school?.shortName}, ${relative(new Date(item.publishedAt))}`}
+      accessibilityLabel={`${unread ? 'Unread. ' : ''}${item.important ? 'Important. ' : ''}${item.title}, ${relative(new Date(item.publishedAt))}`}
       style={({ pressed }) => [s.annRow, pressed && { backgroundColor: colors.surfaceMuted }]}>
       <View style={[s.unreadDot, { backgroundColor: unread ? accent : 'transparent' }]} />
       <View style={{ flex: 1, gap: 2 }}>
@@ -123,12 +116,14 @@ export function AnnouncementRow({ item, onPress, showSchool }: { item: Announcem
           </Text>
         </View>
         <Text variant="subhead" tone="secondary" numberOfLines={2}>
-          {item.body}
+          {item.summary || plainText(item.body)}
         </Text>
-        <View style={{ flexDirection: 'row', gap: 6, marginTop: 2 }}>
-          {item.important && <Text variant="caption" tone="danger">Important</Text>}
-          {showSchool && school ? <Tag label={school.shortName} color={accent} /> : null}
-        </View>
+        {item.important || item.pinned ? (
+          <View style={{ flexDirection: 'row', gap: 6, marginTop: 2 }}>
+            {item.important && <Text variant="caption" tone="danger">Important</Text>}
+            {item.pinned && <Text variant="caption" tone="secondary">Pinned</Text>}
+          </View>
+        ) : null}
       </View>
     </Pressable>
   );
@@ -136,10 +131,18 @@ export function AnnouncementRow({ item, onPress, showSchool }: { item: Announcem
 
 // ---------- Statuses ----------
 
-type AnyStatus = AbsenceStatus | RequestStatus;
+/** Markdown body as one line of plain text, for previews. */
+export function plainText(md: string): string {
+  return md
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\n\s*[-*+]\s+/g, ' · ')
+    .replace(/[#>*_`~|]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
-export function StatusLabel({ status, label }: { status: AnyStatus; label: string }) {
-  const tone = status === 'recorded' || status === 'answered' ? 'success' : status === 'cancelled' || status === 'closed' ? 'secondary' : 'warning';
+export function StatusLabel({ tone, label }: { tone: StatusTone; label: string }) {
   return (
     <Text variant="caption" tone={tone}>
       {label}
@@ -150,20 +153,21 @@ export function StatusLabel({ status, label }: { status: AnyStatus; label: strin
 export function StatusRow({
   title,
   subtitle,
-  status,
+  tone,
   statusLabel,
   childId,
   onPress,
 }: {
   title: string;
   subtitle: string;
-  status: AnyStatus;
+  tone: StatusTone;
   statusLabel: string;
-  childId?: string;
+  childId?: string | null;
   onPress: () => void;
 }) {
   const { colors } = useAppTheme();
-  const child = childId ? childById(childId) : undefined;
+  const { family } = useAppState();
+  const child = childById(family, childId);
   return (
     <Pressable
       onPress={onPress}
@@ -179,7 +183,7 @@ export function StatusRow({
           {subtitle}
         </Text>
       </View>
-      <StatusLabel status={status} label={statusLabel} />
+      <StatusLabel tone={tone} label={statusLabel} />
     </Pressable>
   );
 }
@@ -204,17 +208,18 @@ export function QuickAction({ icon, label, onPress }: { icon: IconName; label: s
 
 // ---------- Assistant sources ----------
 
-const sourceIcon: Record<Source['type'], IconName> = { event: 'event', announcement: 'inbox', document: 'document', contact: 'phone' };
+type SourceCard = Extract<AssistantCard, { kind: 'source' }>;
 
-export function SourceChip({ source, onPress }: { source: Source; onPress: () => void }) {
+export function SourceChip({ source, onPress }: { source: SourceCard; onPress?: () => void }) {
   const { colors } = useAppTheme();
   return (
     <Pressable
       onPress={onPress}
+      disabled={!onPress}
       accessibilityRole="link"
       accessibilityLabel={`Source: ${source.title}`}
       style={({ pressed }) => [s.source, { borderColor: colors.separator, backgroundColor: pressed ? colors.surfaceMuted : colors.surface }]}>
-      <Icon name={sourceIcon[source.type]} size={16} color={colors.tint} />
+      <Icon name="document" size={16} color={colors.tint} />
       <Text variant="footnote" tone="tint" numberOfLines={1} style={{ flexShrink: 1, fontWeight: '600' }}>
         {source.title}
       </Text>

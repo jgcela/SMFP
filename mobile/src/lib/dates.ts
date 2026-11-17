@@ -45,9 +45,25 @@ export function shortWeekday(d: Date): string {
   return (WEEKDAYS[d.getDay()] ?? '').slice(0, 3);
 }
 
+let displayZone: string | undefined;
+/** Event times are shown in the school's time zone (set once the family loads). */
+export function setDisplayTimeZone(tz: string | undefined) {
+  displayZone = tz;
+}
+
+function hoursMinutes(d: Date): [number, number] {
+  if (!displayZone) return [d.getHours(), d.getMinutes()];
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: displayZone, hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }).formatToParts(d);
+    const n = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
+    return [n('hour') % 24, n('minute')];
+  } catch {
+    return [d.getHours(), d.getMinutes()];
+  }
+}
+
 export function time(d: Date): string {
-  const h = d.getHours();
-  const m = d.getMinutes();
+  const [h, m] = hoursMinutes(d);
   const suffix = h >= 12 ? 'PM' : 'AM';
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return m === 0 ? `${h12} ${suffix}` : `${h12}:${String(m).padStart(2, '0')} ${suffix}`;
@@ -88,4 +104,10 @@ export function greeting(now = new Date()): string {
 export function firstOfNextMonth(now = new Date()): string {
   const d = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   return `${MONTHS[d.getMonth()]} 1`;
+}
+
+/** Adds days to a YYYY-MM-DD date. */
+export function addDaysIso(day: string, n: number): string {
+  const d = fromIsoDate(day);
+  return isoDate(new Date(d.getFullYear(), d.getMonth(), d.getDate() + n));
 }

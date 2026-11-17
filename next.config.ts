@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
+  // The family app (Expo web export in public/) is a single-page app: any path
+  // that is not a Next page, API route or file opens it, and it picks the screen.
+  async rewrites() {
+    return { beforeFiles: [], afterFiles: [], fallback: [{ source: '/:path*', destination: '/index.html' }] };
+  },
 };
 
 export default nextConfig;

@@ -74,19 +74,8 @@ export function Screen({
       style={{ flex: 1, backgroundColor: grouped ? colors.grouped : colors.bg }}
       contentContainerStyle={[{ paddingBottom: spacing.xxl * 2 }, webColumn, contentStyle]}
       refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colors.tint} /> : undefined}>
-      <SampleDataBanner />
       {children}
     </ScrollView>
-  );
-}
-
-/** Fixed reminder that the prototype shows invented data. */
-export function SampleDataBanner() {
-  const { colors } = useAppTheme();
-  return (
-    <View style={[styles.sample, { backgroundColor: colors.banner }]} accessibilityRole="text">
-      <RNText style={[typeScale.caption as TextStyle, { color: colors.bannerText }]}>Sample data — not real students</RNText>
-    </View>
   );
 }
 
@@ -309,7 +298,6 @@ export function Tag({ label, color }: { label: string; color: string }) {
 }
 
 export const styles = StyleSheet.create({
-  sample: { alignSelf: 'center', marginTop: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: 4, borderRadius: 999 },
   section: { marginTop: spacing.xl, paddingHorizontal: spacing.lg },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', minHeight: touchTarget, marginBottom: spacing.xs },
   sectionFooter: { marginTop: spacing.sm, paddingHorizontal: spacing.xs },

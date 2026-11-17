@@ -4,25 +4,37 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { ChoiceField, Field } from '@/components/form';
 import { Icon } from '@/components/icon';
-import { Button, haptic, SampleDataBanner, Text, TextButton, webColumn } from '@/components/primitives';
-import { children } from '@/data/sample';
-import type { AbsenceType } from '@/data/types';
+import { Button, haptic, Text, TextButton, webColumn } from '@/components/primitives';
+import type { AbsenceReason, AbsenceType } from '@/data/types';
 import { dayLabel, isoDate, schoolDay } from '@/lib/dates';
-import { absenceTypeLabel, schoolById } from '@/lib/lookup';
+import { absenceReasonLabel, absenceTypeLabel } from '@/lib/lookup';
+import { newIdempotencyKey } from '@/services/api';
 import { useSubmitAbsence } from '@/services/queries';
 import { useAppState } from '@/state/app-state';
 import { spacing } from '@/theme/tokens';
-import { schoolColors, useAppTheme } from '@/theme/use-app-theme';
+import { useAppTheme } from '@/theme/use-app-theme';
 
-const TIMES = ['8:30 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM'];
+/** Values as the portal expects them (24-hour), labels as families read them. */
+const TIMES = [
+  ['08:30', '8:30 AM'],
+  ['09:00', '9:00 AM'],
+  ['10:00', '10:00 AM'],
+  ['11:00', '11:00 AM'],
+  ['12:00', '12:00 PM'],
+  ['13:00', '1:00 PM'],
+  ['14:00', '2:00 PM'],
+  ['15:00', '3:00 PM'],
+] as const;
 
 export default function ReportAbsence() {
   const params = useLocalSearchParams<{ childId?: string }>();
-  const { colors, scheme } = useAppTheme();
-  const { schoolFilter } = useAppState();
+  const { colors } = useAppTheme();
+  const { family } = useAppState();
   const submit = useSubmitAbsence();
+  // One key per form: a double tap or a retry after a timeout sends one notice.
+  const [idempotencyKey, setIdempotencyKey] = useState(newIdempotencyKey);
 
-  const eligible = children.filter((c) => c.canReportAbsence && (schoolFilter === 'all' || c.schoolId === schoolFilter));
+  const eligible = (family?.children ?? []).filter((c) => c.canReportAbsence);
   const [childId, setChildId] = useState<string | null>(params.childId ?? (eligible.length === 1 ? eligible[0]!.id : null));
   const [type, setType] = useState<AbsenceType>('absent');
   const days = useMemo(() => {
@@ -36,28 +48,42 @@ export default function ReportAbsence() {
   const [day, setDay] = useState(isoDate(days[0]!));
   const [until, setUntil] = useState(isoDate(days[0]!));
   const [timeOfDay, setTimeOfDay] = useState<string | null>(null);
-  const [reason, setReason] = useState('');
+  const [reason, setReason] = useState<AbsenceReason | null>(null);
+  const [comment, setComment] = useState('');
   const [sentId, setSentId] = useState<string | null>(null);
 
   const needsTime = type !== 'absent';
-  const ready = !!childId && (!needsTime || !!timeOfDay);
+  const ready = !!childId && !!reason && (!needsTime || !!timeOfDay);
 
   const send = () => {
-    if (!childId) return;
+    if (!childId || !reason) return;
     submit.mutate(
-      { childId, type, dateFrom: day, dateTo: type === 'absent' && until > day ? until : day, time: needsTime ? (timeOfDay ?? undefined) : undefined, reason: reason.trim() },
+      {
+        childId,
+        type,
+        dateFrom: day,
+        dateTo: type === 'absent' && until > day ? until : day,
+        time: needsTime ? (timeOfDay ?? undefined) : undefined,
+        reason,
+        comment: comment.trim(),
+        idempotencyKey,
+      },
       {
         onSuccess: (n) => {
           haptic('success');
           setSentId(n.id);
         },
-        onError: () => haptic('error'),
+        onError: (err) => {
+          haptic('error');
+          // A refused notice was not created; a new attempt gets a new key.
+          if ((err as { kind?: string }).kind === 'invalid') setIdempotencyKey(newIdempotencyKey());
+        },
       },
     );
   };
 
   if (sentId) {
-    const child = children.find((c) => c.id === childId);
+    const child = eligible.find((c) => c.id === childId);
     return (
       <View style={[s.done, { backgroundColor: colors.bg }]} accessibilityLiveRegion="polite">
         <Icon name="check" size={56} color={colors.success} />
@@ -91,17 +117,12 @@ export default function ReportAbsence() {
         <View style={{ width: 56 }} />
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[s.body, webColumn]}>
-        <SampleDataBanner />
-        <ChoiceField
-          label="Child"
-          value={childId}
-          onChange={setChildId}
-          options={eligible.map((c) => ({ value: c.id, label: c.firstName, dotColor: schoolColors(c.schoolId, scheme).tint }))}
-        />
-        {childId && (
-          <Text variant="footnote" tone="secondary" style={{ marginTop: -spacing.sm }}>
-            Goes to {schoolById(children.find((c) => c.id === childId)!.schoolId)?.name}.
+        {eligible.length === 0 ? (
+          <Text variant="subhead" tone="secondary">
+            None of your children can be reported here yet. Call the school office to report an absence.
           </Text>
+        ) : (
+          <ChoiceField label="Child" value={childId} onChange={setChildId} options={eligible.map((c) => ({ value: c.id, label: c.firstName }))} />
         )}
         <ChoiceField
           label="What happened"
@@ -110,7 +131,7 @@ export default function ReportAbsence() {
             setType(t);
             setTimeOfDay(null);
           }}
-          options={(['absent', 'late', 'early_pickup'] as const).map((t) => ({ value: t, label: absenceTypeLabel[t] }))}
+          options={(['absent', 'late', 'early_dismissal'] as const).map((t) => ({ value: t, label: absenceTypeLabel[t] }))}
         />
         <ChoiceField
           label={type === 'absent' ? 'First day' : 'Day'}
@@ -134,13 +155,19 @@ export default function ReportAbsence() {
             label={type === 'late' ? 'Expected arrival' : 'Pickup time'}
             value={timeOfDay}
             onChange={setTimeOfDay}
-            options={TIMES.map((t) => ({ value: t, label: t }))}
+            options={TIMES.map(([value, label]) => ({ value, label }))}
           />
         )}
-        <Field label="Reason (optional)" value={reason} onChangeText={setReason} placeholder="For example, a doctor's appointment" multiline hint="Only the school office sees this." />
+        <ChoiceField
+          label="Reason"
+          value={reason}
+          onChange={setReason}
+          options={(['illness', 'medical_appointment', 'family', 'other'] as const).map((r) => ({ value: r, label: absenceReasonLabel[r] }))}
+        />
+        <Field label="Comment (optional)" value={comment} onChangeText={setComment} maxLength={500} multiline hint="Only the school office sees this." />
         {submit.isError && (
           <Text variant="subhead" tone="danger" accessibilityRole="alert">
-            {submit.error.message} Your report was not sent. Try again.
+            {submit.error.message.replace(/"My requests"/g, "Inbox")} Your report was not sent.
           </Text>
         )}
         <Button label="Send to the office" onPress={send} loading={submit.isPending} disabled={!ready} />

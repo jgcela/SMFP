@@ -1,78 +1,81 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from 'react-native';
 
-import { SourceChip } from '@/components/family-ui';
+import { SourceChip, StatusLabel } from '@/components/family-ui';
 import { Icon } from '@/components/icon';
-import { Button, Group, haptic, Row, SampleDataBanner, Text, TextButton, webColumn, webHeaderEdge } from '@/components/primitives';
+import { Markdown } from '@/components/markdown';
+import { Button, Group, haptic, Row, Text, TextButton, webColumn, webHeaderEdge } from '@/components/primitives';
 import { EmptyState } from '@/components/states';
-import type { AskMessage, Source } from '@/data/types';
-import { dayLabel, firstOfNextMonth, fromIsoDate } from '@/lib/dates';
-import { absenceTypeLabel, childById } from '@/lib/lookup';
+import type { AssistantAction, AssistantCard, AssistantMessage } from '@/data/types';
+import { requestStatusLabel, requestTone } from '@/lib/lookup';
 import { useOpen } from '@/lib/nav';
-import { ApiError } from '@/services/api';
-import { suggestedQuestions, type AskContext } from '@/services/assistant';
-import { useAsk, useConversation, useResolveDraft } from '@/services/queries';
+import { useAsk, useConversation, useDecideAction } from '@/services/queries';
+import { portalUrl } from '@/services/session';
 import { useAppState } from '@/state/app-state';
 import { spacing, touchTarget, type as typeScale } from '@/theme/tokens';
 import { useAppTheme } from '@/theme/use-app-theme';
 
+const SUGGESTED = ['What is on the calendar this week?', 'When is the next day with no school?', 'What is the uniform policy?', 'How do I report an absence?'];
+
 export default function Ask() {
-  const params = useLocalSearchParams<{ contextType?: string; contextId?: string; contextTitle?: string; conversation?: string }>();
+  const params = useLocalSearchParams<{ prefill?: string; conversation?: string }>();
   const router = useRouter();
   const { colors, radius } = useAppTheme();
   const { askAvailable } = useAppState();
   const open = useOpen();
   const [conversationId, setConversationId] = useState<string | null>(params.conversation ?? null);
-  const [context, setContext] = useState<AskContext | undefined>();
   const [text, setText] = useState('');
   const scroll = useRef<ScrollViewInstance>(null);
 
   const convo = useConversation(conversationId);
   const ask = useAsk();
-  const resolve = useResolveDraft();
+  const decide = useDecideAction(conversationId ?? 'none');
 
   // Opened from "Ask about this" or from history.
   useEffect(() => {
-    if (params.contextType === 'announcement' && params.contextId) {
+    if (params.prefill) {
       setConversationId(null);
-      setContext({ type: 'announcement', id: params.contextId, title: params.contextTitle ?? 'Announcement' });
+      setText(params.prefill);
     }
-  }, [params.contextType, params.contextId, params.contextTitle]);
+  }, [params.prefill]);
   useEffect(() => {
     if (params.conversation) setConversationId(params.conversation);
   }, [params.conversation]);
 
   const send = (q: string) => {
     const question = q.trim();
-    if (!question || ask.isPending) return;
+    if (question.length < 2 || ask.isPending) return;
     setText('');
     ask.mutate(
-      { conversationId, text: question, context },
+      { conversationId, text: question },
       {
         onSuccess: (c) => {
-          setConversationId(c.id);
+          setConversationId(c.conversation.id);
           setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 50);
         },
-        onError: () => haptic('error'),
+        onError: () => {
+          haptic('error');
+          setText(question);
+        },
       },
     );
   };
 
   const newConversation = () => {
     setConversationId(null);
-    setContext(undefined);
     ask.reset();
   };
 
-  const openSource = (src: Source) => open(src.type === 'contact' ? 'contact' : `${src.type}/${src.id}`);
+  const openUrl = (url: string) => void WebBrowser.openBrowserAsync(url.startsWith('/') ? portalUrl(url) : url);
 
   if (!askAvailable) {
-    return <EmptyState icon="ask" title="The assistant isn't available" body="Your school's plan doesn't include the assistant." />;
+    return <EmptyState icon="ask" title="The assistant isn't available" body="The school hasn't turned on the assistant yet." />;
   }
 
   const messages = convo.data?.messages ?? [];
-  const quota = ask.error instanceof ApiError && ask.error.kind === 'quota';
+  const actions = convo.data?.actions ?? {};
 
   return (
     <>
@@ -90,55 +93,40 @@ export default function Ask() {
       <View style={{ flex: 1, backgroundColor: colors.grouped }}>
         <View style={[s.inputBar, { backgroundColor: colors.bg, borderBottomColor: colors.separator }]}>
           <View style={[{ gap: spacing.sm }, webColumn]}>
-          {context && (
-            <View style={[s.context, { backgroundColor: colors.surfaceMuted }]}>
-              <Icon name="inbox" size={14} color={colors.textSecondary} />
-              <Text variant="footnote" tone="secondary" numberOfLines={1} style={{ flex: 1 }}>
-                About: {context.title}
-              </Text>
-              <Pressable onPress={() => setContext(undefined)} accessibilityRole="button" accessibilityLabel="Remove context" hitSlop={10}>
-                <Icon name="close" size={14} color={colors.textSecondary} />
+            <View style={[s.field, { backgroundColor: colors.surfaceMuted, borderRadius: Math.min(radius, 14) }]}>
+              <TextInput
+                value={text}
+                onChangeText={setText}
+                placeholder="Ask about your school"
+                placeholderTextColor={colors.textSecondary}
+                accessibilityLabel="Your question"
+                style={[typeScale.body, { flex: 1, color: colors.text, paddingVertical: spacing.md }]}
+                returnKeyType="send"
+                onSubmitEditing={() => send(text)}
+                maxLength={1000}
+                maxFontSizeMultiplier={2}
+              />
+              <Pressable
+                onPress={() => send(text)}
+                disabled={!text.trim() || ask.isPending}
+                accessibilityRole="button"
+                accessibilityLabel="Send question"
+                style={{ minWidth: touchTarget, minHeight: touchTarget, alignItems: 'center', justifyContent: 'center', opacity: text.trim() ? 1 : 0.4 }}>
+                {ask.isPending ? <ActivityIndicator color={colors.tint} /> : <Icon name="send" size={28} color={colors.tint} />}
               </Pressable>
             </View>
-          )}
-          <View style={[s.field, { backgroundColor: colors.surfaceMuted, borderRadius: Math.min(radius, 14) }]}>
-            <TextInput
-              value={text}
-              onChangeText={setText}
-              placeholder="Ask about your school"
-              placeholderTextColor={colors.textSecondary}
-              accessibilityLabel="Your question"
-              style={[typeScale.body, { flex: 1, color: colors.text, paddingVertical: spacing.md }]}
-              returnKeyType="send"
-              onSubmitEditing={() => send(text)}
-              editable={!quota}
-              maxFontSizeMultiplier={2}
-            />
-            <Pressable
-              onPress={() => send(text)}
-              disabled={!text.trim() || ask.isPending}
-              accessibilityRole="button"
-              accessibilityLabel="Send question"
-              style={{ minWidth: touchTarget, minHeight: touchTarget, alignItems: 'center', justifyContent: 'center', opacity: text.trim() ? 1 : 0.4 }}>
-              {ask.isPending ? <ActivityIndicator color={colors.tint} /> : <Icon name="send" size={28} color={colors.tint} />}
-            </Pressable>
-          </View>
           </View>
         </View>
 
         <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" contentContainerStyle={[{ padding: spacing.lg, gap: spacing.lg, paddingBottom: 120 }, webColumn]}>
-          <SampleDataBanner />
-          {quota && (
-            <Group style={{ padding: spacing.lg, gap: spacing.xs }}>
-              <Text variant="headline">You've reached this month's limit</Text>
-              <Text variant="subhead" tone="secondary">
-                Your school has used this month's assistant questions. It will be available again on {firstOfNextMonth()}. You can still find everything in Calendar, Inbox and Family.
-              </Text>
-            </Group>
-          )}
-          {ask.isError && !quota && (
+          {ask.isError && (
             <Text variant="subhead" tone="danger" accessibilityRole="alert">
-              We couldn't send your question. Check your connection and try again.
+              {ask.error.message}
+            </Text>
+          )}
+          {convo.isError && (
+            <Text variant="subhead" tone="danger" accessibilityRole="alert">
+              {convo.error.message}
             </Text>
           )}
 
@@ -148,10 +136,10 @@ export default function Ask() {
                 How can I help?
               </Text>
               <Text variant="subhead" tone="secondary">
-                I answer from your school's calendar, announcements and documents, and I show where each answer comes from. I can't see grades or homework.
+                I answer from the information your school shared with families, and I show where each answer comes from. I can't see grades or homework. I can also prepare an absence notice or a request for you to review before it is sent.
               </Text>
               <View style={{ gap: spacing.sm }}>
-                {(context ? ['What do I need to bring?', 'Summarize this announcement'] : suggestedQuestions).map((q) => (
+                {SUGGESTED.map((q) => (
                   <Pressable
                     key={q}
                     onPress={() => send(q)}
@@ -170,16 +158,14 @@ export default function Ask() {
               <MessageView
                 key={m.id}
                 m={m}
-                onSource={openSource}
-                onFollowUp={send}
-                onDraft={(action) =>
-                  resolve.mutate(
-                    { conversationId: conversationId!, messageId: m.id, action },
-                    { onSuccess: () => haptic(action === 'send' ? 'success' : 'light') },
-                  )
+                actions={actions}
+                onUrl={openUrl}
+                onRequest={(id) => open(`request/${id}`)}
+                onDecide={(actionId, decision) =>
+                  decide.mutate({ actionId, decision }, { onSuccess: () => haptic(decision === 'confirm' ? 'success' : 'light'), onError: () => haptic('error') })
                 }
-                draftBusy={resolve.isPending}
-                onOpenAbsences={() => router.push('/inbox')}
+                deciding={decide.isPending ? decide.variables?.actionId : undefined}
+                decideError={decide.isError ? { id: decide.variables?.actionId, message: decide.error.message } : undefined}
               />
             ))
           )}
@@ -197,91 +183,118 @@ export default function Ask() {
   );
 }
 
+function ActionCard({
+  action,
+  onDecide,
+  busy,
+  error,
+}: {
+  action: AssistantAction | undefined;
+  onDecide: (d: 'confirm' | 'dismiss') => void;
+  busy: boolean;
+  error?: string;
+}) {
+  if (!action) return null;
+  const title = action.kind === 'absence_notice' ? 'Absence notice (draft)' : 'Request to the office (draft)';
+  return (
+    <Group style={{ padding: spacing.lg, gap: spacing.sm }}>
+      <Text variant="headline">{title}</Text>
+      <Text variant="body">{action.summary}</Text>
+      {action.status === 'proposed' && !action.expired ? (
+        <>
+          <Button label="Send to the office" loading={busy} onPress={() => onDecide('confirm')} />
+          <TextButton label="Discard" tone="secondary" onPress={() => onDecide('dismiss')} />
+          {error ? (
+            <Text variant="footnote" tone="danger" accessibilityRole="alert">
+              {error}
+            </Text>
+          ) : null}
+        </>
+      ) : action.status === 'confirmed' ? (
+        <Text variant="subhead" tone="success">
+          Sent{action.result ? ` as ${action.result}` : ''}. You can follow it in Inbox.
+        </Text>
+      ) : action.status === 'failed' ? (
+        <Text variant="subhead" tone="danger">
+          Not sent: {action.result ?? 'please use the form or call the office.'}
+        </Text>
+      ) : action.status === 'dismissed' ? (
+        <Text variant="subhead" tone="secondary">
+          Discarded. Nothing was sent.
+        </Text>
+      ) : (
+        <Text variant="subhead" tone="secondary">
+          This draft is more than a day old. Ask again or use the form.
+        </Text>
+      )}
+    </Group>
+  );
+}
+
 function MessageView({
   m,
-  onSource,
-  onFollowUp,
-  onDraft,
-  draftBusy,
-  onOpenAbsences,
+  actions,
+  onUrl,
+  onRequest,
+  onDecide,
+  deciding,
+  decideError,
 }: {
-  m: AskMessage;
-  onSource: (s: Source) => void;
-  onFollowUp: (q: string) => void;
-  onDraft: (action: 'send' | 'discard') => void;
-  draftBusy: boolean;
-  onOpenAbsences: () => void;
+  m: AssistantMessage;
+  actions: Record<string, AssistantAction>;
+  onUrl: (url: string) => void;
+  onRequest: (id: string) => void;
+  onDecide: (actionId: string, d: 'confirm' | 'dismiss') => void;
+  deciding?: string;
+  decideError?: { id?: string; message: string };
 }) {
   const { colors, radius } = useAppTheme();
   if (m.role === 'user') {
     return (
       <View style={[s.userBubble, { backgroundColor: colors.tint, borderRadius: Math.max(radius, 14) }]}>
-        {m.contextTitle && (
-          <Text variant="caption" style={{ color: colors.onTint, opacity: 0.85 }}>
-            About: {m.contextTitle}
-          </Text>
-        )}
         <Text variant="body" style={{ color: colors.onTint }}>
-          {m.text}
+          {m.content}
         </Text>
       </View>
     );
   }
-  const child = m.draft ? childById(m.draft.childId) : undefined;
+  const sources = m.cards.filter((c): c is Extract<AssistantCard, { kind: 'source' }> => c.kind === 'source');
+  const requests = m.cards.filter((c): c is Extract<AssistantCard, { kind: 'request' }> => c.kind === 'request');
+  const drafts = m.cards.filter((c): c is Extract<AssistantCard, { kind: 'action' }> => c.kind === 'action');
   return (
-    <View style={{ gap: spacing.sm }} accessibilityLabel={`Answer: ${m.text}`}>
-      {m.status === 'not_found' && (
-        <Text variant="caption" tone="warning">
-          No verified answer
-        </Text>
-      )}
-      <Text variant="body">{m.text}</Text>
-      {m.sources.length > 0 && (
+    <View style={{ gap: spacing.sm }}>
+      <Markdown text={m.content} />
+      {sources.length > 0 && (
         <View style={{ gap: 6 }}>
           <Text variant="caption" tone="secondary">
             Sources
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-            {m.sources.map((src) => (
-              <SourceChip key={`${src.type}-${src.id}`} source={src} onPress={() => onSource(src)} />
+            {sources.map((src, i) => (
+              <SourceChip key={`${src.title}-${i}`} source={src} onPress={src.url ? () => onUrl(src.url!) : undefined} />
             ))}
           </View>
         </View>
       )}
-      {m.draft && child && (
-        <Group style={{ padding: spacing.lg, gap: spacing.sm }}>
-          <Text variant="headline">Absence report (draft)</Text>
-          <Row title={child.firstName} subtitle={`${absenceTypeLabel[m.draft.type]} · ${dayLabel(fromIsoDate(m.draft.dateFrom))}${m.draft.reason ? ` · ${m.draft.reason}` : ''}`} showChevron={false} />
-          {m.draft.state === 'pending' ? (
-            <>
-              <Button label="Send to the office" loading={draftBusy} onPress={() => onDraft('send')} />
-              <TextButton label="Discard" tone="secondary" onPress={() => onDraft('discard')} />
-            </>
-          ) : m.draft.state === 'sent' ? (
-            <View style={{ gap: spacing.xs }}>
-              <Text variant="subhead" tone="success">
-                Sent. The office will see it right away.
-              </Text>
-              <TextButton label="See it in Inbox" onPress={onOpenAbsences} />
-            </View>
-          ) : (
-            <Text variant="subhead" tone="secondary">
-              Discarded. Nothing was sent.
-            </Text>
-          )}
+      {requests.map((r) => (
+        <Group key={r.id}>
+          <Row
+            icon="mail"
+            title={`R-${r.number}: ${r.subject}`}
+            trailing={r.status in requestStatusLabel ? <StatusLabel tone={requestTone(r.status as never)} label={requestStatusLabel[r.status as keyof typeof requestStatusLabel]} /> : undefined}
+            onPress={() => onRequest(r.id)}
+          />
         </Group>
-      )}
-      {m.followUps.length > 0 && (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {m.followUps.map((f) => (
-            <Pressable key={f} onPress={() => onFollowUp(f)} accessibilityRole="button" style={[s.followUp, { borderColor: colors.separator }]}>
-              <Text variant="footnote" tone="tint" style={{ fontWeight: '600' }}>
-                {f}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
+      ))}
+      {drafts.map((d) => (
+        <ActionCard
+          key={d.actionId}
+          action={actions[d.actionId]}
+          busy={deciding === d.actionId}
+          error={decideError?.id === d.actionId ? decideError.message : undefined}
+          onDecide={(decision) => onDecide(d.actionId, decision)}
+        />
+      ))}
     </View>
   );
 }
@@ -289,8 +302,6 @@ function MessageView({
 const s = StyleSheet.create({
   inputBar: { padding: spacing.md, gap: spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth },
   field: { flexDirection: 'row', alignItems: 'center', paddingLeft: spacing.md },
-  context: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: spacing.md, paddingVertical: 6, borderRadius: 999 },
   suggestion: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg, minHeight: touchTarget + 8 },
   userBubble: { alignSelf: 'flex-end', maxWidth: '85%', padding: spacing.md, gap: 4 },
-  followUp: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, borderWidth: 1, minHeight: 36, justifyContent: 'center' },
 });
