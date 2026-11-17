@@ -37,6 +37,8 @@ export type Features = {
   community: boolean;
   links: boolean;
   ask: boolean;
+  /** The server runs the assistant in test mode: simulated answers, no real AI. */
+  askTestMode?: boolean;
 };
 
 export type Family = {
@@ -189,7 +191,7 @@ export type AssistantCard =
   | { kind: 'request'; id: string; number: number; subject: string; status: string }
   | { kind: 'action'; actionId: string };
 
-export type AssistantMessage = { id: string; role: 'user' | 'assistant'; content: string; cards: AssistantCard[]; createdAt: string };
+export type AssistantMessage = { id: string; role: 'user' | 'assistant'; content: string; cards: AssistantCard[]; createdAt: string; /** Written by the test-mode model. */ simulated?: boolean };
 
 export type AssistantAction = {
   id: string;

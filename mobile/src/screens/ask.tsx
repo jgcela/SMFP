@@ -23,7 +23,7 @@ export default function Ask() {
   const params = useLocalSearchParams<{ prefill?: string; conversation?: string }>();
   const router = useRouter();
   const { colors, radius } = useAppTheme();
-  const { askAvailable } = useAppState();
+  const { askAvailable, askTestMode } = useAppState();
   const open = useOpen();
   const [conversationId, setConversationId] = useState<string | null>(params.conversation ?? null);
   const [text, setText] = useState('');
@@ -119,6 +119,14 @@ export default function Ask() {
         </View>
 
         <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" contentContainerStyle={[{ padding: spacing.lg, gap: spacing.lg, paddingBottom: 120 }, webColumn]}>
+          {askTestMode && (
+            <View style={[s.testBanner, { backgroundColor: colors.surface, borderRadius: Math.min(radius, 14) }]} accessibilityRole="text">
+              <Icon name="warning" size={18} color={colors.warning} />
+              <Text variant="footnote" tone="secondary" style={{ flex: 1 }}>
+                Test mode: answers are simulated, not from a real AI. They still use your school's real information, and drafts you send are real.
+              </Text>
+            </View>
+          )}
           {ask.isError && (
             <Text variant="subhead" tone="danger" accessibilityRole="alert">
               {ask.error.message}
@@ -263,6 +271,11 @@ function MessageView({
   const drafts = m.cards.filter((c): c is Extract<AssistantCard, { kind: 'action' }> => c.kind === 'action');
   return (
     <View style={{ gap: spacing.sm }}>
+      {m.simulated && (
+        <Text variant="caption" tone="warning">
+          Test mode · simulated answer
+        </Text>
+      )}
       <Markdown text={m.content} />
       {sources.length > 0 && (
         <View style={{ gap: 6 }}>
@@ -303,5 +316,6 @@ const s = StyleSheet.create({
   inputBar: { padding: spacing.md, gap: spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth },
   field: { flexDirection: 'row', alignItems: 'center', paddingLeft: spacing.md },
   suggestion: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg, minHeight: touchTarget + 8 },
+  testBanner: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md },
   userBubble: { alignSelf: 'flex-end', maxWidth: '85%', padding: spacing.md, gap: 4 },
 });

@@ -15,6 +15,7 @@ import { listPublicVolunteer } from '../services/volunteer';
 import { listPublicCommunity, type CommunityKind } from '../services/community';
 import { familyAssistantAvailable } from '../services/family-assistant';
 import { getAssistantModel } from '../ai/assistant-model';
+import { aiMode } from '../ai/provider';
 import { getPrivateStorage, StorageNotConfiguredError } from '../storage/storage';
 import { ApiError, requireModule, type FamilyContext } from './context';
 
@@ -67,6 +68,8 @@ export async function me(c: FamilyContext) {
       links: c.modules.has('quick_links'),
       // On only when the school turned it on and the portal has an AI key.
       ask: (await familyAssistantAvailable(c.tenant.id, c.viewer)) && getAssistantModel() !== null,
+      // Test mode (AI_MOCK): answers are simulated, the app says so.
+      askTestMode: aiMode() === 'mock',
     },
   };
 }

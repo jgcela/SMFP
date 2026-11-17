@@ -6,6 +6,7 @@
 // a school document can't change these rules. The server then checks every
 // citation against the passage text (see answer.ts) before anything is shown.
 import Anthropic from '@anthropic-ai/sdk';
+import { MockAiProvider } from './mock';
 
 export type Passage = {
   n: number;
@@ -146,9 +147,19 @@ export function setAiProviderForTests(p: AiProvider | null | undefined) {
   override = p;
 }
 
-/** The configured provider, or null when no API key is set (search-only mode). */
+/**
+ * How AI answers are produced: "live" with ANTHROPIC_API_KEY, "mock" (test
+ * mode, no API calls) with AI_MOCK=true and no key, otherwise "off". A real
+ * key always wins, so going live only needs the key.
+ */
+export function aiMode(): 'live' | 'mock' | 'off' {
+  if (process.env.ANTHROPIC_API_KEY) return 'live';
+  return process.env.AI_MOCK === 'true' ? 'mock' : 'off';
+}
+
+/** The configured provider, or null when AI is off (search-only mode). */
 export function getAiProvider(): AiProvider | null {
   if (override !== undefined) return override;
-  const key = process.env.ANTHROPIC_API_KEY;
-  return key ? new AnthropicProvider(key) : null;
+  const mode = aiMode();
+  return mode === 'live' ? new AnthropicProvider(process.env.ANTHROPIC_API_KEY!) : mode === 'mock' ? new MockAiProvider() : null;
 }
