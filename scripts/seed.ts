@@ -52,7 +52,8 @@ async function main() {
       ...ST_MARY,
       planId: 'autonomous',
       ownerUserId: ownerId,
-      subdomainHost: root && root !== 'localhost' ? `${ST_MARY.slug}.${root}` : undefined,
+      // *.vercel.app has no wildcard DNS: the school is then reached by path (/s/stmary).
+      subdomainHost: root && root !== 'localhost' && !root.endsWith('.vercel.app') ? `${ST_MARY.slug}.${root}` : undefined,
     });
     console.log('Created tenant St. Mary Catholic Virtue School (slug: stmary).');
   }
