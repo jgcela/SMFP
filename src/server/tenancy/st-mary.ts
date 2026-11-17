@@ -39,7 +39,22 @@ export const ST_MARY: Omit<ProvisionInput, 'planId'> = {
   grades: PK8_GRADES,
   academicYear: { label: '2026–27', startsOn: '2026-08-17', endsOn: '2027-05-28' },
   theme: ST_MARY_THEME,
-  enabledModules: ['home', 'calendar', 'announcements', 'pages', 'documents'],
+  // Every module the St. Mary app and web portal use (Home, Calendar, Inbox,
+  // absences, requests, documents, quick links, volunteer, community, Ask).
+  enabledModules: [
+    'home',
+    'calendar',
+    'announcements',
+    'pages',
+    'documents',
+    'quick_links',
+    'community',
+    'volunteer',
+    'attendance_notices',
+    'operations_inbox',
+    'knowledge_ai',
+    'family_assistant',
+  ],
   profile: {
     displayName: 'St. Mary Catholic Virtue School',
     shortName: 'St. Mary',

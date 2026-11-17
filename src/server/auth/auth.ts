@@ -3,7 +3,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
-import { twoFactor } from 'better-auth/plugins';
+import { bearer, twoFactor } from 'better-auth/plugins';
 import { platformDb } from '../db/client';
 import * as schema from '../db/schema';
 import { allowedAuthHosts } from '../tenancy/config';
@@ -43,7 +43,9 @@ function createAuth() {
       useSecureCookies: process.env.NODE_ENV === 'production',
       cookiePrefix: 'fp',
     },
-    plugins: [twoFactor({ issuer: process.env.PLATFORM_NAME ?? 'School Portal' }), nextCookies()],
+    // bearer(): the native app (iOS/Android) sends its session token in an
+    // Authorization header instead of a cookie. The web app uses the cookie.
+    plugins: [twoFactor({ issuer: process.env.PLATFORM_NAME ?? 'School Portal' }), bearer(), nextCookies()],
   });
 }
 
