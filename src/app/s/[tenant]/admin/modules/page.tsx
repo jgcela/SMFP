@@ -1,0 +1,96 @@
+import { notFound } from 'next/navigation';
+import { hasAnywhere } from '@/server/rbac/authorize';
+import { getModuleState } from '@/server/services/modules';
+import { requireStaff } from '@/server/request';
+import { ModuleToggle } from './toggle';
+
+export const metadata = { title: 'Module Manager' };
+
+type Props = { params: Promise<{ tenant: string }> };
+
+export default async function ModulesPage({ params }: Props) {
+  const key = (await params).tenant;
+  const { tenant, ctx } = await requireStaff(key);
+  const canToggle = hasAnywhere(ctx, 'modules.toggle');
+  if (!hasAnywhere(ctx, 'modules.view')) notFound();
+  const state = await getModuleState(tenant.id);
+  const core = state.catalog.filter((m) => m.stage === 'core');
+  const future = state.catalog.filter((m) => m.stage === 'future');
+  const nameOf = new Map(state.catalog.map((m) => [m.id, m.name]));
+  const byId = new Map(state.catalog.map((m) => [m.id, m]));
+  /** Dependencies this school can never switch on today (not built yet or not in the plan). */
+  const blockers = (m: (typeof state.catalog)[number]) =>
+    m.dependencies.filter((d) => {
+      const dep = byId.get(d);
+      return !dep || !dep.implemented || !dep.entitled;
+    });
+
+  const status = (m: (typeof state.catalog)[number]) => {
+    if (m.required && m.implemented) return <span className="badge badge-on">Always on</span>;
+    if (m.enabled && m.implemented) return <span className="badge badge-on">On</span>;
+    if (!m.implemented) return <span className="badge badge-future">Coming later</span>;
+    if (!m.entitled) return <span className="badge">Not in your plan</span>;
+    return <span className="badge badge-off">Off</span>;
+  };
+
+  return (
+    <>
+      <div className="admin-head">
+        <div>
+          <h1>Module Manager</h1>
+          <p>Modules your portal can use. Turning a module off hides it from families but never deletes its content.</p>
+        </div>
+      </div>
+      {[
+        { title: 'Portal modules', list: core },
+        { title: 'Planned modules', list: future },
+      ].map((g) => (
+        <section className="panel" key={g.title} aria-labelledby={g.title}>
+          <div className="panel-head">
+            <h2 id={g.title}>{g.title}</h2>
+          </div>
+          <div className="table-wrap">
+            <table className="data">
+              <thead>
+                <tr>
+                  <th scope="col">Module</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Needs</th>
+                  <th scope="col">Status</th>
+                  {canToggle && <th scope="col" style={{ whiteSpace: "nowrap" }}>On / off</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {g.list.map((m) => (
+                  <tr key={m.id}>
+                    <th scope="row">{m.name}</th>
+                    <td className="muted">{m.description}</td>
+                    <td className="muted">{m.dependencies.map((d) => nameOf.get(d) ?? d).join(', ') || '—'}</td>
+                    <td>{status(m)}</td>
+                    {canToggle && (
+                      <td>
+                        {m.implemented && m.entitled && !m.required && (
+                          <ModuleToggle
+                            tenantKey={key}
+                            moduleId={m.id}
+                            name={m.name}
+                            enabled={m.enabled}
+                            blockedReason={
+                              !m.enabled && blockers(m).length > 0
+                                ? `Needs ${blockers(m).map((d) => nameOf.get(d) ?? d).join(', ')}, which is not available yet.`
+                                : undefined
+                            }
+                          />
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))}
+    </>
+  );
+}
