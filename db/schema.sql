@@ -169,3 +169,10 @@ create table if not exists login_attempts (
   failures      int not null default 0,
   window_start  timestamptz not null default now()
 );
+
+-- ---------------------------------------------------------------------------
+-- Step 4a: the calendar is managed from the staff area.
+-- start_time: null = all day. Shown on the portal as "6:30 pm" before the note.
+alter table events add column if not exists start_time time;
+-- The school's time zone, used to read times from imported .ics files.
+alter table schools add column if not exists timezone text not null default 'UTC';

@@ -64,3 +64,11 @@ PORTAL_SCHOOL=<slug> npm run dev     # http://localhost:3000
 - Contraseña: `node scripts/staff-link.mjs <colegio> <correo> "<nombre>" <url-del-portal>` crea el usuario (si no existe) y un enlace de un solo uso (72 horas) para que la persona elija su contraseña. Solo se guarda el hash del enlace. Sirve también para restablecer una contraseña olvidada.
 - `login_attempts`: tras 8 intentos fallidos en 15 minutos (por correo y por IP) se bloquea temporalmente.
 - Variables nuevas: `BETTER_AUTH_SECRET` (obligatoria). Opcional `AUTH_HOSTS` (dominios propios, separados por comas).
+
+## Paso 4a: calendario desde el panel
+
+- `/admin/calendar`: lista de eventos por fecha con buscador (por defecto solo los próximos; "Show past events" muestra el resto). Crear, editar y borrar (pide confirmación).
+- Campos: título, fecha, hora o "All day", categoría (No school, Faith, Academic, Community) y nota opcional. Los eventos antiguos de "Health" conservan su categoría al editarlos.
+- `/admin/calendar/import`: importa .ics o .csv con vista previa; nada se guarda hasta pulsar Import. Se saltan los que ya existen (misma fecha y título). Las horas de .ics se pasan a la zona horaria del colegio (`schools.timezone`).
+- Cada cambio regenera la portada: "This week and next", el calendario mensual y el aviso automático de "No school".
+- Base de datos: `events.start_time` (vacío = todo el día) y `schools.timezone`. Cambio de datos de una vez: `db/migrations/2026-11-18-step4a-event-times.sql` (ya aplicado en Neon).
