@@ -98,3 +98,24 @@
   .adm-ev .act{justify-content:flex-start}
   .adm-row{grid-template-columns:1fr}
 }
+/* Documents */
+.adm-cat{margin-top:24px}
+.adm-cat-top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-end;justify-content:space-between;padding-bottom:8px}
+.adm-cat-top h2{margin:0;font:700 18px/24px var(--font-brand);color:var(--navy)}
+.adm-cat-top .count{font:600 13px/18px var(--font-brand);color:#5b6470;background:var(--azure);border-radius:var(--r-pill);padding:1px 8px;margin-left:4px;vertical-align:2px}
+.adm-cat-top .note{margin:2px 0 0;color:#5b6470;font-size:14px;line-height:20px}
+.adm-doc{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray)}
+.adm-doc .what{display:flex;flex-direction:column;gap:2px;min-width:0}
+.adm-doc .what strong{font:600 16px/22px var(--font-brand);color:var(--jet)}
+.adm-doc .note{color:#5b6470;font-size:14px;line-height:20px}
+.pill{display:inline-block;margin-left:8px;font:700 12px/16px var(--font-brand);padding:1px 8px;border-radius:var(--r-pill);background:var(--gold);color:var(--navy)}
+.adm-doc .act,.adm-cat-top .act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.adm-doc .act button,.adm-doc .act a,.adm-cat-top .act button,.adm-cat-top .confirm button{min-height:40px;min-width:40px;padding:0 12px;border-radius:var(--r-md);border:1px solid var(--cerulean);background:var(--white);color:var(--navy);font:600 14px/20px var(--font-brand);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box}
+.adm-doc .act button:hover:not(:disabled),.adm-doc .act a:hover,.adm-cat-top .act button:hover:not(:disabled){background:var(--azure)}
+.adm-doc .act button:disabled,.adm-cat-top .act button:disabled{opacity:.35;cursor:default}
+.adm-doc .confirm,.adm-cat-top .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:600 14px/20px var(--font-brand);color:#8a1c12}
+.adm-doc .confirm button{min-height:40px;padding:0 14px;border-radius:var(--r-md);border:1px solid var(--cerulean);background:var(--white);color:var(--navy);font:600 14px/20px var(--font-brand);cursor:pointer}
+.adm-doc .confirm .danger,.adm-cat-top .confirm .danger{background:#b3261e;border-color:#b3261e;color:var(--white)}
+.adm-radios{display:flex;gap:20px;flex-wrap:wrap}
+.adm-f input[type=file]{font:400 15px/22px var(--font-text)}
+@media (max-width:640px){.adm-doc{grid-template-columns:1fr}.adm-doc .act{justify-content:flex-start}}

@@ -45,3 +45,11 @@ export async function recordFailure(key: string) {
 export async function clearFailures(key: string) {
   await db()`delete from login_attempts where key = ${key}`;
 }
+
+/** For server actions: the signed-in staff member, or an error to show. */
+export async function requireStaff(): Promise<Staff> {
+  const { user, staff } = await currentStaff();
+  if (!user) throw new Error("Your session has ended. Sign in again.");
+  if (!staff) throw new Error("This account cannot edit this school’s portal.");
+  return staff;
+}
