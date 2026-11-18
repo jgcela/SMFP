@@ -72,3 +72,12 @@ PORTAL_SCHOOL=<slug> npm run dev     # http://localhost:3000
 - `/admin/calendar/import`: importa .ics o .csv con vista previa; nada se guarda hasta pulsar Import. Se saltan los que ya existen (misma fecha y título). Las horas de .ics se pasan a la zona horaria del colegio (`schools.timezone`).
 - Cada cambio regenera la portada: "This week and next", el calendario mensual y el aviso automático de "No school".
 - Base de datos: `events.start_time` (vacío = todo el día) y `schools.timezone`. Cambio de datos de una vez: `db/migrations/2026-11-18-step4a-event-times.sql` (ya aplicado en Neon).
+
+## Paso 4b: documentos desde el panel
+
+- `/admin/documents`: categorías (crear, renombrar, ordenar, borrar si están vacías) y documentos (crear, editar, borrar con confirmación, ordenar dentro de su categoría, "Most used").
+- Un documento es un enlace (por ejemplo, Google Drive) o un archivo subido: PDF, Word o imagen, hasta 25 MB. El tipo real se comprueba por el contenido del archivo, no por el nombre.
+- Los archivos van directamente del navegador a Cloudflare R2 (bucket `R2_PRIVATE_BUCKET`, carpeta `documents/<colegio>/`) con un enlace firmado. El bucket necesita la regla CORS que permite `PUT` desde el dominio del portal.
+- El portal enlaza `doc/<id>`, que redirige a un enlace firmado de 10 minutos. La descripción corta aparece antes del tipo ("Due Sept 4 · PDF · 0.2 MB").
+- `/api/health` dice si la web llega a la base de datos y al almacenamiento (solo true/false).
+- Pruebas en local sin R2: `STORAGE_LOCAL_DIR=/ruta` guarda los archivos en disco (nunca en Vercel).

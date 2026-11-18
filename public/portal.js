@@ -128,7 +128,7 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   const docTotal = DOCS.reduce((n, c) => n + c.items.length, 0);
   $('#docs-intro').textContent = `${docTotal} forms, handbooks and flyers for 2026–27, grouped by what you need to do.`;
   $('#most').innerHTML = MOST_USED.map(([c, i]) => { const it = DOCS.find(x => x.id === c).items[i];
-    return `<li><a href="${esc(it.h)}"><svg class="icon" style="color:var(--navy);width:24px;height:24px" aria-hidden="true"><use href="#i-doc"/></svg><span class="t">${esc(it.t)}</span><span class="meta">${esc(it.m)}</span></a></li>`; }).join('');
+    return `<li><a href="${esc(it.h)}"><svg class="icon" style="color:var(--navy);width:24px;height:24px" aria-hidden="true"><use href="#i-doc"/></svg><span class="t">${esc(it.t)}${it.d ? `<span class="desc">${esc(it.d)}</span>` : ''}</span><span class="meta">${esc(it.m)}</span></a></li>`; }).join('');
   const renderDocs = (q = '') => {
     const words = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
     const match = (it) => !words.length || words.every(w => (it.t + ' ' + (it.k || '')).toLowerCase().includes(w));
@@ -141,7 +141,7 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
         <div class="cat-top"><h3 class="h3" id="cat-${c.id}-t">${esc(c.name)}</h3><span class="caption">${items.length} ${noun}${items.length > 1 ? 's' : ''}</span></div>
         <p class="small">${esc(c.desc)}</p>
         <ul class="doc-list">${items.map(it => `<li><a href="${esc(it.h)}"${it.type === 'ext' ? ' target="_blank" rel="noopener"' : ''}>
-          <span>${esc(it.t)}${isNew(it) ? '<span class="badge-new">New</span>' : ''}</span>
+          <span>${esc(it.t)}${isNew(it) ? '<span class="badge-new">New</span>' : ''}${it.d ? `<span class="doc-desc">${esc(it.d)}</span>` : ''}</span>
           <span class="doc-meta">${esc(it.m)}<svg class="icon" aria-hidden="true"><use href="#${icon(it)}"/></svg>${it.type === 'ext' ? '<span class="sr-only">(opens in a new tab)</span>' : ''}</span></a></li>`).join('')}</ul></section>`;
     }).join('');
     $('#most-wrap').hidden = words.length > 0;

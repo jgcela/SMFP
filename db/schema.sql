@@ -176,3 +176,13 @@ create table if not exists login_attempts (
 alter table events add column if not exists start_time time;
 -- The school's time zone, used to read times from imported .ics files.
 alter table schools add column if not exists timezone text not null default 'UTC';
+
+-- ---------------------------------------------------------------------------
+-- Step 4b: documents managed from the staff area.
+-- An uploaded file lives in Cloudflare R2 (file_key); the portal links to
+-- /doc/<id>, which redirects to a short-lived signed link.
+alter table documents add column if not exists description  text not null default '';
+alter table documents add column if not exists file_key     text;
+alter table documents add column if not exists file_name    text;
+alter table documents add column if not exists content_type text;
+alter table documents add column if not exists file_size    bigint;

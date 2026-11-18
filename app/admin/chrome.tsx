@@ -3,7 +3,7 @@ import Link from "next/link";
 import { signOut } from "./actions";
 import { loadSchoolHeader } from "./school";
 
-export type Section = "notice" | "calendar";
+export type Section = "notice" | "calendar" | "documents";
 
 export async function AdminTop({ signedIn, section }: { signedIn: boolean; section?: Section }) {
   const school = await loadSchoolHeader();
@@ -26,6 +26,7 @@ export async function AdminTop({ signedIn, section }: { signedIn: boolean; secti
           <div className="in">
             <Link href="/admin" aria-current={section === "notice" ? "page" : undefined}>Notice</Link>
             <Link href="/admin/calendar" aria-current={section === "calendar" ? "page" : undefined}>Calendar</Link>
+            <Link href="/admin/documents" aria-current={section === "documents" ? "page" : undefined}>Documents</Link>
           </div>
         </nav>
       )}

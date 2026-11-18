@@ -153,6 +153,7 @@ p.contact-line{font-weight:400}
 .most a{height:100%;display:flex;flex-direction:column;gap:12px;padding:20px;background:var(--white);border:1px solid var(--gray);border-radius:var(--r-md);text-decoration:none}
 .most a:hover{border-color:var(--cerulean)}
 .most .t{font:700 16px/22px var(--font-brand);color:var(--navy);flex:1}
+.most .desc{display:block;margin-top:6px;font:400 12px/18px var(--font-text);color:var(--jet)}
 .most .meta{font-size:14px;line-height:20px;color:var(--cerulean);text-decoration:underline}
 .cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px}
 @media (max-width:420px){.cats{grid-template-columns:1fr}}
@@ -161,6 +162,7 @@ p.contact-line{font-weight:400}
 .doc-list{list-style:none;margin:4px 0 0;padding:0;border-top:1px solid var(--gray)}
 .doc-list li{border-bottom:1px solid var(--gray)}
 .doc-list a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:8px 0;color:var(--navy);font-weight:600;font-size:15px;line-height:20px}
+.doc-desc{display:inline-block;width:100%;margin-top:2px;font-weight:400;font-size:12px;line-height:18px;color:var(--jet)}
 .doc-meta{display:inline-flex;align-items:center;gap:6px;flex:none;font-weight:400;font-size:13px;color:var(--cerulean)}
 .doc-meta .icon{width:16px;height:16px;stroke-width:2}
 .badge-new{display:inline-flex;align-items:center;height:20px;padding:0 6px;margin-left:8px;border-radius:var(--r-sm);background:var(--gold);color:var(--navy);font:600 12px/16px var(--font-brand)}

@@ -22,7 +22,7 @@ export type PortalData = {
   // Active notices; the page shows the newest one whose dates include today
   // (checked in the browser, like every other date on the page).
   notices: { message: string; linkLabel: string; linkHref: string; from: string; until: string }[];
-  docs: { id: string; name: string; desc: string; items: { t: string; h: string; m: string; type?: string; k: string; added?: string }[] }[];
+  docs: { id: string; name: string; desc: string; items: { t: string; h: string; m: string; d?: string; type?: string; k: string; added?: string }[] }[];
   mostUsed: [string, number][];
   // [date, category, title, details, badges, link, endDate]
   events: [string, string, string, string, string, string, string?][];
@@ -56,8 +56,8 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
       from events where school_id = ${school.id} order by event_date, sort_order, id`,
     sql<{ id: number; key: string; name: string; description: string }[]>`
       select id, key, name, description from document_categories where school_id = ${school.id} order by sort_order, id`,
-    sql<{ category_id: number; title: string; href: string; meta: string; kind: string; keywords: string; added_on: string | null; most_used_rank: number | null }[]>`
-      select category_id, title, href, meta, kind, keywords, added_on::text, most_used_rank
+    sql<{ category_id: number; title: string; href: string; meta: string; description: string; kind: string; keywords: string; added_on: string | null; most_used_rank: number | null }[]>`
+      select category_id, title, href, meta, description, kind, keywords, added_on::text, most_used_rank
       from documents where school_id = ${school.id} order by sort_order, id`,
     sql<Link[]>`select placement, label, short_label, href from links where school_id = ${school.id} order by sort_order, id`,
   ]);
@@ -78,7 +78,10 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
     docs: docGroups.map(({ cat, items }) => ({
       id: cat.key, name: cat.name, desc: cat.description,
       items: items.map((d) => ({
-        t: d.title, h: d.href, m: d.meta, k: d.keywords,
+        // The optional short description is shown as plain text under the title, not inside the link line.
+        t: d.title, h: d.href, m: d.meta,
+        ...(d.description ? { d: d.description } : {}),
+        k: [d.keywords, d.description].filter(Boolean).join(" "),
         ...(d.kind !== "file" ? { type: d.kind } : {}),
         ...(d.added_on ? { added: iso(d.added_on) } : {}),
       })),
