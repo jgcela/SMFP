@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { opensInNewTabByDefault } from "./links";
 import { mapsHref } from "./contact";
+import { absolutePaths } from "./page-html";
 import type { ContactPerson, Link, School } from "./portal";
 
 // The page markup, with {{...}} where each school's content goes.
@@ -150,5 +151,6 @@ export function renderSchoolPage(school: School, links: Link[], people: ContactP
       <div class="hb-scrim" id="hb-scrim" hidden></div>
 `
     : "";
-  return fill(pageTemplate, values);
+  // Pages live under /pages/, so the portal's relative links (menu, contact...) must start at the site root.
+  return absolutePaths(fill(pageTemplate, values));
 }
