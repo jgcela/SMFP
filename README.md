@@ -9,21 +9,36 @@ está guardado en la rama `backlog/portal-v1`.
 
 ## Cómo está hecho
 
+Copia completa de la carpeta `Portal_202627` de Google Drive (la misma que sirve
+`stmarycommunication.javiercela.me/Portal_202627/`): la portada, las 8 páginas enlazadas
+y todos sus archivos (PDFs, imágenes, números del School Messenger).
+
 | Archivo | Qué es |
 |---|---|
-| `reference/portal_202627.original.html` | Copia del HTML original (de la carpeta `Portal_202627` en Google Drive). |
-| `scripts/import-original.py` | Separa el original en las tres piezas de abajo. |
-| `app/portal.css` | Los estilos del original, sin cambios. |
-| `content/portal-body.html` | El contenido de la página, sin cambios. |
-| `public/portal.js` | El JavaScript del original (eventos, documentos, calendario, buscador), sin cambios. |
-| `public/logo_white.png`, `public/favicon.png` | El logo y el icono del original. |
-| `app/layout.tsx`, `app/page.tsx` | La página Next.js que junta todo. |
+| `reference/*.html` | Copia sin tocar de cada página HTML original. |
+| `scripts/import-original.py` | Convierte `reference/` en lo que sirve la app. |
+| `app/layout.tsx`, `app/page.tsx` | La portada como página Next.js (`/` y `/portal_202627.html`). |
+| `app/portal.css`, `content/portal-body.html`, `public/portal.js` | Estilos, contenido y JavaScript de la portada, sin cambios. |
+| `public/*_202627.html` | Las demás páginas (Messenger, Volunteer, Teacher wishlists, Staff favorites, Handbooks, Supply list). |
+| `public/assets/` | La carpeta `assets` original completa. |
+| `public/new-tab.js` | Hace que los enlaces a archivos y a otras webs se abran en una pestaña nueva. |
+| `next.config.ts` | `/portal_202627.html` lleva a la portada; cabecera `noindex` en todo (como el `.htaccess` original). |
 
-Único cambio respecto al original: los enlaces relativos (`assets/...`, `handbook_202627.html`, etc.)
-apuntan ahora al sitio original, porque esos documentos y páginas aún no están en esta app.
+Cambios en el contenido:
 
-Para actualizar desde un HTML nuevo: sustituir `reference/portal_202627.original.html` y ejecutar
-`npm run import-original`.
+- El logo se carga desde esta app (`assets/logo_white.png`) en lugar de desde
+  `stmarycommunication.javiercela.me`.
+- Cada página y cada número del Messenger carga `/new-tab.js`: los enlaces a PDFs, flyers,
+  imágenes y otras webs se abren en una pestaña nueva. Los enlaces entre las páginas del
+  portal (menú de arriba, Home…), los saltos dentro de la misma página (`#calendar`), los
+  correos (`mailto:`) y los teléfonos (`tel:`) se abren en la misma pestaña, como antes.
+
+Todos los demás enlaces son los
+originales, así que páginas, PDFs e imágenes los sirve esta app. Las imágenes dentro de
+los números del Messenger siguen viniendo de Flocknote, igual que en el original.
+
+Para actualizar: sustituir los HTML en `reference/` (o los archivos en `public/assets/`)
+y ejecutar `npm run import-original`.
 
 ## Desarrollo
 

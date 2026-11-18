@@ -1,44 +1,61 @@
-"""Split the original portal page (reference/portal_202627.original.html) into the
-pieces the Next.js app uses, without changing their content:
+"""Turn the original portal files (reference/) into what this app serves.
 
-  app/portal.css        <- the <style> block
-  content/portal-body.html <- everything inside <body> except the <script>
-  public/portal.js      <- the <script> block
+The original site is the Google Drive folder `Portal_202627`
+(the same files that run at stmarycommunication.javiercela.me/Portal_202627/).
 
-Only one thing changes: relative links ("assets/...", "handbook_202627.html")
-become absolute links to the original site, because those pages and files
-are not part of this app yet. The logo and favicon are served from /public.
+  reference/portal_202627.original.html -> the home page of the Next.js app:
+      app/portal.css            (its <style> block)
+      content/portal-body.html  (everything inside <body> except the <script>)
+      public/portal.js          (its <script> block)
+  reference/<other page>.html  -> public/<other page>.html
+  public/assets/               -> the original assets folder, copied as is
+                                  (PDFs, images, CSS, School Messenger issues)
+
+Changes to the content:
+- the logo is loaded from this app (assets/logo_white.png) instead of from
+  stmarycommunication.javiercela.me;
+- every page (and every School Messenger issue) loads /new-tab.js, so links
+  to files and other websites open in a new tab; links between the portal's
+  own pages stay in the same tab (asked for on 2026-11-18).
+The links themselves stay exactly as in the original, so pages, PDFs and
+images are served by this app.
 
 Run: python3 scripts/import-original.py
 """
 import re, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-BASE = "https://stmarycommunication.javiercela.me/Portal_202627/"
-src = (ROOT / "reference/portal_202627.original.html").read_text(encoding="utf-8")
+REF = ROOT / "reference"
+OLD_LOGO = "https://stmarycommunication.javiercela.me/portal/assets/logo_white.png"
+NEW_LOGO = "assets/logo_white.png"
 
+NEW_TAB = '<script src="/new-tab.js"></script>\n'
+
+def fix(text):
+    return text.replace(OLD_LOGO, NEW_LOGO)
+
+def add_new_tab(text):
+    if NEW_TAB in text:
+        return text
+    i = text.rindex("</body>")
+    return text[:i] + NEW_TAB + text[i:]
+
+src = (REF / "portal_202627.original.html").read_text(encoding="utf-8")
 css = re.search(r"<style>\n?(.*?)</style>", src, re.S).group(1)
 body = re.search(r"<body>\n?(.*?)<script>", src, re.S).group(1)
 js = re.search(r"<script>\n?(.*?)</script>", src, re.S).group(1)
-
-def is_relative(u):
-    return not re.match(r"^(#|https?:|mailto:|tel:|webcal:|/|\$\{)", u)
-
-# Markup: href="..." / src="..."
-def fix_attr(m):
-    attr, url = m.group(1), m.group(2)
-    if url == "https://stmarycommunication.javiercela.me/portal/assets/logo_white.png":
-        return f'{attr}="/logo_white.png"'
-    return f'{attr}="{BASE + url}"' if is_relative(url) else m.group(0)
-body = re.sub(r'\b(href|src)="([^"]*)"', fix_attr, body)
-
-# Script data: string literals that are relative file/page paths
-def fix_str(m):
-    q, url = m.group(1), m.group(2)
-    return f"{q}{BASE + url}{q}"
-js = re.sub(r"""(['"])((?:assets/[^'"]+)|(?:[\w-]+_202627\.html))\1""", fix_str, js)
-
 (ROOT / "app/portal.css").write_text(css, encoding="utf-8")
-(ROOT / "content/portal-body.html").write_text(body, encoding="utf-8")
-(ROOT / "public/portal.js").write_text(js, encoding="utf-8")
-print("css", len(css), "body", len(body), "js", len(js))
+(ROOT / "content/portal-body.html").write_text(fix(body), encoding="utf-8")
+(ROOT / "public/portal.js").write_text(fix(js), encoding="utf-8")
+
+for page in sorted(REF.glob("*_202627.html")):
+    (ROOT / "public" / page.name).write_text(add_new_tab(fix(page.read_text(encoding="utf-8"))), encoding="utf-8")
+    print("page", page.name)
+
+for issue in sorted((ROOT / "public/assets/messenger/data").glob("*.html")):
+    # newline="" keeps the issue's own line endings (CRLF) untouched.
+    with open(issue, encoding="utf-8", newline="") as f:
+        text = f.read()
+    with open(issue, "w", encoding="utf-8", newline="") as f:
+        f.write(add_new_tab(text))
+    print("messenger issue", issue.name)

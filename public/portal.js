@@ -17,39 +17,39 @@ const CONFIG = {
    ========================================================= */
 const DOCS = [
   { id:'forms', name:'Forms to return', desc:'Print, fill in and send back to the front office.', items:[
-    { t:'Milk Order Form', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/2026-27_Milk_Order_Form.pdf', m:'PDF · 1.8 MB', k:'milk lunch order' },
-    { t:'Physical Exam Form', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Physical_Exam_Form.pdf', m:'PDF · 0.4 MB', k:'health physical exam doctor' },
-    { t:'Authorization to Administer Medication', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Authorization to Administer Medication.pdf', m:'PDF · 0.2 MB', k:'medication medicine health nurse' },
-    { t:'SMEED Form', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/SMEED/SMEED Form.pdf', m:'PDF · 0.3 MB', k:'smeed extended day after school care' },
-    { t:'Family Covenant Agreements', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/2026-27_Family_Covenant_Agreements.pdf', m:'PDF · 0.2 MB', k:'covenant agreement' }
+    { t:'Milk Order Form', h:'assets/documents/2026-27_Milk_Order_Form.pdf', m:'PDF · 1.8 MB', k:'milk lunch order' },
+    { t:'Physical Exam Form', h:'assets/documents/Physical_Exam_Form.pdf', m:'PDF · 0.4 MB', k:'health physical exam doctor' },
+    { t:'Authorization to Administer Medication', h:'assets/documents/Authorization to Administer Medication.pdf', m:'PDF · 0.2 MB', k:'medication medicine health nurse' },
+    { t:'SMEED Form', h:'assets/documents/SMEED/SMEED Form.pdf', m:'PDF · 0.3 MB', k:'smeed extended day after school care' },
+    { t:'Family Covenant Agreements', h:'assets/documents/2026-27_Family_Covenant_Agreements.pdf', m:'PDF · 0.2 MB', k:'covenant agreement' }
   ]},
   { id:'handbooks', name:'Handbooks & policies', desc:'Read online or download the PDF.', items:[
-    { t:'Student Handbook 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/handbook_202627.html', m:'Web page', type:'web', k:'handbook rules policy conduct uniform' },
-    { t:'Student Handbook 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/2026-2027_Parent_Handbook.pdf', m:'PDF · 0.8 MB', k:'handbook rules policy conduct uniform' },
-    { t:'Preschool Handbook 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/preschool-handbook_202627.html', m:'Web page', type:'web', k:'preschool handbook' },
-    { t:'Preschool Handbook 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/2026-2027_Parent_Handbook_Preschool.pdf', m:'PDF · 0.5 MB', k:'preschool handbook' },
-    { t:'SMEED Handbook 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/SMEED/SMEED Handbook 26-27.pdf', m:'PDF · 0.4 MB', k:'smeed extended day handbook' },
-    { t:'Cell Phone Policy (Middle School)', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Cell_Phone_Policy.pdf', m:'PDF · 0.3 MB', k:'phone policy middle school' }
+    { t:'Student Handbook 2026–27', h:'handbook_202627.html', m:'Web page', type:'web', k:'handbook rules policy conduct uniform' },
+    { t:'Student Handbook 2026–27', h:'assets/documents/2026-2027_Parent_Handbook.pdf', m:'PDF · 0.8 MB', k:'handbook rules policy conduct uniform' },
+    { t:'Preschool Handbook 2026–27', h:'preschool-handbook_202627.html', m:'Web page', type:'web', k:'preschool handbook' },
+    { t:'Preschool Handbook 2026–27', h:'assets/documents/2026-2027_Parent_Handbook_Preschool.pdf', m:'PDF · 0.5 MB', k:'preschool handbook' },
+    { t:'SMEED Handbook 2026–27', h:'assets/documents/SMEED/SMEED Handbook 26-27.pdf', m:'PDF · 0.4 MB', k:'smeed extended day handbook' },
+    { t:'Cell Phone Policy (Middle School)', h:'assets/documents/Cell_Phone_Policy.pdf', m:'PDF · 0.3 MB', k:'phone policy middle school' }
   ]},
   { id:'health', name:'Health & safety', desc:'Medical information and emergency procedures.', items:[
-    { t:'Health Information 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Medical_Information_26-27.pdf', m:'PDF · 0.6 MB', k:'health medical immunization vaccine nurse' },
-    { t:'SMEED Emergency Information', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/SMEED/SMEED Emergency Information.pdf', m:'PDF · 0.1 MB', k:'emergency smeed' }
+    { t:'Health Information 2026–27', h:'assets/documents/Medical_Information_26-27.pdf', m:'PDF · 0.6 MB', k:'health medical immunization vaccine nurse' },
+    { t:'SMEED Emergency Information', h:'assets/documents/SMEED/SMEED Emergency Information.pdf', m:'PDF · 0.1 MB', k:'emergency smeed' }
   ]},
   { id:'preschool', name:'Preschool', desc:'Uniform, vocabulary and the drop-off route.', items:[
-    { t:'Preschool Uniform 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Preschool Uniform 26-27.pdf', m:'PDF · 0.7 MB', k:'uniform preschool' },
-    { t:'Preschool Dictionary', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Preschool Dictionary.pdf', m:'PDF · 4.7 MB', k:'preschool dictionary vocabulary' },
-    { t:'Preschool Drop-Off Map', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Map Preschool Drop Off.pdf', m:'PDF · 2.8 MB', k:'map drop off pick up preschool' }
+    { t:'Preschool Uniform 2026–27', h:'assets/documents/Preschool Uniform 26-27.pdf', m:'PDF · 0.7 MB', k:'uniform preschool' },
+    { t:'Preschool Dictionary', h:'assets/documents/Preschool Dictionary.pdf', m:'PDF · 4.7 MB', k:'preschool dictionary vocabulary' },
+    { t:'Preschool Drop-Off Map', h:'assets/documents/Map Preschool Drop Off.pdf', m:'PDF · 2.8 MB', k:'map drop off pick up preschool' }
   ]},
   { id:'academics', name:'Academics', desc:'Calendar, standards, supplies and summer work.', items:[
-    { t:'Academic Calendar 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/Calendar_2026-27.pdf', m:'PDF · 2.4 MB', k:'calendar dates schedule' },
+    { t:'Academic Calendar 2026–27', h:'assets/documents/Calendar_2026-27.pdf', m:'PDF · 2.4 MB', k:'calendar dates schedule' },
     { t:'Curriculum Standards', h:'https://www.denvercatholicschools.com/why-catholic-education/curriculum', m:'External site', type:'ext', k:'curriculum standards archdiocese' },
-    { t:'School Supply List by Grade', h:'https://stmarycommunication.javiercela.me/Portal_202627/supply-list_202627.html', m:'Web page', type:'web', k:'supplies supply list' },
-    { t:'Summer Math, incoming 6th grade', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/6th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 6th' },
-    { t:'Summer Math, incoming 7th grade', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/7th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 7th' },
-    { t:'Summer Math, incoming 8th grade', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/documents/8th Grade.pdf', m:'PDF · 0.7 MB', k:'summer math 8th' }
+    { t:'School Supply List by Grade', h:'supply-list_202627.html', m:'Web page', type:'web', k:'supplies supply list' },
+    { t:'Summer Math, incoming 6th grade', h:'assets/documents/6th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 6th' },
+    { t:'Summer Math, incoming 7th grade', h:'assets/documents/7th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 7th' },
+    { t:'Summer Math, incoming 8th grade', h:'assets/documents/8th Grade.pdf', m:'PDF · 0.7 MB', k:'summer math 8th' }
   ]},
   { id:'flyers', name:'Flyers', desc:'Menus and school-wide announcements.', items:[
-    { t:'School Eatery 2026–27', h:'https://stmarycommunication.javiercela.me/Portal_202627/assets/flyers/schooleatery.pdf', m:'PDF · 3.0 MB', k:'lunch menu eatery food' }
+    { t:'School Eatery 2026–27', h:'assets/flyers/schooleatery.pdf', m:'PDF · 3.0 MB', k:'lunch menu eatery food' }
   ]}
 ];
 const MOST_USED = [
@@ -76,7 +76,7 @@ const EVENTS = [
 ["2026-08-28","faith","All School Mass K-8","Mass Uniform","Faith",""],
 ["2026-08-28","community","Back to School Night","5:00 pm","Community|Important",""],
 ["2026-09-02","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2026-09-04","community","Bookends of Beauty at 7PM","Night Flight by Anthoine Saint-Exupery","Community","https://stmarycommunication.javiercela.me/Portal_202627/assets/events/Bookends of Beauty 26-27.pdf"],
+["2026-09-04","community","Bookends of Beauty at 7PM","Night Flight by Anthoine Saint-Exupery","Community","assets/events/Bookends of Beauty 26-27.pdf"],
 ["2026-09-04","faith","All School Mass K-8","Mass Uniform","Faith",""],
 ["2026-09-07","noclasses","Labor Day — No School","Observed Holiday","No School|Important",""],
 ["2026-09-08","faith","All School Mass K-8","Mass Uniform","Faith",""],
@@ -108,7 +108,7 @@ const EVENTS = [
 ["2026-10-31","community","Trunk-or-Treat","2:00 pm, Blacktop","Community",""],
 ["2026-11-04","community","SMPA Meeting","6:00 pm, Library","Community",""],
 ["2026-11-06","faith","Picture Retakes","All School Mass","Faith",""],
-["2026-11-06","community","Bookends of Beauty at 7PM","All The Lights We Cannot See by Anthony Doerr","Community","https://stmarycommunication.javiercela.me/Portal_202627/assets/events/Bookends of Beauty 26-27.pdf"],
+["2026-11-06","community","Bookends of Beauty at 7PM","All The Lights We Cannot See by Anthony Doerr","Community","assets/events/Bookends of Beauty 26-27.pdf"],
 ["2026-11-08","community","Sapientia Sunday","9:30 am","Community",""],
 ["2026-11-13","faith","All School Mass","Preschool-8","Faith",""],
 ["2026-11-13","academic","End of Trimester","Report cards to follow","Academic|Important",""],
@@ -147,7 +147,7 @@ const EVENTS = [
 ["2027-02-11","noclasses","Parent/Teacher Conferences — No School","Feb 11-12. Schedule through the portal","No School|Important","","2027-02-15"],
 ["2027-02-15","noclasses","Presidents Day — No School","Observed Holiday","No School",""],
 ["2027-02-16","faith","1st Communion Parent Workshop","6:30 pm, Joachim Hall · Mandatory for parents","Faith",""],
-["2027-02-19","community","Bookends of Beauty at 7PM","The Secret Diary of Elisabeth Leseur: The Woman whose Goodness Changed Her Husband from Atheist to Priest","Community","https://stmarycommunication.javiercela.me/Portal_202627/assets/events/Bookends of Beauty 26-27.pdf"],
+["2027-02-19","community","Bookends of Beauty at 7PM","The Secret Diary of Elisabeth Leseur: The Woman whose Goodness Changed Her Husband from Atheist to Priest","Community","assets/events/Bookends of Beauty 26-27.pdf"],
 ["2027-02-19","faith","All School Mass","Preschool-8","Faith",""],
 ["2027-02-23","faith","1st Reconciliation — SMS","6:30 pm, in the church","Faith",""],
 ["2027-02-26","academic","End of Trimester","Report cards to follow","Academic|Important",""],
@@ -179,7 +179,7 @@ const EVENTS = [
 ["2027-04-28","academic","Taste Star — 4th Grade","10:00 am, Marian Hall","Academic|Community",""],
 ["2027-04-29","faith","All School Mass","Preschool-8","Faith",""],
 ["2027-04-30","noclasses","No School — Teacher In-Service","Staff only","No School",""],
-["2027-04-30","community","Bookends of Beauty at 7PM","Theo of Golden by Allen Levi","Community","https://stmarycommunication.javiercela.me/Portal_202627/assets/events/Bookends of Beauty 26-27.pdf"],
+["2027-04-30","community","Bookends of Beauty at 7PM","Theo of Golden by Allen Levi","Community","assets/events/Bookends of Beauty 26-27.pdf"],
 ["2027-05-01","faith","Confirmation & First Communion Mass","10 am: Homeschool & SMS Class 1 (arrive 9:30) · 2 pm: Bethlehem & SMS Class 2 (arrive 1:30)","Faith|Important",""],
 ["2027-05-03","faith","May Crowning","9:30 am, All School Mass · Wear 1st Communion gear","Faith",""],
 ["2027-05-04","community","SMPA Meeting","6:00 pm, Library","Community",""],
