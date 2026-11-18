@@ -21,10 +21,18 @@ y todos sus archivos (PDFs, imágenes, números del School Messenger).
 | `app/portal.css`, `content/portal-body.html`, `public/portal.js` | Estilos, contenido y JavaScript de la portada, sin cambios. |
 | `public/*_202627.html` | Las demás páginas (Messenger, Volunteer, Teacher wishlists, Staff favorites, Handbooks, Supply list). |
 | `public/assets/` | La carpeta `assets` original completa. |
+| `public/new-tab.js` | Hace que los enlaces a otras páginas y archivos se abran en una pestaña nueva. |
 | `next.config.ts` | `/portal_202627.html` lleva a la portada; cabecera `noindex` en todo (como el `.htaccess` original). |
 
-Único cambio en el contenido: el logo se carga desde esta app (`assets/logo_white.png`)
-en lugar de desde `stmarycommunication.javiercela.me`. Todos los demás enlaces son los
+Cambios en el contenido:
+
+- El logo se carga desde esta app (`assets/logo_white.png`) en lugar de desde
+  `stmarycommunication.javiercela.me`.
+- Cada página y cada número del Messenger carga `/new-tab.js`: todo enlace a otra página,
+  PDF o web se abre en una pestaña nueva. Los saltos dentro de la misma página (`#calendar`),
+  los correos (`mailto:`) y los teléfonos (`tel:`) funcionan como antes.
+
+Todos los demás enlaces son los
 originales, así que páginas, PDFs e imágenes los sirve esta app. Las imágenes dentro de
 los números del Messenger siguen viniendo de Flocknote, igual que en el original.
 

@@ -11,10 +11,13 @@ The original site is the Google Drive folder `Portal_202627`
   public/assets/               -> the original assets folder, copied as is
                                   (PDFs, images, CSS, School Messenger issues)
 
-The only change to the content: the logo is loaded from this app
-(assets/logo_white.png) instead of from stmarycommunication.javiercela.me.
-Every other link stays exactly as in the original, so pages, PDFs and images
-are served by this app.
+Changes to the content:
+- the logo is loaded from this app (assets/logo_white.png) instead of from
+  stmarycommunication.javiercela.me;
+- every page (and every School Messenger issue) loads /new-tab.js, so links
+  to other pages and files open in a new tab (asked for on 2026-11-18).
+The links themselves stay exactly as in the original, so pages, PDFs and
+images are served by this app.
 
 Run: python3 scripts/import-original.py
 """
@@ -25,8 +28,16 @@ REF = ROOT / "reference"
 OLD_LOGO = "https://stmarycommunication.javiercela.me/portal/assets/logo_white.png"
 NEW_LOGO = "assets/logo_white.png"
 
+NEW_TAB = '<script src="/new-tab.js"></script>\n'
+
 def fix(text):
     return text.replace(OLD_LOGO, NEW_LOGO)
+
+def add_new_tab(text):
+    if NEW_TAB in text:
+        return text
+    i = text.rindex("</body>")
+    return text[:i] + NEW_TAB + text[i:]
 
 src = (REF / "portal_202627.original.html").read_text(encoding="utf-8")
 css = re.search(r"<style>\n?(.*?)</style>", src, re.S).group(1)
@@ -37,5 +48,13 @@ js = re.search(r"<script>\n?(.*?)</script>", src, re.S).group(1)
 (ROOT / "public/portal.js").write_text(fix(js), encoding="utf-8")
 
 for page in sorted(REF.glob("*_202627.html")):
-    (ROOT / "public" / page.name).write_text(fix(page.read_text(encoding="utf-8")), encoding="utf-8")
+    (ROOT / "public" / page.name).write_text(add_new_tab(fix(page.read_text(encoding="utf-8"))), encoding="utf-8")
     print("page", page.name)
+
+for issue in sorted((ROOT / "public/assets/messenger/data").glob("*.html")):
+    # newline="" keeps the issue's own line endings (CRLF) untouched.
+    with open(issue, encoding="utf-8", newline="") as f:
+        text = f.read()
+    with open(issue, "w", encoding="utf-8", newline="") as f:
+        f.write(add_new_tab(text))
+    print("messenger issue", issue.name)

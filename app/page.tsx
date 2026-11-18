@@ -14,6 +14,9 @@ export default function Home() {
       <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: markup }} />
       {/* eslint-disable-next-line @next/next/no-sync-scripts */}
       <script src="/portal.js" />
+      {/* Links to other pages and files open in a new tab. */}
+      {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+      <script src="/new-tab.js" />
     </body>
   );
 }
