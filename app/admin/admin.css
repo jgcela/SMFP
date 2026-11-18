@@ -119,3 +119,8 @@
 .adm-radios{display:flex;gap:20px;flex-wrap:wrap}
 .adm-f input[type=file]{font:400 15px/22px var(--font-text)}
 @media (max-width:640px){.adm-doc{grid-template-columns:1fr}.adm-doc .act{justify-content:flex-start}}
+
+/* Links (step 4c) */
+.pill--muted{background:var(--gray);color:var(--jet)}
+.adm-doc.is-hidden .what strong{color:#5b6470}
+.adm-href{overflow-wrap:anywhere}

@@ -14,7 +14,7 @@ export type School = {
   logo_url: string; phone_display: string; phone_href: string; email: string; office_hours: string;
   google_calendar_id: string; notice_auto_days: number;
 };
-export type Link = { placement: string; label: string; short_label: string; href: string };
+export type Link = { placement: string; label: string; short_label: string; href: string; new_tab: boolean };
 
 // The data the page script (public/portal.js) works with, in the shapes it expects.
 export type PortalData = {
@@ -59,7 +59,7 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
     sql<{ category_id: number; title: string; href: string; meta: string; description: string; kind: string; keywords: string; added_on: string | null; most_used_rank: number | null }[]>`
       select category_id, title, href, meta, description, kind, keywords, added_on::text, most_used_rank
       from documents where school_id = ${school.id} order by sort_order, id`,
-    sql<Link[]>`select placement, label, short_label, href from links where school_id = ${school.id} order by sort_order, id`,
+    sql<Link[]>`select placement, label, short_label, href, new_tab from links where school_id = ${school.id} and not hidden order by sort_order, id`,
   ]);
 
   const docGroups = cats.map((c) => {

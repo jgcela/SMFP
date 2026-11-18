@@ -81,3 +81,14 @@ PORTAL_SCHOOL=<slug> npm run dev     # http://localhost:3000
 - El portal enlaza `doc/<id>`, que redirige a un enlace firmado de 10 minutos. La descripción corta aparece antes del tipo ("Due Sept 4 · PDF · 0.2 MB").
 - `/api/health` dice si la web llega a la base de datos y al almacenamiento (solo true/false).
 - Pruebas en local sin R2: `STORAGE_LOCAL_DIR=/ruta` guarda los archivos en disco (nunca en Vercel).
+
+## Step 4c: links
+
+Staff edit the portal's links at `/admin/links`: the "Popular" shortcuts, the main
+menu (top bar and phone menu) and the FACTS button (which can be changed or
+hidden, not deleted). Each link has its text, address, whether it opens in a new
+tab, and can be hidden or reordered. Addresses must start with `https://`, or be
+one of the portal's own pages, files or sections; `lib/links.ts` checks this in
+the browser before saving and again on the server. The list of the portal's own
+files (`lib/public-files.json`) is regenerated before every build.
+Database change: `db/migrations/2026-11-18-step4c-links.sql`.

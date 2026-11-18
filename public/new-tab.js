@@ -8,7 +8,7 @@
   var SAME_PAGE = /^(#|mailto:|tel:|sms:|javascript:)/i;
   document.addEventListener("click", function (e) {
     var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
-    if (!a) return;
+    if (!a || a.hasAttribute("data-same-tab")) return; // the school chose the same tab
     var href = a.getAttribute("href") || "";
     if (SAME_PAGE.test(href)) return;
     var url = new URL(a.href, location.href);
