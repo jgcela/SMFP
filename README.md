@@ -54,3 +54,13 @@ psql "$PORTAL_DATABASE_URL" -f db/schema.sql
 node scripts/seed-from-original.mjs <slug> tmp/seed && psql "$PORTAL_DATABASE_URL" -f tmp/seed/seed.sql
 PORTAL_SCHOOL=<slug> npm run dev     # http://localhost:3000
 ```
+
+## Paso 3: entrada del personal y aviso destacado
+
+- `/admin`: inicio de sesión del personal (Better Auth, correo y contraseña). Sin registro público.
+- Una vez dentro, un único formulario: texto del aviso, enlace opcional e interruptor mostrar/ocultar. Al guardar, la portada se actualiza al momento.
+- Usuarios en la base `portal`: tablas `auth_user`, `auth_session`, `auth_account`, `auth_verification`.
+- `school_staff` dice qué colegio puede editar cada usuario. El colegio sale siempre de `PORTAL_SCHOOL` y además tiene que estar en `school_staff`; el navegador no decide nada.
+- Contraseña: `node scripts/staff-link.mjs <colegio> <correo> "<nombre>" <url-del-portal>` crea el usuario (si no existe) y un enlace de un solo uso (72 horas) para que la persona elija su contraseña. Solo se guarda el hash del enlace. Sirve también para restablecer una contraseña olvidada.
+- `login_attempts`: tras 8 intentos fallidos en 15 minutos (por correo y por IP) se bloquea temporalmente.
+- Variables nuevas: `BETTER_AUTH_SECRET` (obligatoria). Opcional `AUTH_HOSTS` (dominios propios, separados por comas).
