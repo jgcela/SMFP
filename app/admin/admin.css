@@ -192,3 +192,24 @@
   .pe-versions{max-height:none}
 }
 @media (max-width:640px){.pe-content{padding:16px 14px}}
+
+/* Families (step 5) */
+.fam-status{border-left:4px solid var(--gold);background:#fff8e6;border-radius:var(--r-md);padding:14px 16px;margin:0 0 4px}
+.fam-status h2{margin:0 0 4px;font:700 17px/24px var(--font-brand);color:var(--navy)}
+.fam-status p{margin:0;color:var(--jet)}
+.adm-f input[aria-invalid=true]{border-color:#b3261e;box-shadow:0 0 0 1px #b3261e}
+.fam-tabs{display:flex;gap:4px;border-bottom:1px solid var(--gray);margin:0 0 4px;overflow-x:auto}
+.fam-tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:600 15px/20px var(--font-brand);color:#5b6470;cursor:pointer;white-space:nowrap;min-height:44px}
+.fam-tabs button[aria-selected=true]{color:var(--navy);border-bottom-color:var(--gold)}
+.fam-tabs button:focus-visible{outline:3px solid var(--aero);outline-offset:-3px}
+.fam-tabs .n{display:inline-block;min-width:20px;margin-left:6px;padding:0 6px;border-radius:var(--r-pill);background:var(--azure);color:var(--navy);font-size:12px;line-height:20px;text-align:center}
+.fam-tabs .n--hot{background:var(--gold)}
+.fam-code{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.fam-code .code{font:700 26px/32px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;color:var(--navy);background:var(--azure);border-radius:var(--r-md);padding:6px 14px;user-select:all}
+.adm-card + .adm-card{margin-top:20px}
+.adm-h2{margin:0 0 4px;font:700 20px/26px var(--font-brand);color:var(--navy)}
+.adm-doc .act .ok{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.adm-doc .act .ok:hover:not(:disabled){background:#0f2643}
+.fam-code .confirm{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font:600 14px/20px var(--font-brand);color:#8a1c12}
+.fam-code .confirm button{min-height:40px;padding:0 14px;border-radius:var(--r-md);border:1px solid var(--cerulean);background:var(--white);color:var(--navy);font:600 14px/20px var(--font-brand);cursor:pointer}
+.fam-code .confirm .danger{background:#b3261e;border-color:#b3261e;color:var(--white)}

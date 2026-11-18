@@ -126,3 +126,22 @@ already imported are never touched. `node scripts/import-legacy-page.mjs <school
 prints the same import as SQL. Old addresses that now lead elsewhere (the Supply
 list became its PDF) are in the `redirects` table.
 Database change: `db/migrations/2026-11-18-step4e-pages.sql`.
+
+## Step 5: families sign in, approved by the school
+
+The public portal stays open to everyone. Families create an account at
+`/family/register` with their name, email, a password and the school code
+(`schools.family_code`, handed out by the school). The account is "pending"
+until staff approve it in `/admin/families`, where they can also reject or turn
+off accounts and change the school code (the old code stops working at once).
+Families sign in at `/family`. A family that is not approved never gets a
+session, and turning a family off signs it out everywhere.
+
+A family belongs to one school (`families.school_id`), and everything is read
+for this deployment's school (`PORTAL_SCHOOL`). Sign-in accounts (`auth_user`) are
+shared with staff, but staff rights come only from `school_staff` and family
+rights only from `families`. `lib/family.ts` (`currentFamily()`) is the one place
+that says whether someone is an approved family; FACTS sign-in (SSO) can later
+link to the same row through `families.sso_provider` / `sso_subject` without
+changing the approval flow.
+Database change: `db/migrations/2026-11-18-step5-families.sql`.
