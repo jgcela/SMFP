@@ -1,19 +1,19 @@
 """Turn the original portal files (reference/) into what this app serves.
 
-The original site is the Google Drive folder `Portal_202627`
-(the same files that run at stmarycommunication.javiercela.me/Portal_202627/).
+The original site is the school's Google Drive folder `Portal_202627`
+(the same files the old website serves).
 
-  reference/portal_202627.original.html -> the home page of the Next.js app:
-      app/portal.css            (its <style> block)
-      content/portal-body.html  (everything inside <body> except the <script>)
-      public/portal.js          (its <script> block)
+  reference/portal_202627.original.html -> app/portal.css (its <style> block)
+      Since step 2 the home page's markup (content/portal-template.html),
+      script (public/portal.js) and content (the database, see
+      scripts/seed-from-original.mjs) are no longer generated here.
   reference/<other page>.html  -> public/<other page>.html
   public/assets/               -> the original assets folder, copied as is
                                   (PDFs, images, CSS, School Messenger issues)
 
 Changes to the content:
 - the logo is loaded from this app (assets/logo_white.png) instead of from
-  stmarycommunication.javiercela.me;
+  the old website;
 - every page (and every School Messenger issue) loads /new-tab.js, so links
   to files and other websites open in a new tab; links between the portal's
   own pages stay in the same tab (asked for on 2026-11-18).
@@ -26,13 +26,13 @@ import re, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 REF = ROOT / "reference"
-OLD_LOGO = "https://stmarycommunication.javiercela.me/portal/assets/logo_white.png"
+OLD_LOGO = re.compile(r"https://[^\"'\s]+/portal/assets/logo_white\.png")
 NEW_LOGO = "assets/logo_white.png"
 
 NEW_TAB = '<script src="/new-tab.js"></script>\n'
 
 def fix(text):
-    return text.replace(OLD_LOGO, NEW_LOGO)
+    return OLD_LOGO.sub(NEW_LOGO, text)
 
 def add_new_tab(text):
     if NEW_TAB in text:
@@ -42,11 +42,9 @@ def add_new_tab(text):
 
 src = (REF / "portal_202627.original.html").read_text(encoding="utf-8")
 css = re.search(r"<style>\n?(.*?)</style>", src, re.S).group(1)
-body = re.search(r"<body>\n?(.*?)<script>", src, re.S).group(1)
-js = re.search(r"<script>\n?(.*?)</script>", src, re.S).group(1)
+# The stylesheet is the same for every school: drop the school's name from its first comment.
+css = re.sub(r"^/\* =+ .*? design system tokens =+ \*/", "/* ===== Design system tokens ===== */", css, count=1)
 (ROOT / "app/portal.css").write_text(css, encoding="utf-8")
-(ROOT / "content/portal-body.html").write_text(fix(body), encoding="utf-8")
-(ROOT / "public/portal.js").write_text(fix(js), encoding="utf-8")
 
 for page in sorted(REF.glob("*_202627.html")):
     (ROOT / "public" / page.name).write_text(add_new_tab(fix(page.read_text(encoding="utf-8"))), encoding="utf-8")

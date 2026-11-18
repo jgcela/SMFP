@@ -1,200 +1,16 @@
 /* =========================================================
-   CONFIGURATION — edit these before publishing
+   DATA — comes from the database. The page puts it in
+   window.__PORTAL__ before this script runs (see app/page.tsx).
    ========================================================= */
-const CONFIG = {
-  // Public Google Calendar ID of the school calendar (Google Calendar › Settings › Integrate calendar › Calendar ID).
-  // While empty, the "Subscribe" buttons show as unavailable.
-  googleCalendarId: 'c_f07a110ada3d1ed8b37e3b1ff883d525166b81bf6847a3cfa10d01eec228a92e@group.calendar.google.com', // 2026-2027 St. Mary Catholic Virtue School Calendar
-  // Front office email. The previous page showed one address and linked to another (families@stmary.edu). Confirm which is correct.
-  officeEmail: 'officemanager@stmarylittleton.com',
-  // Days ahead to show the "No school" alert banner.
-  alertDays: 14
-};
-
-/* =========================================================
-   DOCUMENTS — "added" (YYYY-MM-DD) is optional: documents added
-   in the last 30 days show a "New" badge.
-   ========================================================= */
-const DOCS = [
-  { id:'forms', name:'Forms to return', desc:'Print, fill in and send back to the front office.', items:[
-    { t:'Milk Order Form', h:'assets/documents/2026-27_Milk_Order_Form.pdf', m:'PDF · 1.8 MB', k:'milk lunch order' },
-    { t:'Physical Exam Form', h:'assets/documents/Physical_Exam_Form.pdf', m:'PDF · 0.4 MB', k:'health physical exam doctor' },
-    { t:'Authorization to Administer Medication', h:'assets/documents/Authorization to Administer Medication.pdf', m:'PDF · 0.2 MB', k:'medication medicine health nurse' },
-    { t:'SMEED Form', h:'assets/documents/SMEED/SMEED Form.pdf', m:'PDF · 0.3 MB', k:'smeed extended day after school care' },
-    { t:'Family Covenant Agreements', h:'assets/documents/2026-27_Family_Covenant_Agreements.pdf', m:'PDF · 0.2 MB', k:'covenant agreement' }
-  ]},
-  { id:'handbooks', name:'Handbooks & policies', desc:'Read online or download the PDF.', items:[
-    { t:'Student Handbook 2026–27', h:'handbook_202627.html', m:'Web page', type:'web', k:'handbook rules policy conduct uniform' },
-    { t:'Student Handbook 2026–27', h:'assets/documents/2026-2027_Parent_Handbook.pdf', m:'PDF · 0.8 MB', k:'handbook rules policy conduct uniform' },
-    { t:'Preschool Handbook 2026–27', h:'preschool-handbook_202627.html', m:'Web page', type:'web', k:'preschool handbook' },
-    { t:'Preschool Handbook 2026–27', h:'assets/documents/2026-2027_Parent_Handbook_Preschool.pdf', m:'PDF · 0.5 MB', k:'preschool handbook' },
-    { t:'SMEED Handbook 2026–27', h:'assets/documents/SMEED/SMEED Handbook 26-27.pdf', m:'PDF · 0.4 MB', k:'smeed extended day handbook' },
-    { t:'Cell Phone Policy (Middle School)', h:'assets/documents/Cell_Phone_Policy.pdf', m:'PDF · 0.3 MB', k:'phone policy middle school' }
-  ]},
-  { id:'health', name:'Health & safety', desc:'Medical information and emergency procedures.', items:[
-    { t:'Health Information 2026–27', h:'assets/documents/Medical_Information_26-27.pdf', m:'PDF · 0.6 MB', k:'health medical immunization vaccine nurse' },
-    { t:'SMEED Emergency Information', h:'assets/documents/SMEED/SMEED Emergency Information.pdf', m:'PDF · 0.1 MB', k:'emergency smeed' }
-  ]},
-  { id:'preschool', name:'Preschool', desc:'Uniform, vocabulary and the drop-off route.', items:[
-    { t:'Preschool Uniform 2026–27', h:'assets/documents/Preschool Uniform 26-27.pdf', m:'PDF · 0.7 MB', k:'uniform preschool' },
-    { t:'Preschool Dictionary', h:'assets/documents/Preschool Dictionary.pdf', m:'PDF · 4.7 MB', k:'preschool dictionary vocabulary' },
-    { t:'Preschool Drop-Off Map', h:'assets/documents/Map Preschool Drop Off.pdf', m:'PDF · 2.8 MB', k:'map drop off pick up preschool' }
-  ]},
-  { id:'academics', name:'Academics', desc:'Calendar, standards, supplies and summer work.', items:[
-    { t:'Academic Calendar 2026–27', h:'assets/documents/Calendar_2026-27.pdf', m:'PDF · 2.4 MB', k:'calendar dates schedule' },
-    { t:'Curriculum Standards', h:'https://www.denvercatholicschools.com/why-catholic-education/curriculum', m:'External site', type:'ext', k:'curriculum standards archdiocese' },
-    { t:'School Supply List by Grade', h:'supply-list_202627.html', m:'Web page', type:'web', k:'supplies supply list' },
-    { t:'Summer Math, incoming 6th grade', h:'assets/documents/6th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 6th' },
-    { t:'Summer Math, incoming 7th grade', h:'assets/documents/7th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 7th' },
-    { t:'Summer Math, incoming 8th grade', h:'assets/documents/8th Grade.pdf', m:'PDF · 0.7 MB', k:'summer math 8th' }
-  ]},
-  { id:'flyers', name:'Flyers', desc:'Menus and school-wide announcements.', items:[
-    { t:'School Eatery 2026–27', h:'assets/flyers/schooleatery.pdf', m:'PDF · 3.0 MB', k:'lunch menu eatery food' }
-  ]}
-];
-const MOST_USED = [
-  ['handbooks',1], ['health',0], ['forms',1], ['forms',0], ['academics',2]
-];
-
-/* =========================================================
-   EVENTS — [date, category, title, details, badges, link, alertEnd]
+const PORTAL = window.__PORTAL__;
+const CONFIG = PORTAL.config;       // googleCalendarId, officeEmail, alertDays
+const DOCS = PORTAL.docs;           // groups of documents
+const MOST_USED = PORTAL.mostUsed;  // [group id, position in group]
+/* EVENTS — [date, category, title, details, badges, link, alertEnd]
    alertEnd (optional): last day with no school, used only by the alert banner
-   category: noclasses | faith | academic | community | health
-   ========================================================= */
-const EVENTS = [
-["2026-06-30","health","Exemption certificates","Nonmedical: K-8 must renew annually after June 30 (see CDPHE)","Health|Important","https://cdphe.colorado.gov/exemptions-to-school-required-vaccines"],
-["2026-08-03","health","Immunization records due","Up-to-date records or valid CO exemption certificate","Health|Important",""],
-["2026-08-03","health","Health appraisal due","New, preschool & K students: new provider form (exam within 12 mo.)","Health|Important",""],
-["2026-08-03","health","Medication forms drop off at office","Two-part authorization form per medication, incl. OTC","Health|Important",""],
-["2026-08-05","community","New Family Orientation","6:30 pm","Community",""],
-["2026-08-07","health","Tdap booster — 7th grade","Schedule appointment before Aug 7, 2026","Health|Important",""],
-["2026-08-10","community","Teacher's Return","","Community",""],
-["2026-08-13","community","Welcome Night","4:00-7:00 pm","Community",""],
-["2026-08-14","noclasses","Teacher Retreat","Staff only","No School",""],
-["2026-08-17","academic","First Day of School","Welcome back — school begins","Academic|Important",""],
-["2026-08-21","faith","All School Mass K-8","Mass Uniform","Faith",""],
-["2026-08-28","faith","All School Mass K-8","Mass Uniform","Faith",""],
-["2026-08-28","community","Back to School Night","5:00 pm","Community|Important",""],
-["2026-09-02","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2026-09-04","community","Bookends of Beauty at 7PM","Night Flight by Anthoine Saint-Exupery","Community","assets/events/Bookends of Beauty 26-27.pdf"],
-["2026-09-04","faith","All School Mass K-8","Mass Uniform","Faith",""],
-["2026-09-07","noclasses","Labor Day — No School","Observed Holiday","No School|Important",""],
-["2026-09-08","faith","All School Mass K-8","Mass Uniform","Faith",""],
-["2026-09-12","faith","Marian Festival","All-school celebration","Faith|Important",""],
-["2026-09-13","community","Sapientia Sunday","9:30 am","Community",""],
-["2026-09-15","academic","8th Grade FOCUS Field Trip","Sep 15-16","Academic",""],
-["2026-09-16","academic","7th Grade FOCUS Field Trip","Sep 16-17","Academic",""],
-["2026-09-18","community","Picture Day","Mass Uniform required","Community",""],
-["2026-09-24","faith","All School Mass K-8","Mass Uniform","Faith",""],
-["2026-09-25","noclasses","No School — Teacher In-Service","Staff only","No School",""],
-["2026-09-29","faith","Sacraments Intro Parent Workshop","6:30 pm, Joachim Hall · Mandatory for parents of children receiving any sacrament this year","Faith",""],
-["2026-09-30","academic","6th Grade FOCUS Field Trip","Sep 30-Oct 1","Academic",""],
-["2026-10-02","faith","All School Mass","Preschool-8","Faith",""],
-["2026-10-05","community","Last Day to Buy Gala Tickets","Click to buy tickets","Community","https://event.auctria.com/b5c3b286-c2e4-4fce-957e-265942a01e78/a809178051b511ea91bae14d12592328"],
-["2026-10-07","faith","All School Mass","","Faith",""],
-["2026-10-07","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2026-10-08","noclasses","Parent/Teacher Conferences — No School","Schedule your appointment through the portal","No School|Important",""],
-["2026-10-09","noclasses","Parent/Teacher Conferences — No School","Schedule your appointment through the portal","No School|Important",""],
-["2026-10-10","faith","125th Parish Celebration Mass","4:30 pm","Faith|Important",""],
-["2026-10-11","community","Sapientia Sunday","9:30 am","Community",""],
-["2026-10-12","noclasses","No School","","No School",""],
-["2026-10-16","faith","All School Mass","Preschool-8","Faith",""],
-["2026-10-18","community","Sapientia Sunday","9:30 am","Community",""],
-["2026-10-22","faith","All School Mass — St. John Paul II Day","Preschool-8, Mass Uniform","Faith",""],
-["2026-10-24","community","School Gala — Ken Caryl Ranch","Annual fundraising gala","Community|Important",""],
-["2026-10-28","community","Last Day for Shorts","","Community",""],
-["2026-10-29","faith","All Saints Day Celebration — All School Mass","9:30 am, Mass Uniform","Faith",""],
-["2026-10-30","noclasses","No School — AoD Teacher Inservice","Staff only","No School",""],
-["2026-10-31","community","Trunk-or-Treat","2:00 pm, Blacktop","Community",""],
-["2026-11-04","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2026-11-06","faith","Picture Retakes","All School Mass","Faith",""],
-["2026-11-06","community","Bookends of Beauty at 7PM","All The Lights We Cannot See by Anthony Doerr","Community","assets/events/Bookends of Beauty 26-27.pdf"],
-["2026-11-08","community","Sapientia Sunday","9:30 am","Community",""],
-["2026-11-13","faith","All School Mass","Preschool-8","Faith",""],
-["2026-11-13","academic","End of Trimester","Report cards to follow","Academic|Important",""],
-["2026-11-19","community","Preschool Nina Maria","8:30 am","Community",""],
-["2026-11-20","faith","All School Mass","Preschool-8","Faith",""],
-["2026-11-20","community","Spirit Night — Red Robin","All day · 63 Centennial Blvd., Highlands Ranch · 20% of sales supports St. Mary","Community",""],
-["2026-11-24","faith","All School Mass","Preschool-8","Faith",""],
-["2026-11-25","noclasses","Thanksgiving Break — No School","Nov 25-27. School resumes Monday, Nov 30","No School|Important","","2026-11-29"],
-["2026-12-01","faith","Reconciliation Parent Workshop","6:30 pm, Joachim Hall · Mandatory for parents","Faith",""],
-["2026-12-02","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2026-12-04","faith","All School Mass","Preschool-8","Faith",""],
-["2026-12-08","faith","All School Mass","Preschool-8","Faith",""],
-["2026-12-10","academic","Advent Production K-2","6:00 pm — Families welcome","Academic|Faith",""],
-["2026-12-10","community","Spirit Night — Chick-fil-A","All day · Chick-fil-A Aspen Grove","Community",""],
-["2026-12-13","community","Sapientia Sunday","9:30 am","Community",""],
-["2026-12-18","community","Classroom Christmas Parties / Noon Dismissal","Pick-up at 12:00 pm","Community|Important",""],
-["2026-12-21","noclasses","Christmas Break — No School","Dec 21-Jan 1. School resumes January 5","No School|Important","","2027-01-04"],
-["2027-01-04","noclasses","No School — Teacher In-Service","Staff only","No School",""],
-["2027-01-05","academic","School Resumes — Students Return","Regular schedule begins 7:45 am","Academic|Important",""],
-["2027-01-06","academic","Spelling Bee","All grades","Academic|Important",""],
-["2027-01-08","faith","All School Mass","Preschool-8","Faith",""],
-["2027-01-09","community","Father/Daughter Dance","5:30 pm","Community",""],
-["2027-01-13","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2027-01-15","faith","All School Mass","Preschool-8","Faith",""],
-["2027-01-18","noclasses","Martin Luther King Jr. Day — No School","Observed Holiday","No School",""],
-["2027-01-21","community","Spirit Night — Freddy's (Highlands Ranch)","11:00 am-9:00 pm · 900 Sgt Jon Stiles Dr., Highlands Ranch","Community",""],
-["2027-01-21","community","Spirit Night — Freddy's (Littleton)","4:00-8:00 pm · 2660 W. Belleview Ave., Littleton","Community",""],
-["2027-01-22","faith","All School Mass","Preschool-8","Faith",""],
-["2027-01-29","faith","All School Mass","Preschool-8","Faith",""],
-["2027-01-31","community","Catholic Schools Week","Jan 31 – Feb 5","Community",""],
-["2027-01-31","community","Sapientia Sunday Open House","9:30 am — Prospective families welcome","Community",""],
-["2027-02-02","faith","Presentation of the Lord — All School Mass","Noon Dismissal, 9:30 am Mass","Faith|Important",""],
-["2027-02-02","faith","Confirmation Parent Workshop","6:30 pm, Joachim Hall · Mandatory · Sponsor attendance highly encouraged","Faith",""],
-["2027-02-03","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2027-02-10","faith","Ash Wednesday — All School Mass","Preschool-8, Mass Uniform","Faith|Important",""],
-["2027-02-11","noclasses","Parent/Teacher Conferences — No School","Feb 11-12. Schedule through the portal","No School|Important","","2027-02-15"],
-["2027-02-15","noclasses","Presidents Day — No School","Observed Holiday","No School",""],
-["2027-02-16","faith","1st Communion Parent Workshop","6:30 pm, Joachim Hall · Mandatory for parents","Faith",""],
-["2027-02-19","community","Bookends of Beauty at 7PM","The Secret Diary of Elisabeth Leseur: The Woman whose Goodness Changed Her Husband from Atheist to Priest","Community","assets/events/Bookends of Beauty 26-27.pdf"],
-["2027-02-19","faith","All School Mass","Preschool-8","Faith",""],
-["2027-02-23","faith","1st Reconciliation — SMS","6:30 pm, in the church","Faith",""],
-["2027-02-26","academic","End of Trimester","Report cards to follow","Academic|Important",""],
-["2027-03-02","faith","1st Reconciliation — Bethlehem / Home School","6:30 pm, in the church","Faith",""],
-["2027-03-03","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2027-03-03","faith","All School Mass","","Faith",""],
-["2027-03-04","noclasses","No School — Teacher Retreat","Staff only","No School",""],
-["2027-03-05","noclasses","No School — AoD In-Service","Staff only","No School",""],
-["2027-03-06","faith","Reconciliation Celebration (Festival of Forgiveness)","6–9 pm","Faith",""],
-["2027-03-09","community","Financial Aid Support Night","5:00 pm","Community",""],
-["2027-03-12","faith","All School Mass","Preschool-8","Faith",""],
-["2027-03-13","faith","Confirmation / 1st Communion Day Retreat","9 am–1 pm, in the church · Mandatory for children receiving First Communion & Confirmation","Faith",""],
-["2027-03-14","community","Sapientia Sunday","9:30 am","Community",""],
-["2027-03-15","academic","8th Grade Washington D.C. Trip","Mar 15-19","Academic",""],
-["2027-03-19","faith","All School Mass","Preschool-8","Faith",""],
-["2027-03-23","faith","Stations of the Cross","2:15 pm","Faith",""],
-["2027-03-25","faith","Holy Thursday — Mass / Noon Dismissal","Mass Uniform, pick-up at 12:00 pm","Faith|Important",""],
-["2027-03-26","noclasses","Good Friday — No School","Spring Break begins","No School|Important","","2027-04-04"],
-["2027-03-29","noclasses","Spring Break — No School","Mar 29-Apr 2. School resumes April 5","No School|Important",""],
-["2027-04-05","faith","All School Mass","Preschool-8","Faith",""],
-["2027-04-06","community","Shorts Resume","","Community",""],
-["2027-04-07","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2027-04-09","academic","5th Grade Play","6:00 pm, Ave Maria Hall","Academic",""],
-["2027-04-11","community","Sapientia Sunday","9:30 am","Community",""],
-["2027-04-16","faith","All School Mass","Preschool-8","Faith",""],
-["2027-04-21","academic","JPII Outdoor Lab — 7th Grade Only","Apr 21-23, off campus","Academic",""],
-["2027-04-23","academic","6th Grade Musical","6:00 pm, Ave Maria Hall","Academic",""],
-["2027-04-27","faith","Confirmation & 1st Communion Rehearsal","6:30–8 pm, in the church · Mandatory · Sponsor attendance required","Faith",""],
-["2027-04-28","academic","Taste Star — 4th Grade","10:00 am, Marian Hall","Academic|Community",""],
-["2027-04-29","faith","All School Mass","Preschool-8","Faith",""],
-["2027-04-30","noclasses","No School — Teacher In-Service","Staff only","No School",""],
-["2027-04-30","community","Bookends of Beauty at 7PM","Theo of Golden by Allen Levi","Community","assets/events/Bookends of Beauty 26-27.pdf"],
-["2027-05-01","faith","Confirmation & First Communion Mass","10 am: Homeschool & SMS Class 1 (arrive 9:30) · 2 pm: Bethlehem & SMS Class 2 (arrive 1:30)","Faith|Important",""],
-["2027-05-03","faith","May Crowning","9:30 am, All School Mass · Wear 1st Communion gear","Faith",""],
-["2027-05-04","community","SMPA Meeting","6:00 pm, Library","Community",""],
-["2027-05-05","community","Step Into the Story","","Community",""],
-["2027-05-09","community","Sapientia Sunday","9:30 am","Community",""],
-["2027-05-12","community","New Parent & Kindergarten Welcome Night","","Community",""],
-["2027-05-13","faith","All School Mass","Preschool-8","Faith",""],
-["2027-05-14","noclasses","No School — School Golf Tournament","Faculty fundraising event","No School",""],
-["2027-05-20","community","Lakeside Night — TBD","","Community",""],
-["2027-05-21","faith","All School Mass","Preschool-8","Faith",""],
-["2027-05-26","community","Preschool St. Sebastian Day","","Community",""],
-["2027-05-27","community","8th Grade Graduation Dance","","Community",""],
-["2027-05-28","faith","8th Grade Graduation Mass","Parish Church — invitations required","Faith|Academic|Important",""],
-["2027-05-28","academic","Saints in Action & Last Day of School — Noon Dismissal","Pick-up at 12:00 pm. Final report cards available","Academic|Important",""]
-];
+   category: noclasses | faith | academic | community | health */
+const EVENTS = PORTAL.events;
+const NOTICES = PORTAL.notices;     // notices written by the school (override the automatic one)
 
 /* =========================================================
    APP
@@ -204,7 +20,7 @@ const EVENTS = [
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])).replace(/(\d)–(\d)/g, '$1–\u2060$2');
 
-  // ---- Dates (AP style, as the St. Mary style guide asks) ----
+  // ---- Dates (AP style) ----
   const MON_AP = ['Jan.','Feb.','March','April','May','June','July','Aug.','Sept.','Oct.','Nov.','Dec.'];
   const MON_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MON_SHORT = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -266,8 +82,17 @@ const EVENTS = [
   menu.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); } });
 
-  // ---- Alert banner: next no-school day within CONFIG.alertDays ----
-  const soon = events.find(e => isNoSchool(e) && e.d >= today && e.d <= addDays(today, CONFIG.alertDays));
+  // ---- Alert banner ----
+  // A notice written by the school (database table "notices") wins; otherwise
+  // the next no-school day within CONFIG.alertDays, taken from the calendar.
+  const notice = NOTICES.find(n => (!n.from || parse(n.from) <= today) && (!n.until || parse(n.until) >= today));
+  if (notice) {
+    $('#alert-text').innerHTML = `<strong>${esc(notice.message)}</strong>`;
+    $('#alert-link').textContent = notice.linkLabel;
+    $('#alert-link').href = notice.linkHref;
+    $('#alert').hidden = false;
+  }
+  const soon = !notice && CONFIG.alertDays > 0 && events.find(e => isNoSchool(e) && e.d >= today && e.d <= addDays(today, CONFIG.alertDays));
   if (soon) {
     const ord = (n) => n + ([11,12,13].includes(n % 100) ? 'th' : ({1:'st',2:'nd',3:'rd'}[n % 10] || 'th'));
     const MON3 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
