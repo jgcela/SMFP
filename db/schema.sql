@@ -77,15 +77,18 @@ create table if not exists documents (
 );
 create index if not exists documents_school on documents(school_id);
 
--- Links: top bar, section menu, mobile menu, "Popular" and the FACTS button.
+-- Links: main menu ("top": top bar and phone menu), section menu, "Popular" and the FACTS button.
+-- "menu_more" is no longer used (step 4c folded it into "top").
 create table if not exists links (
   id          serial primary key,
   school_id   integer not null references schools(id) on delete cascade,
   placement   text not null check (placement in ('top','sections','menu_sections','menu_more','popular','facts')),
   label       text not null,
-  short_label text not null default '',            -- FACTS button: shown on small screens
+  short_label text not null default '',            -- shorter text: FACTS on small screens, main menu in the top bar
   href        text not null,
-  sort_order  integer not null default 0
+  sort_order  integer not null default 0,
+  new_tab     boolean not null default false,      -- step 4c: open in a new tab
+  hidden      boolean not null default false       -- step 4c: kept, but not shown on the portal
 );
 create index if not exists links_school on links(school_id, placement);
 
