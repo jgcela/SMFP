@@ -89,7 +89,8 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   if (notice) {
     $('#alert-text').innerHTML = `<strong>${esc(notice.message)}</strong>`;
     $('#alert-link').textContent = notice.linkLabel;
-    $('#alert-link').href = notice.linkHref;
+    $('#alert-link').href = notice.linkHref || '#';
+    $('#alert-link').hidden = !notice.linkHref; // the link is optional
     $('#alert').hidden = false;
   }
   const soon = !notice && CONFIG.alertDays > 0 && events.find(e => isNoSchool(e) && e.d >= today && e.d <= addDays(today, CONFIG.alertDays));

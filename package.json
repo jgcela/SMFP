@@ -9,13 +9,16 @@
     "import-original": "python3 scripts/import-original.py"
   },
   "dependencies": {
+    "better-auth": "^1.7.25",
     "next": "16.4.6",
+    "pg": "^8.23.1",
     "postgres": "^3.4.7",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "typescript": "^5.9.3"

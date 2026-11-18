@@ -88,3 +88,84 @@ create table if not exists links (
   sort_order  integer not null default 0
 );
 create index if not exists links_school on links(school_id, placement);
+
+-- ---------------------------------------------------------------------------
+-- Step 3: school staff sign-in (Better Auth) and editing the notice.
+-- auth_* tables are Better Auth's own (user, session, account, verification),
+-- with snake_case columns. Access to a school's data comes ONLY from
+-- school_staff: a signed-in user can edit a school only if listed there.
+
+create table if not exists auth_user (
+  id              text primary key,
+  name            text not null,
+  email           text not null unique,
+  email_verified  boolean not null default false,
+  image           text,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now()
+);
+
+create table if not exists auth_session (
+  id          text primary key,
+  expires_at  timestamptz not null,
+  token       text not null unique,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  ip_address  text,
+  user_agent  text,
+  user_id     text not null references auth_user(id) on delete cascade
+);
+create index if not exists auth_session_user on auth_session(user_id);
+
+create table if not exists auth_account (
+  id                        text primary key,
+  account_id                text not null,
+  provider_id               text not null,
+  user_id                   text not null references auth_user(id) on delete cascade,
+  access_token              text,
+  refresh_token             text,
+  id_token                  text,
+  access_token_expires_at   timestamptz,
+  refresh_token_expires_at  timestamptz,
+  scope                     text,
+  password                  text,
+  created_at                timestamptz not null default now(),
+  updated_at                timestamptz not null default now()
+);
+create index if not exists auth_account_user on auth_account(user_id);
+
+create table if not exists auth_verification (
+  id          text primary key,
+  identifier  text not null,
+  value       text not null,
+  expires_at  timestamptz not null,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+create index if not exists auth_verification_identifier on auth_verification(identifier);
+
+-- Which school(s) each staff user may edit.
+create table if not exists school_staff (
+  user_id     text not null references auth_user(id) on delete cascade,
+  school_id   int  not null references schools(id) on delete cascade,
+  role        text not null default 'admin',
+  created_at  timestamptz not null default now(),
+  primary key (user_id, school_id)
+);
+
+-- One-time links to choose a password (only a SHA-256 hash of the token is
+-- stored). Used once, then expire. Created by scripts/staff-link.mjs.
+create table if not exists staff_setup_links (
+  token_hash  text primary key,
+  user_id     text not null references auth_user(id) on delete cascade,
+  expires_at  timestamptz not null,
+  used_at     timestamptz,
+  created_at  timestamptz not null default now()
+);
+
+-- Failed sign-in counter (slows down password guessing).
+create table if not exists login_attempts (
+  key           text primary key,
+  failures      int not null default 0,
+  window_start  timestamptz not null default now()
+);
