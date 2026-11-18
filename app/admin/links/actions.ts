@@ -21,6 +21,10 @@ async function categoryKeys(schoolId: number) {
   const rows = await db()<{ key: string }[]>`select key from document_categories where school_id = ${schoolId}`;
   return rows.map((r) => r.key);
 }
+async function pagePaths(schoolId: number) {
+  const rows = await db()<{ slug: string; legacy_path: string }[]>`select slug, legacy_path from pages where school_id = ${schoolId}`;
+  return rows.flatMap((r) => [`pages/${r.slug}`, r.legacy_path].filter(Boolean));
+}
 
 export async function saveLink(_prev: LinkState, fd: FormData): Promise<LinkState> {
   try {
@@ -35,7 +39,7 @@ export async function saveLink(_prev: LinkState, fd: FormData): Promise<LinkStat
     if (label.length > 60) return { error: "The text is too long (60 characters at most)." };
     if (shortLabel.length > 30) return { error: "The shorter text is too long (30 characters at most)." };
     if (href.length > 1000) return { error: "The address is too long." };
-    const bad = checkHref(href, await categoryKeys(staff.schoolId));
+    const bad = checkHref(href, await categoryKeys(staff.schoolId), await pagePaths(staff.schoolId));
     if (bad) return { error: bad };
 
     if (id) {

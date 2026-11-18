@@ -43,14 +43,15 @@ export function opensInNewTabByDefault(href: string) {
   if (/^(#|mailto:|tel:|sms:)/i.test(h)) return false;
   if (/^https?:\/\//i.test(h)) return true;
   const path = h.replace(/^\//, "").split("#")[0];
-  return !(path === "" || /_202627\.html$/.test(path));
+  return !(path === "" || /_202627\.html$/.test(path) || path.startsWith("pages/"));
 }
 
 const HOST = /^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:[a-z]{2,24}|xn--[a-z0-9-]{2,59})$/i;
 
 // Returns a message when the address looks wrong, or null when it is fine.
 // categoryKeys: the document categories, which the portal shows as #cat-<key>.
-export function checkHref(raw: string, categoryKeys: string[]): string | null {
+// pagePaths: the school's text pages ("pages/supply-list") and their old addresses.
+export function checkHref(raw: string, categoryKeys: string[], pagePaths: string[] = []): string | null {
   const href = raw.trim();
   if (!href) return "Enter the address.";
   if (/\s/.test(href)) return "The address has a space in it. Check that it is written correctly.";
@@ -80,6 +81,6 @@ export function checkHref(raw: string, categoryKeys: string[]): string | null {
   } catch {
     return "This address is not written correctly.";
   }
-  if (path === "" || FILES.has(path)) return null;
+  if (path === "" || FILES.has(path) || pagePaths.includes(path)) return null;
   return "There is no page or file with that name on the portal. Check the spelling, or use a full address that starts with https://";
 }

@@ -4,25 +4,33 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/list-public.mjs",
+    "prebuild": "node scripts/list-public.mjs && node scripts/seed-legacy-pages.mjs",
     "build": "next build",
     "start": "next start",
     "import-original": "python3 scripts/import-original.py"
   },
   "dependencies": {
+    "@tiptap/extension-image": "3.32.2",
+    "@tiptap/extension-list": "3.32.2",
+    "@tiptap/extension-table": "3.32.2",
+    "@tiptap/pm": "3.32.2",
+    "@tiptap/react": "3.32.2",
+    "@tiptap/starter-kit": "3.32.2",
     "aws4fetch": "^1.0.20",
     "better-auth": "^1.7.25",
     "next": "16.4.6",
     "pg": "^8.23.1",
     "postgres": "^3.4.7",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "sanitize-html": "2.18.1"
   },
   "devDependencies": {
     "@types/node": "^22",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "2.16.2",
     "typescript": "^5.9.3"
   }
 }

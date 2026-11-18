@@ -102,3 +102,27 @@ The phone link (`tel:`) is made from the number, and the address links to the
 map. `lib/contact.ts` checks the phone and email in the browser before saving
 and again on the server. No school's details are in the code.
 Database change: `db/migrations/2026-11-18-step4d-contact.sql`.
+
+## Step 4e: text pages
+
+Staff edit the portal's text pages at `/admin/pages` with a simple editor
+(titles, bold, italic, lists, checklists, links, tables, images). Each page has
+a draft and a published copy: families only see the published one, at
+`/pages/<slug>`. Every saved draft and every publish is kept in `page_versions`,
+and any of them can be put back in the draft. A page with three or more section
+titles gets the handbook layout: a contents list built from its titles and a
+search box. HTML is cleaned on save (`lib/page-html.ts`).
+
+Old addresses such as `supply-list_202627.html` answer with a permanent redirect
+to the new page (`app/[legacy]/route.ts`), using the page's `legacy_path`.
+Images are uploaded to the private bucket and served through `/files/...`; the
+browser uploads straight to R2, so the bucket needs a CORS rule that allows `PUT`
+from the portal's address.
+
+The two handbooks were imported from the old pages kept in `content/legacy/`.
+Before each build, `scripts/seed-legacy-pages.mjs` adds any old page there that
+the school does not have yet (and moves portal links to its new address); pages
+already imported are never touched. `node scripts/import-legacy-page.mjs <school> <file>`
+prints the same import as SQL. Old addresses that now lead elsewhere (the Supply
+list became its PDF) are in the `redirects` table.
+Database change: `db/migrations/2026-11-18-step4e-pages.sql`.
