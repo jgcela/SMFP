@@ -1,13 +1,7 @@
 node_modules/
 .next/
+out/
 next-env.d.ts
 *.tsbuildinfo
-.env
-.env.local
-.env.*.local
-coverage/
-.storage/
-.expo/
-# The family app's web export (scripts/build-app-web.mjs) is built into public/
-/public/
-.vercel/
+.vercel
+.env*
