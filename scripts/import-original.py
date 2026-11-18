@@ -15,7 +15,8 @@ Changes to the content:
 - the logo is loaded from this app (assets/logo_white.png) instead of from
   stmarycommunication.javiercela.me;
 - every page (and every School Messenger issue) loads /new-tab.js, so links
-  to other pages and files open in a new tab (asked for on 2026-11-18).
+  to files and other websites open in a new tab; links between the portal's
+  own pages stay in the same tab (asked for on 2026-11-18).
 The links themselves stay exactly as in the original, so pages, PDFs and
 images are served by this app.
 
