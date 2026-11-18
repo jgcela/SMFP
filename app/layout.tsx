@@ -2,9 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./portal.css";
 
 export const metadata: Metadata = {
-  title: "Parent Portal — St. Mary Catholic Virtue School",
-  description:
-    "Calendar, forms and school updates for St. Mary Catholic Virtue School families, school year 2026–27.",
   robots: { index: false, follow: false },
   icons: { icon: { url: "/assets/favicon.png", type: "image/png" } },
 };

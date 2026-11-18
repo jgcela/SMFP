@@ -21,23 +21,15 @@
 <header class="site-header on-navy">
   <div class="util">
     <div class="wrap">
-      <a href="messenger-archive_202627.html">School Messenger</a>
-      <a href="volunteer-opportunities_202627.html">Volunteer</a>
-      <a href="teacher-wishlists_202627.html">Teacher wishlists</a>
-      <a href="staff-favorites_202627.html">Staff favorites</a>
-    </div>
+{{links.top}}    </div>
   </div>
   <div class="bar">
     <div class="wrap">
-      <a class="logo" href="#top"><img src="assets/logo_white.png" alt="St. Mary Catholic Virtue School, Littleton — Parent Portal home" width="140" height="52"></a>
+      <a class="logo" href="#top"><img src="{{school.logo_url}}" alt="{{school.logo_alt}}" width="140" height="52"></a>
       <nav class="main-nav" aria-label="Portal sections">
-        <a href="#this-week">This week</a>
-        <a href="#documents">Documents</a>
-        <a href="#calendar">Calendar</a>
-        <a href="#contact">Contact</a>
-      </nav>
+{{links.sections}}      </nav>
       <div class="bar-actions">
-        <a class="btn btn--gold btn-facts" href="https://sis.factsmgt.com/accounts/Account/Login" target="_blank" rel="noopener">FACTS<span class="lbl-long">&nbsp;Login</span>
+        <a class="btn btn--gold btn-facts" href="{{facts.href}}" target="_blank" rel="noopener">{{facts.short}}<span class="lbl-long">&nbsp;{{facts.long}}</span>
           <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr-only">(opens in a new tab)</span></a>
         <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu">
           <svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg><span class="sr-only">Menu</span>
@@ -48,17 +40,9 @@
   <nav id="mobile-menu" class="mobile-menu" aria-label="Menu" hidden>
     <div class="wrap">
       <ul>
-        <li><a href="#this-week">This week</a></li>
-        <li><a href="#documents">Documents</a></li>
-        <li><a href="#calendar">Calendar</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
+{{links.menu_sections}}      </ul>
       <ul class="sub">
-        <li><a href="messenger-archive_202627.html">School Messenger</a></li>
-        <li><a href="volunteer-opportunities_202627.html">Volunteer opportunities</a></li>
-        <li><a href="teacher-wishlists_202627.html">Teacher wishlists</a></li>
-        <li><a href="staff-favorites_202627.html">Staff favorite things</a></li>
-      </ul>
+{{links.menu_more}}      </ul>
     </div>
   </nav>
 </header>
@@ -75,7 +59,7 @@
   <section id="top" class="hero on-navy" aria-labelledby="hero-title">
     <div class="wrap">
       <div class="sec-head">
-        <p class="eyebrow">Parent Portal · School year 2026–27</p>
+        <p class="eyebrow">Parent Portal · School year {{school.school_year}}</p>
         <h1 id="hero-title">Everything your family needs, in one place.</h1>
         <p class="lead" style="margin-top:8px">Find a form, check what's on this week, or add the school calendar to your phone.</p>
       </div>
@@ -90,12 +74,7 @@
       </form>
       <div class="chips">
         <span>Popular:</span>
-        <a class="chip-link" href="handbook_202627.html">Student Handbook</a>
-        <a class="chip-link" href="#cat-health">Health forms</a>
-        <a class="chip-link" href="supply-list_202627.html">Supply list</a>
-        <a class="chip-link" href="assets/flyers/schooleatery.pdf">Lunch menu</a>
-        <a class="chip-link" href="teacher-wishlists_202627.html">Teacher wishlists</a>
-      </div>
+{{links.popular}}      </div>
       <nav class="quick-nav" aria-label="Jump to">
         <a href="#this-week">This week</a>
         <a href="#documents">Documents</a>
@@ -128,9 +107,9 @@
         </div>
         <div class="card">
           <h3 class="h3">Need the front office?</h3>
-          <a class="contact-line" href="tel:+13037982375"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>(303) 798-2375</a>
-          <a class="contact-line js-email" href="mailto:officemanager@stmarylittleton.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><span class="js-email-text">officemanager@stmarylittleton.com</span></a>
-          <p class="contact-line"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Monday–Friday, 7:30 a.m.–4:00 p.m.</p>
+          <a class="contact-line" href="{{school.phone_href}}"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>{{school.phone_display}}</a>
+          <a class="contact-line js-email" href="mailto:{{school.email}}"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><span class="js-email-text">{{school.email}}</span></a>
+          <p class="contact-line"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>{{school.office_hours}}</p>
         </div>
       </aside>
     </div>
@@ -167,7 +146,7 @@
       <div class="cal-head">
         <div class="sec-head">
           <p class="eyebrow">Academic calendar</p>
-          <h2 class="h2" id="cal-title">School calendar 2026–27</h2>
+          <h2 class="h2" id="cal-title">School calendar {{school.school_year}}</h2>
           <div class="rule"></div>
         </div>
         <div class="cal-tools">
@@ -223,11 +202,11 @@
       <h2 class="h2" id="contact-title">We're here for your family.</h2>
     </div>
     <div class="contact-grid">
-      <a class="ctile" href="tel:+13037982375"><span class="k">CALL THE OFFICE</span><span class="v">(303) 798-2375</span></a>
-      <a class="ctile js-email" href="mailto:officemanager@stmarylittleton.com"><span class="k">EMAIL</span><span class="v js-email-text">officemanager@stmarylittleton.com</span></a>
-      <div class="ctile"><span class="k">OFFICE HOURS</span><span class="v">Monday–Friday, 7:30 a.m.–4:00 p.m.</span></div>
+      <a class="ctile" href="{{school.phone_href}}"><span class="k">CALL THE OFFICE</span><span class="v">{{school.phone_display}}</span></a>
+      <a class="ctile js-email" href="mailto:{{school.email}}"><span class="k">EMAIL</span><span class="v js-email-text">{{school.email}}</span></a>
+      <div class="ctile"><span class="k">OFFICE HOURS</span><span class="v">{{school.office_hours}}</span></div>
     </div>
-    <p class="legal">St. Mary Catholic Virtue School · Littleton, Colorado · Parent Portal, school year 2026–27</p>
+    <p class="legal">{{school.footer}}</p>
   </div>
 </footer>
 

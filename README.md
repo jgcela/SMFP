@@ -1,49 +1,56 @@
-# Portal de familias de St. Mary (SMFP)
+# Portal de familias (SMFP)
 
-Paso 1: el portal actual de St. Mary Catholic Virtue School, rehecho como app Next.js
-y con el mismo aspecto que el original
-(`stmarycommunication.javiercela.me/Portal_202627/portal_202627.html`).
+Portal para las familias de un colegio, rehecho paso a paso a partir del portal HTML
+original. Preparado para varios colegios: cada dato pertenece a un colegio y la web
+muestra el colegio indicado en la variable `PORTAL_SCHOOL`.
 
-Todavía no hay base de datos, login ni panel. El código anterior (portal v1)
-está guardado en la rama `backlog/portal-v1`.
+- **Paso 1**: copia exacta del portal original como app Next.js (portada + 8 páginas + archivos).
+- **Paso 2**: el contenido de la portada vive en una base de datos (Neon Postgres) y la página
+  tiene el mismo aspecto.
 
-## Cómo está hecho
+Todavía no hay login ni panel. El código anterior (portal v1) está en la rama `backlog/portal-v1`.
 
-Copia completa de la carpeta `Portal_202627` de Google Drive (la misma que sirve
-`stmarycommunication.javiercela.me/Portal_202627/`): la portada, las 8 páginas enlazadas
-y todos sus archivos (PDFs, imágenes, números del School Messenger).
+## Qué sale de la base de datos (portada)
+
+| Tabla | Qué guarda |
+|---|---|
+| `schools` | Un colegio por fila: nombre, ciudad, curso escolar, logo, teléfono, correo, horario, calendario de Google y cuántos días antes sale el aviso automático de "No school". |
+| `notices` | El aviso destacado. Si hay uno activo (`is_active`, y hoy entre `show_from` y `show_until` si están puestas), se muestra ese; si no, el aviso automático del próximo día sin clase sacado de `events`. |
+| `events` | Eventos del calendario con su categoría (`noclasses`, `faith`, `academic`, `community`, `health`). "This week and next", la vista mensual, la lista y el aviso automático salen de aquí. |
+| `document_categories`, `documents` | "Family documents": grupos, documentos y su posición en "Most used" (`most_used_rank`). |
+| `links` | Menú de arriba (`top`), menú de secciones (`sections`), menú del móvil (`menu_sections`, `menu_more`), "Popular" (`popular`) y el botón de FACTS (`facts`). |
+
+Todas las tablas (menos `schools`) tienen `school_id`.
+
+| Archivo | Qué es |
+|---|---|
+| `db/schema.sql` | Crea las tablas (se puede ejecutar más de una vez). |
+| `scripts/seed-from-original.mjs` | Genera el SQL que carga un colegio a partir de la página original: `node scripts/seed-from-original.mjs <slug>`. |
+| `lib/portal.ts` | Lee el contenido del colegio de la base de datos. |
+| `lib/render.ts`, `content/portal-template.html` | La portada, con `{{...}}` donde va el contenido de cada colegio. |
+| `public/portal.js` | El JavaScript original de la portada; ahora toma los datos de `window.__PORTAL__`. |
+| `app/page.tsx` | La portada (`/` y `/portal_202627.html`). Se regenera como mucho cada minuto. |
+
+Variables (en Vercel): `PORTAL_DATABASE_URL` (base de datos `portal` del proyecto Neon SMFP)
+y `PORTAL_SCHOOL` (el `slug` del colegio).
+
+## Páginas y archivos estáticos (paso 1)
 
 | Archivo | Qué es |
 |---|---|
 | `reference/*.html` | Copia sin tocar de cada página HTML original. |
-| `scripts/import-original.py` | Convierte `reference/` en lo que sirve la app. |
-| `app/layout.tsx`, `app/page.tsx` | La portada como página Next.js (`/` y `/portal_202627.html`). |
-| `app/portal.css`, `content/portal-body.html`, `public/portal.js` | Estilos, contenido y JavaScript de la portada, sin cambios. |
-| `public/*_202627.html` | Las demás páginas (Messenger, Volunteer, Teacher wishlists, Staff favorites, Handbooks, Supply list). |
+| `scripts/import-original.py` | Copia las páginas de `reference/` a `public/` y los estilos a `app/portal.css`. |
+| `public/*_202627.html` | Las demás páginas (Messenger, Volunteer, Teacher wishlists, Staff favorites, Handbooks, Supply list). Siguen siendo HTML fijo. |
 | `public/assets/` | La carpeta `assets` original completa. |
-| `public/new-tab.js` | Hace que los enlaces a archivos y a otras webs se abran en una pestaña nueva. |
-| `next.config.ts` | `/portal_202627.html` lleva a la portada; cabecera `noindex` en todo (como el `.htaccess` original). |
-
-Cambios en el contenido:
-
-- El logo se carga desde esta app (`assets/logo_white.png`) en lugar de desde
-  `stmarycommunication.javiercela.me`.
-- Cada página y cada número del Messenger carga `/new-tab.js`: los enlaces a PDFs, flyers,
-  imágenes y otras webs se abren en una pestaña nueva. Los enlaces entre las páginas del
-  portal (menú de arriba, Home…), los saltos dentro de la misma página (`#calendar`), los
-  correos (`mailto:`) y los teléfonos (`tel:`) se abren en la misma pestaña, como antes.
-
-Todos los demás enlaces son los
-originales, así que páginas, PDFs e imágenes los sirve esta app. Las imágenes dentro de
-los números del Messenger siguen viniendo de Flocknote, igual que en el original.
-
-Para actualizar: sustituir los HTML en `reference/` (o los archivos en `public/assets/`)
-y ejecutar `npm run import-original`.
+| `public/new-tab.js` | Los enlaces a PDFs, flyers, imágenes y otras webs se abren en una pestaña nueva; los enlaces entre páginas del portal, los saltos dentro de la página, los correos y los teléfonos, en la misma. |
+| `next.config.ts` | `/portal_202627.html` lleva a la portada; cabecera `noindex` en todo. |
 
 ## Desarrollo
 
 ```bash
 npm install
-npm run dev     # http://localhost:3000
-npm run build
+# Base de datos local de prueba:
+psql "$PORTAL_DATABASE_URL" -f db/schema.sql
+node scripts/seed-from-original.mjs <slug> tmp/seed && psql "$PORTAL_DATABASE_URL" -f tmp/seed/seed.sql
+PORTAL_SCHOOL=<slug> npm run dev     # http://localhost:3000
 ```

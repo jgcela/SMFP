@@ -1,20 +1,27 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
+import type { Metadata } from "next";
+import { loadPortal, schoolSlug } from "../lib/portal";
+import { renderPortal, schoolDescription, schoolTitle } from "../lib/render";
 
-// The markup of the current portal (content/portal-body.html), unchanged.
-// public/portal.js is the original page script: it fills in "This week",
-// the documents and the calendar, exactly as on the old page.
-const markup = readFileSync(path.join(process.cwd(), "content/portal-body.html"), "utf8");
+// The page is rebuilt from the database at most once a minute,
+// so a change in the database shows up within about a minute.
+export const revalidate = 60;
 
-export const dynamic = "force-static";
+export async function generateMetadata(): Promise<Metadata> {
+  const { school } = await loadPortal(schoolSlug());
+  return { title: schoolTitle(school), description: schoolDescription(school) };
+}
 
-export default function Home() {
+export default async function Home() {
+  const { school, links, data } = await loadPortal(schoolSlug());
+  // "<" is escaped so no text in the data can close the script tag.
+  const json = JSON.stringify(data).replace(/</g, "\\u003c");
   return (
     <body>
-      <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: markup }} />
+      <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: renderPortal(school, links) }} />
+      <script dangerouslySetInnerHTML={{ __html: `window.__PORTAL__=${json};` }} />
       {/* eslint-disable-next-line @next/next/no-sync-scripts */}
       <script src="/portal.js" />
-      {/* Links to other pages and files open in a new tab. */}
+      {/* Links to files and other websites open in a new tab. */}
       {/* eslint-disable-next-line @next/next/no-sync-scripts */}
       <script src="/new-tab.js" />
     </body>
