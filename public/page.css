@@ -1,0 +1,17 @@
+/* School text pages (step 4e), on top of portal-2627.css. */
+.hb--plain .hb-main{padding-top:32px}
+.prose img{max-width:100%;height:auto}
+.prose blockquote{margin-left:0;padding:8px 16px;border-left:4px solid var(--gold);background:#F7F9FB}
+.prose hr{border:0;border-top:1px solid var(--gray);margin:32px 0}
+.prose table p{margin:0}
+/* Checklists: the box and the text on one line; ticked items are dimmed. */
+.prose ul[data-type="taskList"]{list-style:none;padding-left:0}
+.prose li[data-type="taskItem"]{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:4px 0}
+.prose li[data-type="taskItem"]>label{flex:none;display:flex;align-items:center;min-height:26px}
+.prose li[data-type="taskItem"] input{width:20px;height:20px;accent-color:var(--navy);cursor:pointer;margin:0}
+.prose li[data-type="taskItem"]>div{flex:1;min-width:0}
+.prose li[data-type="taskItem"]>div>p{margin:0}
+.prose li[data-type="taskItem"].is-done>div{color:#5B6B80;text-decoration:line-through}
+/* Staff preview of a draft */
+.page-preview{background:var(--gold);color:var(--navy);font:600 15px/22px var(--font-brand);padding:10px 16px;text-align:center}
+@media print{.page-preview{display:none}.prose li[data-type="taskItem"]{break-inside:avoid}}

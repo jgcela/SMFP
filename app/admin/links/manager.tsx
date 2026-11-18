@@ -8,12 +8,13 @@ export type AdminLink = {
   id: number; placement: LinkGroup; label: string; shortLabel: string; href: string; newTab: boolean; hidden: boolean;
 };
 type Category = { key: string; name: string };
+type SitePage = { slug: string; title: string; legacy: string };
 type Msg = { text: string; err?: boolean } | null;
 
 // ----------------------------------------------------------------- form ----
 
-function LinkForm({ link, group, categories, onDone }: {
-  link: AdminLink | null; group: LinkGroup; categories: Category[]; onDone: (msg: string) => void;
+function LinkForm({ link, group, categories, pages, onDone }: {
+  link: AdminLink | null; group: LinkGroup; categories: Category[]; pages: SitePage[]; onDone: (msg: string) => void;
 }) {
   const [state, action, pending] = useActionState<LinkState, FormData>(saveLink, undefined);
   const [href, setHref] = useState(link?.href ?? "");
@@ -22,17 +23,18 @@ function LinkForm({ link, group, categories, onDone }: {
   const [tabTouched, setTabTouched] = useState(!!link);
   const ref = useRef<HTMLFormElement>(null);
   const keys = categories.map((c) => c.key);
+  const pagePaths = pages.flatMap((p) => [`pages/${p.slug}`, p.legacy].filter(Boolean));
   useEffect(() => { ref.current?.scrollIntoView({ block: "nearest" }); ref.current?.querySelector<HTMLInputElement>("input[name=label]")?.focus(); }, []);
   useEffect(() => { if (state?.ok) onDone(state.ok); }, [state, onDone]);
 
   const changeHref = (v: string) => {
     setHref(v);
-    if (warning) setWarning(checkHref(v, keys)); // update an existing warning as they fix it
+    if (warning) setWarning(checkHref(v, keys, pagePaths)); // update an existing warning as they fix it
     if (!tabTouched) setNewTab(opensInNewTabByDefault(v));
   };
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const problem = checkHref(href, keys);
+    const problem = checkHref(href, keys, pagePaths);
     setWarning(problem);
     if (problem) { ref.current?.querySelector<HTMLInputElement>("input[name=href]")?.focus(); return; }
     const fd = new FormData(e.currentTarget);
@@ -61,11 +63,12 @@ function LinkForm({ link, group, categories, onDone }: {
         Address
         <span className="hint">A full web address that starts with https://, or one of the portal’s own pages or sections from the suggestions.</span>
         <input type="text" name="href" inputMode="url" list="link-targets" maxLength={1000} required placeholder="https://"
-          value={href} onChange={(e) => changeHref(e.target.value)} onBlur={() => href.trim() && setWarning(checkHref(href, keys))}
+          value={href} onChange={(e) => changeHref(e.target.value)} onBlur={() => href.trim() && setWarning(checkHref(href, keys, pagePaths))}
           aria-invalid={!!warning} aria-describedby={warning ? "href-warning" : undefined} />
         {warning && <span id="href-warning" className="adm-msg adm-msg--err" role="alert">{warning}</span>}
       </label>
       <datalist id="link-targets">
+        {pages.map((p) => <option key={p.slug} value={`pages/${p.slug}`}>{`Page: ${p.title}`}</option>)}
         {PORTAL_PAGES.map((p) => <option key={p.href} value={p.href}>{`Page: ${p.name}`}</option>)}
         {PORTAL_SECTIONS.map((s) => <option key={s.href} value={s.href}>{`Section: ${s.name}`}</option>)}
         {categories.map((c) => <option key={c.key} value={`#cat-${c.key}`}>{`Documents: ${c.name}`}</option>)}
@@ -143,7 +146,7 @@ function LinkRow({ l, first, last, onEdit, report }: { l: AdminLink; first: bool
 
 type Editing = { group: LinkGroup; link: AdminLink | null } | null;
 
-export function LinksManager({ links, categories }: { links: AdminLink[]; categories: Category[] }) {
+export function LinksManager({ links, categories, pages }: { links: AdminLink[]; categories: Category[]; pages: SitePage[] }) {
   const [editing, setEditing] = useState<Editing>(null);
   const [msg, setMsg] = useState<Msg>(null);
   const router = useRouter();
@@ -164,7 +167,7 @@ export function LinksManager({ links, categories }: { links: AdminLink[]; catego
       </div>
       {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
       {editing && (
-        <LinkForm key={`${editing.group}-${editing.link?.id ?? "new"}`} link={editing.link} group={editing.group} categories={categories} onDone={done} />
+        <LinkForm key={`${editing.group}-${editing.link?.id ?? "new"}`} link={editing.link} group={editing.group} categories={categories} pages={pages} onDone={done} />
       )}
       {LINK_GROUPS.map((g) => {
         const items = links.filter((l) => l.placement === g.key);
