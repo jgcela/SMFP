@@ -92,3 +92,13 @@ one of the portal's own pages, files or sections; `lib/links.ts` checks this in
 the browser before saving and again on the server. The list of the portal's own
 files (`lib/public-files.json`) is regenerated before every build.
 Database change: `db/migrations/2026-11-18-step4c-links.sql`.
+
+## Step 4d: contact details
+
+Staff edit the school's phone, email, street address, office hours and optional
+contact people at `/admin/contact`. Both places on the portal ("Need the front
+office?" and "We're here for your family.") are built from these same fields.
+The phone link (`tel:`) is made from the number, and the address links to the
+map. `lib/contact.ts` checks the phone and email in the browser before saving
+and again on the server. No school's details are in the code.
+Database change: `db/migrations/2026-11-18-step4d-contact.sql`.

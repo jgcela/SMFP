@@ -15,11 +15,23 @@ create table if not exists schools (
   phone_href        text not null default '',      -- tel: link
   email             text not null default '',
   office_hours      text not null default '',
+  address           text not null default '',      -- step 4d: street address, linked to the map
   -- Calendar
   google_calendar_id text not null default '',     -- public Google Calendar id for "Subscribe"
   notice_auto_days  integer not null default 14,   -- automatic "No school" notice: days ahead (0 = off)
   created_at        timestamptz not null default now()
 );
+
+-- Step 4d: people families can write to, shown under the contact details.
+create table if not exists contact_people (
+  id          serial primary key,
+  school_id   integer not null references schools(id) on delete cascade,
+  name        text not null,
+  role        text not null default '',
+  email       text not null default '',
+  sort_order  integer not null default 0
+);
+create index if not exists contact_people_school on contact_people(school_id, sort_order);
 
 -- The highlighted notice under the header (the "No school" bar).
 -- An active notice here is shown instead of the automatic one built from the calendar.

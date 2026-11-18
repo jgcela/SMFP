@@ -11,9 +11,10 @@ export function schoolSlug() {
 
 export type School = {
   id: number; slug: string; name: string; city: string; region: string; school_year: string;
-  logo_url: string; phone_display: string; phone_href: string; email: string; office_hours: string;
+  logo_url: string; phone_display: string; phone_href: string; email: string; office_hours: string; address: string;
   google_calendar_id: string; notice_auto_days: number;
 };
+export type ContactPerson = { name: string; role: string; email: string };
 export type Link = { placement: string; label: string; short_label: string; href: string; new_tab: boolean };
 
 // The data the page script (public/portal.js) works with, in the shapes it expects.
@@ -47,7 +48,7 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
   if (!school) throw new Error(`No school with slug "${slug}"`);
 
   // Dates come back as text so no time zone can move them by a day.
-  const [notices, events, cats, docs, links] = await Promise.all([
+  const [notices, events, cats, docs, links, contacts] = await Promise.all([
     sql<{ message: string; link_label: string; link_href: string; show_from: string | null; show_until: string | null }[]>`
       select message, link_label, link_href, show_from::text, show_until::text from notices
       where school_id = ${school.id} and is_active order by created_at desc, id desc`,
@@ -60,6 +61,7 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
       select category_id, title, href, meta, description, kind, keywords, added_on::text, most_used_rank
       from documents where school_id = ${school.id} order by sort_order, id`,
     sql<Link[]>`select placement, label, short_label, href, new_tab from links where school_id = ${school.id} and not hidden order by sort_order, id`,
+    sql<ContactPerson[]>`select name, role, email from contact_people where school_id = ${school.id} order by sort_order, id`,
   ]);
 
   const docGroups = cats.map((c) => {
@@ -94,5 +96,5 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
       return row;
     }),
   };
-  return { school, links, data };
+  return { school, links, contacts, data };
 });
