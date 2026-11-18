@@ -233,3 +233,13 @@ create table if not exists page_versions (
   created_at  timestamptz not null default now()
 );
 create index if not exists page_versions_page on page_versions(page_id, created_at desc);
+
+-- Old addresses that now lead somewhere other than a page, e.g. the old Supply list
+-- page, which became its PDF. Checked after pages.legacy_path.
+create table if not exists redirects (
+  id         serial primary key,
+  school_id  integer not null references schools(id) on delete cascade,
+  path       text not null,            -- e.g. supply-list_202627.html
+  target     text not null,            -- portal file (assets/...) or https:// address
+  unique (school_id, path)
+);

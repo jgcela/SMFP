@@ -119,5 +119,10 @@ Images are uploaded to the private bucket and served through `/files/...`; the
 browser uploads straight to R2, so the bucket needs a CORS rule that allows `PUT`
 from the portal's address.
 
-Import of the old Supply list: `node scripts/import-supply-list.mjs <school_slug>`
-prints the SQL. Database change: `db/migrations/2026-11-18-step4e-pages.sql`.
+The two handbooks were imported from the old pages kept in `content/legacy/`.
+Before each build, `scripts/seed-legacy-pages.mjs` adds any old page there that
+the school does not have yet (and moves portal links to its new address); pages
+already imported are never touched. `node scripts/import-legacy-page.mjs <school> <file>`
+prints the same import as SQL. Old addresses that now lead elsewhere (the Supply
+list became its PDF) are in the `redirects` table.
+Database change: `db/migrations/2026-11-18-step4e-pages.sql`.

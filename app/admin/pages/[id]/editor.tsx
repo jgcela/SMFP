@@ -39,7 +39,7 @@ function Toolbar({ editor, onImage, onLink }: { editor: Editor; onImage: () => v
   const s = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
-      block: e.isActive("heading", { level: 2 }) ? "h2" : e.isActive("heading", { level: 3 }) ? "h3" : e.isActive("heading", { level: 4 }) ? "h4" : "p",
+      block: e.isActive("heading", { level: 2 }) ? "h2" : e.isActive("heading", { level: 3 }) ? "h3" : e.isActive("heading", { level: 4 }) ? "h4" : e.isActive("heading", { level: 5 }) ? "h5" : "p",
       bold: e.isActive("bold"), italic: e.isActive("italic"), underline: e.isActive("underline"),
       bullet: e.isActive("bulletList"), ordered: e.isActive("orderedList"), task: e.isActive("taskList"),
       link: e.isActive("link"), table: e.isActive("table"),
@@ -51,12 +51,13 @@ function Toolbar({ editor, onImage, onLink }: { editor: Editor; onImage: () => v
     <div className="pe-toolbar" role="toolbar" aria-label="Formatting">
       <select aria-label="Text style" value={s.block} onChange={(e) => {
         const v = e.target.value;
-        if (v === "p") c().setParagraph().run(); else c().setHeading({ level: Number(v[1]) as 2 | 3 | 4 }).run();
+        if (v === "p") c().setParagraph().run(); else c().setHeading({ level: Number(v[1]) as 2 | 3 | 4 | 5 }).run();
       }}>
         <option value="p">Normal text</option>
         <option value="h2">Title 1 (section)</option>
         <option value="h3">Title 2</option>
         <option value="h4">Title 3</option>
+        <option value="h5">Title 4</option>
       </select>
       <span className="pe-sep" />
       <Btn label="Bold" active={s.bold} on={() => c().toggleBold().run()}><b>B</b></Btn>
@@ -141,11 +142,12 @@ export function PageEditor({ page, versions }: { page: EditorPage; versions: Ver
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
-        heading: { levels: [2, 3, 4] },
+        heading: { levels: [2, 3, 4, 5] },
         code: false, codeBlock: false,
         link: { openOnClick: false, autolink: true, defaultProtocol: "https", HTMLAttributes: { rel: null, target: null } },
       }),
-      Image.configure({ HTMLAttributes: {} }),
+      // Keeps the size class of imported logos and icons (hb-logo, hb-icon).
+      Image.extend({ addAttributes() { return { ...this.parent?.(), class: { default: null } }; } }),
       TableKit.configure({ table: { resizable: false } }),
       TaskList, TaskItem.configure({ nested: true }),
     ],

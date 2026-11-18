@@ -5,7 +5,7 @@ import sanitizeHtml from "sanitize-html";
 
 const ALLOWED: sanitizeHtml.IOptions = {
   allowedTags: [
-    "h2", "h3", "h4", "p", "br", "hr", "strong", "b", "em", "i", "u", "s", "a", "blockquote",
+    "h2", "h3", "h4", "h5", "p", "br", "hr", "strong", "b", "em", "i", "u", "s", "a", "blockquote",
     "ul", "ol", "li", "label", "input", "div",
     "table", "thead", "tbody", "tr", "th", "td", "colgroup", "col", "img",
   ],
@@ -46,13 +46,13 @@ const plain = (s: string) =>
   s.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
 
 const slugify = (s: string) =>
-  plain(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "section";
+  plain(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "section";
 
 /** Gives each heading an id, so the contents and links like #kindergarten work. */
 export function withHeadingIds(html: string) {
   const used = new Set<string>();
   let headings = 0;
-  const out = html.replace(/<(h[234])>([\s\S]*?)<\/\1>/g, (_m, tag: string, inner: string) => {
+  const out = html.replace(/<(h[2-5])>([\s\S]*?)<\/\1>/g, (_m, tag: string, inner: string) => {
     headings++;
     const base = slugify(inner);
     let id = base;
