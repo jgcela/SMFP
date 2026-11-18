@@ -232,4 +232,9 @@ a.ctile:hover{background:#1d3f6e;color:var(--white)}
 .ctile .k{font:500 13px/16px var(--font-brand);letter-spacing:.08em;color:var(--azure)}
 .ctile .v{font:700 18px/28px var(--font-brand);overflow-wrap:anywhere}
 a.ctile .v{text-decoration:underline}
+.contact-people{display:flex;flex-direction:column;gap:16px}
+.contact-people h3{color:var(--white)}
+.contact-people ul{list-style:none;margin:0;padding:0}
+.contact-people .k{text-transform:uppercase}
+.contact-people a{color:var(--white);font-size:15px;line-height:22px;overflow-wrap:anywhere;min-height:44px;display:inline-flex;align-items:center}
 .legal{padding-top:24px;border-top:1px solid var(--cerulean);font-size:14px;line-height:20px;color:var(--azure)}

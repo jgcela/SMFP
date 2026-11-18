@@ -15,7 +15,7 @@
 .adm-f{display:flex;flex-direction:column;gap:18px}
 .adm-f label{display:flex;flex-direction:column;gap:6px;font:600 14px/20px var(--font-brand);color:var(--navy)}
 .adm-f .hint{font:400 13px/18px var(--font-text);color:#5b6470}
-.adm-f input[type=email],.adm-f input[type=password],.adm-f input[type=text],.adm-f input[type=url],.adm-f textarea{font:400 16px/24px var(--font-text);color:var(--jet);border:1px solid var(--gray);border-radius:var(--r-md);padding:10px 12px;background:var(--white);width:100%;box-sizing:border-box}
+.adm-f input[type=email],.adm-f input[type=tel],.adm-f input[type=password],.adm-f input[type=text],.adm-f input[type=url],.adm-f textarea{font:400 16px/24px var(--font-text);color:var(--jet);border:1px solid var(--gray);border-radius:var(--r-md);padding:10px 12px;background:var(--white);width:100%;box-sizing:border-box}
 .adm-f textarea{min-height:96px;resize:vertical}
 .adm-f input:focus,.adm-f textarea:focus,.adm-f button:focus-visible,.adm-switch input:focus-visible+span{outline:3px solid var(--aero);outline-offset:1px}
 .adm-f fieldset{border:1px solid var(--gray);border-radius:var(--r-md);padding:14px 14px 16px;margin:0;display:flex;flex-direction:column;gap:14px}
@@ -124,3 +124,8 @@
 .pill--muted{background:var(--gray);color:var(--jet)}
 .adm-doc.is-hidden .what strong{color:#5b6470}
 .adm-href{overflow-wrap:anywhere}
+
+/* Five sections: on narrow phones the tabs get tighter and can scroll sideways */
+.adm-nav .in{overflow-x:auto;scrollbar-width:none}
+.adm-nav a{white-space:nowrap;flex:none}
+@media (max-width:480px){.adm-nav a{padding:12px 8px;font-size:14px}}

@@ -16,6 +16,7 @@
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
   <symbol id="i-mobile" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
 </svg>
 
 <header class="site-header on-navy">
@@ -108,7 +109,7 @@
           <a class="contact-line" href="{{school.phone_href}}"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>{{school.phone_display}}</a>
           <a class="contact-line js-email" href="mailto:{{school.email}}"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><span class="js-email-text">{{school.email}}</span></a>
           <p class="contact-line"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>{{school.office_hours}}</p>
-        </div>
+{{contact.aside_address}}        </div>
       </aside>
     </div>
   </section>
@@ -203,8 +204,8 @@
       <a class="ctile" href="{{school.phone_href}}"><span class="k">CALL THE OFFICE</span><span class="v">{{school.phone_display}}</span></a>
       <a class="ctile js-email" href="mailto:{{school.email}}"><span class="k">EMAIL</span><span class="v js-email-text">{{school.email}}</span></a>
       <div class="ctile"><span class="k">OFFICE HOURS</span><span class="v">{{school.office_hours}}</span></div>
-    </div>
-    <p class="legal">{{school.footer}}</p>
+{{contact.tile_address}}    </div>
+{{contact.people}}    <p class="legal">{{school.footer}}</p>
   </div>
 </footer>
 

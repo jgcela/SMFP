@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { opensInNewTabByDefault } from "./links";
-import type { Link, School } from "./portal";
+import { mapsHref } from "./contact";
+import type { ContactPerson, Link, School } from "./portal";
 
 // The page markup, with {{...}} where each school's content goes.
 const template = readFileSync(path.join(process.cwd(), "content/portal-template.html"), "utf8");
@@ -47,7 +48,31 @@ export function schoolDescription(school: School) {
   return `Calendar, forms and school updates for ${school.name} families, school year ${school.school_year}.`;
 }
 
-export function renderPortal(school: School, links: Link[]) {
+// Step 4d: the address and the contact people. Both are empty until the school
+// fills them in, and then the page is exactly as before.
+function contactParts(school: School, people: ContactPerson[]) {
+  const address = school.address.trim();
+  const map = esc(mapsHref(address));
+  const lines = address ? esc(address) : "";
+  return {
+    "contact.aside_address": address
+      ? `          <a class="contact-line" href="${map}"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span>${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
+      : "",
+    "contact.tile_address": address
+      ? `      <a class="ctile" href="${map}"><span class="k">ADDRESS</span><span class="v">${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
+      : "",
+    "contact.people": people.length
+      ? `    <div class="contact-people">
+      <h3 class="h3">Who to contact</h3>
+      <ul class="contact-grid">
+${people.map((p) => `        <li class="ctile">${p.role ? `<span class="k">${esc(p.role)}</span>` : ""}<span class="v">${esc(p.name)}</span>${p.email ? `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>` : ""}</li>\n`).join("")}      </ul>
+    </div>
+`
+      : "",
+  };
+}
+
+export function renderPortal(school: School, links: Link[], people: ContactPerson[] = []) {
   const place = [school.city, school.region].filter(Boolean).join(", ");
   const values: Record<string, string> = {
     "school.logo_url": esc(school.logo_url),
@@ -59,6 +84,7 @@ export function renderPortal(school: School, links: Link[]) {
     "school.office_hours": esc(school.office_hours),
     "school.footer": esc([school.name, place, `Parent Portal, school year ${school.school_year}`].filter(Boolean).join(" · ")),
     "facts.button": factsButton(links.find((l) => l.placement === "facts")),
+    ...contactParts(school, people),
   };
   for (const [slot, { from, html }] of Object.entries(LINK_HTML)) {
     values[`links.${slot}`] = links.filter((l) => l.placement === from).map(html).join("");
