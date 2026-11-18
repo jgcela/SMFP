@@ -28,6 +28,12 @@ export type PortalData = {
   events: [string, string, string, string, string, string, string?][];
 };
 
+/** "18:30:00" -> "6:30 pm" (the format the portal has always used). */
+export function formatTime(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`;
+}
+
 const iso = (d: Date | string | null) => {
   if (!d) return "";
   if (typeof d === "string") return d.slice(0, 10);
@@ -45,8 +51,8 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
     sql<{ message: string; link_label: string; link_href: string; show_from: string | null; show_until: string | null }[]>`
       select message, link_label, link_href, show_from::text, show_until::text from notices
       where school_id = ${school.id} and is_active order by created_at desc, id desc`,
-    sql<{ event_date: string; end_date: string | null; category: string; title: string; details: string; badges: string[]; link_url: string }[]>`
-      select event_date::text, end_date::text, category, title, details, badges, link_url
+    sql<{ event_date: string; end_date: string | null; start_time: string | null; category: string; title: string; details: string; badges: string[]; link_url: string }[]>`
+      select event_date::text, end_date::text, start_time::text, category, title, details, badges, link_url
       from events where school_id = ${school.id} order by event_date, sort_order, id`,
     sql<{ id: number; key: string; name: string; description: string }[]>`
       select id, key, name, description from document_categories where school_id = ${school.id} order by sort_order, id`,
@@ -79,7 +85,8 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
     })),
     mostUsed,
     events: events.map((e) => {
-      const row: PortalData["events"][number] = [iso(e.event_date), e.category, e.title, e.details, e.badges.join("|"), e.link_url];
+      const details = e.start_time ? formatTime(e.start_time) + (e.details ? `, ${e.details}` : "") : e.details;
+      const row: PortalData["events"][number] = [iso(e.event_date), e.category, e.title, details, e.badges.join("|"), e.link_url];
       if (e.end_date) row.push(iso(e.end_date));
       return row;
     }),

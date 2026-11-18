@@ -1,14 +1,14 @@
 /* Staff area. Uses the portal's design tokens (app/portal.css). */
 .adm{min-height:100vh;background:var(--azure);display:flex;flex-direction:column}
 .adm-top{background:var(--navy);color:var(--white)}
-.adm-top .in{max-width:640px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.adm-top .in{max-width:880px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
 .adm-top img{height:36px;width:auto}
 .adm-top .t{flex:1;font:600 15px/20px var(--font-brand)}
 .adm-top .t small{display:block;font-weight:400;opacity:.8}
 .adm-top form{margin:0}
 .adm-top button{background:none;border:1px solid rgba(255,255,255,.5);color:var(--white);border-radius:var(--r-md);min-height:40px;padding:0 14px;font:600 14px/20px var(--font-brand);cursor:pointer}
 .adm-top button:hover{background:rgba(255,255,255,.12)}
-.adm-main{width:100%;max-width:640px;margin:0 auto;padding:24px 16px 48px;box-sizing:border-box}
+.adm-main{width:100%;max-width:880px;margin:0 auto;padding:24px 16px 48px;box-sizing:border-box}
 .adm-card{background:var(--white);border-radius:var(--r-md);padding:24px;box-shadow:0 1px 2px rgba(22,51,91,.12)}
 .adm-card h1{margin:0 0 4px;font:700 24px/30px var(--font-brand);color:var(--navy)}
 .adm-card .lead{margin:0 0 20px;color:#555}
@@ -33,3 +33,68 @@
 .adm-actions a{color:var(--cerulean);font:600 15px/20px var(--font-brand)}
 .adm-f button[disabled]{opacity:.6;cursor:wait}
 @media (prefers-reduced-motion:reduce){.adm-switch span,.adm-switch span::after{transition:none}}
+.adm-nav{background:#0f2643}
+.adm-nav .in{padding-top:0;padding-bottom:0;gap:4px}
+.adm-nav a{color:var(--white);text-decoration:none;font:600 15px/20px var(--font-brand);padding:12px 14px;border-bottom:3px solid transparent;opacity:.85}
+.adm-nav a:hover{opacity:1}
+.adm-nav a[aria-current=page]{border-bottom-color:var(--gold);opacity:1}
+.adm-card--narrow{max-width:480px;margin:0 auto}
+/* Calendar */
+.adm-head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.adm-head .lead{margin-bottom:0}
+.adm-card .btn{text-decoration:none}
+.adm-panel{border:2px solid var(--cerulean);border-radius:var(--r-md);padding:18px;margin:0 0 20px;background:#f7fbfd}
+.adm-panel h2{margin:0;font:700 18px/24px var(--font-brand);color:var(--navy)}
+.adm-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.adm-f input[type=date],.adm-f input[type=time],.adm-f select,.adm-search input{font:400 16px/24px var(--font-text);color:var(--jet);border:1px solid var(--gray);border-radius:var(--r-md);padding:10px 12px;background:var(--white);width:100%;box-sizing:border-box}
+.adm-f input:disabled{background:#eef1f4;color:#888}
+.adm-check{display:flex!important;flex-direction:row!important;align-items:center;gap:10px!important;font:600 14px/20px var(--font-brand);color:var(--navy);cursor:pointer}
+.adm-check input{width:20px;height:20px;accent-color:var(--cerulean);margin:0}
+.adm-f .hint,.adm-panel .hint{margin:0}
+.adm-tools{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin:4px 0 8px}
+.adm-search{flex:1 1 280px}
+.adm-search input:focus,.adm-f select:focus{outline:3px solid var(--aero);outline-offset:1px}
+.adm-count{margin:0 0 8px;color:#5b6470;font-size:14px}
+.adm-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--gray)}
+.adm-ev{display:grid;grid-template-columns:190px 1fr auto;gap:8px 16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--gray)}
+.adm-ev.is-past{opacity:.6}
+.adm-ev .when{display:flex;flex-direction:column;font:600 14px/20px var(--font-brand);color:var(--navy)}
+.adm-ev .when .t{font-weight:400;color:#5b6470}
+.adm-ev .what{display:flex;flex-direction:column;gap:2px;min-width:0}
+.adm-ev .what strong{font:600 16px/22px var(--font-brand);color:var(--jet)}
+.adm-ev .note{color:#5b6470;font-size:14px;line-height:20px}
+.cat{align-self:flex-start;font:700 12px/16px var(--font-brand);text-transform:uppercase;letter-spacing:.03em;padding:2px 8px;border-radius:var(--r-pill);background:var(--azure);color:var(--navy)}
+.cat--noclasses{background:#fdecea;color:#8a1c12}
+.cat--faith{background:#efe7f7;color:#4b2a73}
+.cat--academic{background:#e3f0f7;color:#0b4f6c}
+.cat--community{background:#e6f4ea;color:#14532d}
+.cat--health{background:#fff4d6;color:#6b4a00}
+.adm-ev .act{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.adm-ev .act button,.adm-ev .confirm button{min-height:40px;padding:0 14px;border-radius:var(--r-md);border:1px solid var(--cerulean);background:var(--white);color:var(--navy);font:600 14px/20px var(--font-brand);cursor:pointer}
+.adm-ev .act button:hover{background:var(--azure)}
+.adm-ev .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:600 14px/20px var(--font-brand);color:#8a1c12}
+.adm-ev .confirm .danger{background:#b3261e;border-color:#b3261e;color:var(--white)}
+.adm-ev .confirm .danger:hover{background:#8a1c12}
+.adm-empty{color:#5b6470;padding:16px 0}
+.adm-back{margin:0 0 8px}
+.adm-back a{color:var(--cerulean);font:600 15px/20px var(--font-brand)}
+.adm-tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--gray);border-radius:var(--r-md)}
+.adm-table{width:100%;border-collapse:collapse;font-size:14px;line-height:20px}
+.adm-table th{text-align:left;font:600 13px/18px var(--font-brand);color:var(--navy);background:var(--azure);padding:8px 10px;white-space:nowrap}
+.adm-table td{padding:8px 10px;border-top:1px solid var(--gray);vertical-align:top}
+.adm-table td:nth-child(2){white-space:nowrap}
+.adm-table td.note{color:#5b6470;max-width:240px}
+.adm-table select{font:400 14px/20px var(--font-text);padding:4px 6px;border:1px solid var(--gray);border-radius:var(--r-sm)}
+.adm-table input[type=checkbox]{width:18px;height:18px;accent-color:var(--cerulean)}
+.adm-table tr.is-err td{background:#fdf2f1}
+.adm-table tr.is-dup td{background:#f6f7f9;color:#777}
+.adm-table .why{display:block;font-size:13px;color:#8a1c12}
+.adm-table .why--dup{color:#6b4a00}
+.adm-sticky{position:sticky;bottom:0;background:var(--white);padding:12px 0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:640px){
+  .adm-card{padding:18px 16px}
+  .adm-ev{grid-template-columns:1fr}
+  .adm-ev .act{justify-content:flex-start}
+  .adm-row{grid-template-columns:1fr}
+}

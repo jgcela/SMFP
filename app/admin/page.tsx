@@ -1,37 +1,19 @@
 import { db } from "../../lib/db";
 import { currentStaff } from "../../lib/staff";
-import { loadSchoolHeader } from "./school";
-import { signOut } from "./actions";
+import { AdminTop } from "./chrome";
 import { NoticeForm, SignInForm } from "./forms";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ password?: string }> }) {
-  const [{ user, staff }, school, sp] = await Promise.all([currentStaff(), loadSchoolHeader(), searchParams]);
-
-  const top = (
-    <header className="adm-top">
-      <div className="in">
-        {school.logoUrl && <img src={school.logoUrl} alt="" />}
-        <div className="t">
-          {school.name}
-          <small>Staff</small>
-        </div>
-        {user && (
-          <form action={signOut}>
-            <button type="submit">Sign out</button>
-          </form>
-        )}
-      </div>
-    </header>
-  );
+  const [{ user, staff }, sp] = await Promise.all([currentStaff(), searchParams]);
 
   if (!user) {
     return (
       <>
-        {top}
+        <AdminTop signedIn={false} />
         <main className="adm-main">
-          <div className="adm-card">
+          <div className="adm-card adm-card--narrow">
             <h1>Staff sign-in</h1>
             <p className="lead">For school staff only. Families do not need to sign in.</p>
             <SignInForm notice={sp.password === "set" ? "Your password is saved. Sign in with it." : undefined} />
@@ -44,9 +26,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   if (!staff) {
     return (
       <>
-        {top}
+        <AdminTop signedIn />
         <main className="adm-main">
-          <div className="adm-card">
+          <div className="adm-card adm-card--narrow">
             <h1>No access</h1>
             <p className="lead">This account cannot edit this school&apos;s portal.</p>
           </div>
@@ -64,7 +46,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      {top}
+      <AdminTop signedIn section="notice" />
       <main className="adm-main">
         <div className="adm-card">
           <h1>Featured notice</h1>

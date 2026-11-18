@@ -1,0 +1,34 @@
+// Header of the staff area: school, sections and sign out.
+import Link from "next/link";
+import { signOut } from "./actions";
+import { loadSchoolHeader } from "./school";
+
+export type Section = "notice" | "calendar";
+
+export async function AdminTop({ signedIn, section }: { signedIn: boolean; section?: Section }) {
+  const school = await loadSchoolHeader();
+  return (
+    <header className="adm-top">
+      <div className="in">
+        {school.logoUrl && <img src={school.logoUrl} alt="" />}
+        <div className="t">
+          {school.name}
+          <small>Staff</small>
+        </div>
+        {signedIn && (
+          <form action={signOut}>
+            <button type="submit">Sign out</button>
+          </form>
+        )}
+      </div>
+      {section && (
+        <nav className="adm-nav" aria-label="Sections">
+          <div className="in">
+            <Link href="/admin" aria-current={section === "notice" ? "page" : undefined}>Notice</Link>
+            <Link href="/admin/calendar" aria-current={section === "calendar" ? "page" : undefined}>Calendar</Link>
+          </div>
+        </nav>
+      )}
+    </header>
+  );
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadSchoolHeader } from "../school";
+import { AdminTop } from "../chrome";
 import { SetPasswordForm } from "../forms";
 
 export const dynamic = "force-dynamic";
@@ -7,20 +7,12 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Choose your password", referrer: "no-referrer" };
 
 export default async function SetPasswordPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
-  const [school, sp] = await Promise.all([loadSchoolHeader(), searchParams]);
+  const sp = await searchParams;
   return (
     <>
-      <header className="adm-top">
-        <div className="in">
-          {school.logoUrl && <img src={school.logoUrl} alt="" />}
-          <div className="t">
-            {school.name}
-            <small>Staff</small>
-          </div>
-        </div>
-      </header>
+      <AdminTop signedIn={false} />
       <main className="adm-main">
-        <div className="adm-card">
+        <div className="adm-card adm-card--narrow">
           <h1>Choose your password</h1>
           <p className="lead">This link works once. After saving, sign in with your email and this password.</p>
           <SetPasswordForm token={sp.token ?? ""} />
