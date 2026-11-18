@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "Calendar, forms and school updates for St. Mary Catholic Virtue School families, school year 2026–27.",
   robots: { index: false, follow: false },
-  icons: { icon: { url: "/favicon.png", type: "image/png" } },
+  icons: { icon: { url: "/assets/favicon.png", type: "image/png" } },
 };
 
 export const viewport: Viewport = {

@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!--<![endif]-->
+<style type="text/css">
+
+    /* CLIENT-SPECIFIC STYLES */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; }
+	
+	#outlook a {padding:0;} /* Force Outlook to provide a "view in browser" button. */
+	.ReadMsgBody{width:100%;} .ExternalClass{width:100%;} /* Force Hotmail to display emails at full width */
+	img {height:auto; line-height:100%; border:0; outline:none; text-decoration:none; margin:0; display: block;}
+	table {border-collapse: collapse;}
+	table td {border-collapse:collapse;}
+	
+    /* RESET STYLES */
+    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    table { border-collapse: collapse !important; }
+
+    /* iOS BLUE LINKS */
+    a[x-apple-data-detectors] {
+        color: inherit !important;
+        text-decoration: none !important;
+        font-family: inherit !important;
+        font-weight: inherit !important;
+        line-height: inherit !important;
+    }
+    .fn_email_column a {
+    	color: inherit;
+    	text-decoration: underline;
+    }
+    #around_all {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	}
+	/* SAMESUNG LINKS */
+	#MessageViewBody a {
+	color: inherit;
+	text-decoration: none;
+	font-size: inherit;
+	font-family: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	}
+	@media screen and (max-width:6400px){
+		.image_img {
+			max-width:100% !important;	
+		}
+	}
+    /* MOBILE STYLES */
+    @media screen and (max-width:640px) {
+	  	
+	  	.hide {display:none !important; }
+	  	
+	  	#top_spacer {
+           display: none;
+           overflow:hidden;
+           float:left;
+           line-height:0px;
+       }
+	  	div[id="top_spacer"] {
+           display: none;
+           overflow:hidden;
+           float:left;
+           line-height:0px;
+       }
+	  	.email_section {
+		  	border-top-left-radius: 0 !important;
+		  	border-top-right-radius: 0 !important;
+		  	border-bottom-left-radius: 0 !important;
+		  	border-bottom-right-radius: 0 !important;
+		  	}
+		.email_section_size_full,
+		.email_section_size_normal {
+			width: 100% !important;
+			}
+	  	.fn_email_column {
+		  	display: block !important;
+		  	width:100%!important;
+		  	padding-left: 0 !important;
+	  		}
+	  	.fn_email_column_2 {
+			padding-top: 20px !important;
+			}
+		.event_date_spacer {
+			width: auto !important;
+			font-size: 12px !important;
+			}
+	  	#sent_by_image, #sent_by_text, #comments_button {
+		  	float:none!important;
+		  	}
+		 #comments_button {
+			 margin:0 auto;
+			 margin-top: 20px;
+			 }
+		#sent_by_image {
+			margin:0 auto !important;
+			}
+		#sent_by_text {
+			text-align: center;
+			}
+		.image_img,
+		.video_img {
+			max-width: 100% !important;
+			}	
+		.button_link {
+			font-size: 28px !important;	
+		}	
+		
+		.file_link {
+			text-align: left !important;
+			padding:20px !important;
+			font-size: 22px !important;
+		}
+		.file_icon {
+			float: left !important;
+			margin: 0 !important;	
+		}
+		.file_title {
+			padding-top: 5px !important;
+			padding-left: 60px !important;
+			line-height: 30px !important;	
+		}
+		
+		
+		
+			
+		
+		.quote_around {
+			padding: 10px !important;
+			}
+		.quote_text {
+			font-size:22px !important;
+			line-height: 32px !important;
+			}
+		.quote_author {
+			padding:20px !important;
+			}
+			
+		.button_holder {
+			padding:0 !important;
+		}
+	
+	
+	
+	
+	.event_date_td {
+		display: block !important;
+		margin:0 auto;	
+	}	
+	.event_details_td {
+		display: block !important;
+		padding-left: 0 !important;
+		width: 100% !important;
+		}
+	.event_rsvp_td {
+		display: block;
+		width: 100% !important;
+		}
+	.event_rsvp_inside_td {
+		padding-top: 0 !important;
+		}
+	.event_are_you_going_td {
+		display: block;
+		width: 100% !important;
+		padding-bottom: 10px;
+		}
+		.iig_template_buttons_pre_spacing {
+			display: table-cell !important;
+		}
+		.iig_profile_image {
+			display:none;
+		}
+		.iig_template_text {
+			float:none !important;
+			width:auto !important;
+		}
+		.iig_template_inside {
+			padding-left:0 !important;
+		}
+    }
+     @media screen and (max-width:500px){
+
+      .event_rsvp_td,
+      .event_are_you_going_td {
+		width: 100% !important;
+		display: block !important;;
+		}
+		.event_rsvp_td {
+			padding-top: 0 !important;
+		}
+		
+		
+		.signup_title_button_spacer_td {
+			display:none !important;
+		}
+		.signup_button_holder_td {
+			display:none !important;
+		}
+		.signup_button_mobile {
+			display: block !important;
+		}
+		.signup_button_mobile_padding {
+			display: block !important;
+		}
+		
+	}
+		
+     @media screen and (max-width:430px){
+
+      .email_section_size_large {
+			width: 100% !important;
+			}
+		}
+    @media screen and (max-width:440px){
+
+       div[id="flocknote_logo"] {
+           float: none !important;
+           clear: both;
+           width: auto;
+           text-align: center;
+           padding-top:40px;
+           padding-bottom: 80px;
+       }
+    }
+
+    /* ANDROID CENTER FIX */
+    div[style*="margin: 16px 0;"] { margin: 0 !important; }
+</style>
+</head>
+<body style="width:100% !important; background-color: #D5ECF3; margin: 0 !important; padding: 0 !important; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+	
+<!-- HIDDEN PREHEADER TEXT -->
+<div style="display: none; font-size: 1px; color: #eceff0; line-height: 1px;  max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;"> Welcome Back “Are you ready for the new school year?” If I had received a dollar every time I have been asked that question, I would be rich by now. My answer has always been, “No.” Some people laughed when I said it...
+</div>
+
+
+
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" id="around_all" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+	<tr>
+		<td style="background-color:#D5ECF3; height:400px; vertical-align:top" height="400" valign="top" bgcolor="#D5ECF3">
+			
+			
+			
+<!--[if (gte mso 12)]>
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+            <td class="spacer" style="height:40px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="40">
+            <![endif]-->
+            	<div id="top_spacer" style="height:40px;">&nbsp;</div>
+            <!--[if (gte mso 12)]>
+            </td>
+        </tr>
+    </table>
+<![endif]-->
+ <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#D5ECF3; color:#3d4041; border-top-right-radius:5px; border-top-left-radius:5px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#D5ECF3">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#D5ECF3; color:#3d4041; border-top-right-radius:5px; border-top-left-radius:5px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#3d4041">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#3d4041">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:640px; max-width:640px;" width="640" border="0" src="https://d6iyrqjd26xke.cloudfront.net/annsmnewsletterheader081626issue1/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#434343">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#434343">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:640px; max-width:640px;" width="640" border="0" src="https://d6iyrqjd26xke.cloudfront.net/frjamesheather/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="padding:20px;">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							            		<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+												</tr>
+												<tr>		
+							                	<td class="spacer" style="font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" width="20">&nbsp;</td>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#434343">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#434343">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="padding-bottom: 20px;">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:600px; max-width:600px;" width="600" border="0" src="https://d6iyrqjd26xke.cloudfront.net/pruebajames802/full.png">
+	
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_text" style="padding-bottom: 20px;">
+<div style="font-size: 16px; line-height: 1.4em; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; -ms-hyphens: auto; color:#434343;">
+	<div class="text_large" style="text-align:center;font-size:24px;line-height:32px;"><span style="color:#16335b;"><strong><strong>Welcome Back<br></strong></strong></span></div>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_text" style="padding-bottom: 20px;">
+<div style="font-size: 16px; line-height: 1.4em; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; -ms-hyphens: auto; color:#434343;">
+	<div><span style="color:#16335b;">“Are you ready for the new school year?”</span></div><div><span style="color:#16335b;"><br>If I had received a dollar every time I have been asked that question, I would be rich by now. My answer has always been, “No.” Some people laughed when I said it. Others probably thought I wasn’t willing to go back, or that I hadn’t done my due diligence to prepare.</span></div><div><span style="color:#16335b;"><br>None of that is what I mean when I say that I am not ready. What I mean is something much simpler and, I think, much truer: <strong>you cannot be ready for what you don’t know is coming your way.</strong></span></div><div><span style="color:#16335b;"><br>The truth is that we have no idea what will happen tomorrow, let alone during an entire school year. We have predictions and expectations based on our plans, and we hope that everything will unfold according to those plans. For that, we might be ready.</span></div><div><span style="color:#16335b;"><br>But the world, life, and God Himself do not bend to our plans. It is the other way around: <strong>our plans must ultimately bend to reality, and reality is held in God’s providence.</strong></span></div><div><span style="color:#16335b;"><br>I do agree with the principle, “Failing to plan is planning to fail.” But I think it needs a second part: <strong>even if you plan thoroughly, you can still fail.</strong> Not necessarily because your planning was poor, but because life is not entirely in our hands.</span></div><div><span style="color:#16335b;"><br>All I can truly be ready for is to give my best; to adapt when God changes my plans; to accept His will and its outcome without complaining; to surrender all my efforts and work to Him; and to do my due diligence to serve Him and those entrusted to me as best I can.</span></div><div><span style="color:#16335b;"><br>So perhaps the real question is not, “Are you ready for the new school year?”</span></div><div><span style="color:#16335b;"><br>Perhaps the real question is: <strong>Are you ready to let God be God in your life? Are you ready to let Him lead your projects and shape your plans?</strong></span></div><div><span style="color:#16335b;"><br>If the answer is yes, then you are ready.<br></span></div><div><span style="color:#16335b;"><br>In Mary, Christ; through Christ, to the Father!</span></div><div style="text-align:left;"><span style="color:#16335b;"><br></span></div><div style="text-align:left;"><span style="color:#16335b;">Fr. James de Cendra, dcjm</span></div>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:600px; max-width:600px;" width="600" border="0" src="https://d6iyrqjd26xke.cloudfront.net/separatorwhite145/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+										<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" height="20" width="20">&nbsp;</td>
+										</tr>
+										<tr>
+											<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#222222">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#222222">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:640px; max-width:640px;" width="640" border="0" src="https://d6iyrqjd26xke.cloudfront.net/importantdateswhite5/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="padding:20px;">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							            		<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+												</tr>
+												<tr>		
+							                	<td class="spacer" style="font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" width="20">&nbsp;</td>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#222222">
+										                	<tr>
+										
+										        <td width="190" style="width:190px; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_small">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#222222">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:190px; max-width:190px;" width="190" border="0" src="https://d6iyrqjd26xke.cloudfront.net/iccalendar4/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+<!--[if (gte mso 12)]>			
+	<td width="20" style="width:20px;">&nbsp;</td>
+<![endif]--><td width="390" style="width:390px; padding-left:20px;" valign="top" class="fn_email_column fn_email_column_2 fn_email_column_large">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#222222">
+<![endif]--><div class="fn_note_item fn_note_item_text" style="">
+<div style="font-size: 16px; line-height: 1.4em; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; -ms-hyphens: auto; color:#222222;">
+	<strong><span style="color:#16335b;"><br></span></strong><ul><li><strong><span style="color:#16335b;">Aug 17: </span></strong><span style="color:#16335b;">First Day of School</span></li><li><span style="color:#16335b;"><strong>Aug 21<strong><span style="color:#16335b;">:</span></strong> </strong>All School Mass K-8</span></li><li><span style="color:#16335b;"><strong>Aug 28<strong><span style="color:#16335b;">:</span></strong> </strong>All School Mass K-8</span></li><li><span style="color:#16335b;"><strong>Aug 28<strong><span style="color:#16335b;">:</span></strong> </strong>Back to School Night @ Blacktop 5PM</span></li><li><font color="#16335b"><span style="caret-color: rgb(22, 51, 91);"><span style="color:#16335b;"><strong>Sep</strong></span></span><strong> 2<strong><span style="color:#16335b;">:</span></strong></strong> SMPA Meeting @ <font color="#16335b">Library </font>6PM</font></li><li><span style="color:#16335b;"><span style="color:#16335b;"><strong>Sep </strong></span><strong>4<strong><span style="color:#16335b;">:</span></strong></strong> All School Mass K-8 </span></li></ul>
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+										<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" height="20" width="20">&nbsp;</td>
+										</tr>
+										<tr>
+											<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="padding:20px;">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							            		<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+												</tr>
+												<tr>		
+							                	<td class="spacer" style="font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" width="20">&nbsp;</td>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#222222">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#222222">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="padding-bottom: 20px;">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:600px; max-width:600px;" width="600" border="0" src="https://d6iyrqjd26xke.cloudfront.net/separatorwhite146/full.png">
+	
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_photo" style="padding-bottom: 20px;">
+<div class="image" style="text-align:center;">
+	<a href="https://email-mg.flocknote.com/c/eJxUzj1ywyAQQOHTQKmBXfFXUKTRPRAsETEIj7zxTG6fcVL5Au97JTqN4FZJUTtvg9LWOnlEXQz6fUdIKhBkC4mKCb7WXGvAomSLoMAqr612uIJdgk57DQ5LIgRKXqyq9plv52Ra8hyyx4P5_hD4IWATsD14pOsnzzG-z5YTt3kuX-nZ6MrU0zJIwHafF6cuYFMGtQHzWW8vdjl4dPkqtxLRKwxBB3nFt5hY1T_RG3MnnuffxjPCbwAAAP__bG9MvQ">
+		<img class="image_img" style="display:block; margin:0 auto; width:600px; max-width:600px;" width="600" border="0" src="https://d6iyrqjd26xke.cloudfront.net/parentportal10/full.png">
+	</a>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_text" style="padding-bottom: 20px;">
+<div style="font-size: 16px; line-height: 1.4em; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; -ms-hyphens: auto; color:#222222;">
+	<span style="color:#16335b;">We've launched a new online <strong>Parent Portal,</strong> one central home for the documents and information you'll reach for throughout the school year. It's built to give you direct, anytime access, and it replaces the paper "Summer Mailing" we used to send.<br><br>Prefer paper? Copies of all documents are available at the turnstile in the school's main entrance. Everything on the Portal also lives in the <strong>FACTS Family Portal</strong>, so you can use whichever is easier for you.<br><br><strong>What you'll find inside:</strong></span><ul><li><span style="color:#16335b;">2026–2027 School Calendar</span></li><li><span style="color:#16335b;">2026–2027 Supply Lists</span></li><li><span style="color:#16335b;">Parent Volunteer Information</span></li><li><span style="color:#16335b;">Hot Lunch Ordering Information</span></li><li><span style="color:#16335b;">Milk Ordering — <em>see the Portal or contact the office for current availability</em></span></li><li><span style="color:#16335b;">Cell Phone Policy Agreement</span></li><li><span style="color:#16335b;">and MORE</span></li></ul><div class="text_large" style="text-align:center;font-size:24px;line-height:32px;"><span style="color:#16335b;"><a href="https://email-mg.flocknote.com/c/eJxUzj1ywyAQQOHTQKmBXfFXUKTRPRAsETEIj7zxTG6fcVL5Au97JTqN4FZJUTtvg9LWOnlEXQz6fUdIKhBkC4mKCb7WXGvAomSLoMAqr612uIJdgk57DQ5LIgRKXqyq9plv52Ra8hyyx4P5_hD4IWATsD14pOsnzzG-z5YTt3kuX-nZ6MrU0zJIwHafF6cuYFMGtQHzWW8vdjl4dPkqtxLRKwxBB3nFt5hY1T_RG3MnnuffxjPCbwAAAP__bG9MvQ" style="color:#16335b;"><strong>Access to Parent Portal</strong></a></span></div>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:600px; max-width:600px;" width="600" border="0" src="https://d6iyrqjd26xke.cloudfront.net/separatorwhite143/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+										<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" height="20" width="20">&nbsp;</td>
+										</tr>
+										<tr>
+											<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#16335B; color:#dbe0e4; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#16335B">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#16335B; color:#dbe0e4; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="padding:20px;">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							            		<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+												</tr>
+												<tr>		
+							                	<td class="spacer" style="font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" width="20">&nbsp;</td>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#dbe0e4">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#dbe0e4">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="padding-bottom: 20px;">
+<div class="image" style="text-align:center;">
+	<a href="https://email-mg.flocknote.com/c/eJwcjsFurCAUQL8GlhPuvQzIgsV7URdNuukPNCiodBCMMtP6903dn5xzvNVAqCUPFnSjjAClNF_sYO4QCIz3KkinlEEVtAQg74RvUPBoUaASDSjQJFHdDLhhMpq8C4TBNUyKKZXxkUsNt7GsPNml1u1g9I9hz7D3e3yF21zKnC6AYV-2kBn10TNq4WOB9_BTzjN1w9u3eeTS_u_uLXVu6uflKzJUz2Nj1F6iz-ngf6noLTWCjAHDdzuWdX3mOLoaS2ZSHHV1-5lirSnUkq-vl8XfAAAA__91hFEa">
+		<img class="image_img" style="display:block; margin:0 auto; width:600px; max-width:600px;" width="600" border="0" src="https://d6iyrqjd26xke.cloudfront.net/grotto139/full.png">
+	</a>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_text" style="">
+<div style="font-size: 16px; line-height: 1.4em; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; -ms-hyphens: auto; color:#dbe0e4;">
+	<div style="text-align:center;"><span style="color:#ffffff;"><a href="https://email-mg.flocknote.com/c/eJxczTtuxCAQANDTQBcLZlhgCoo0vscY4ywKn4idRMrtI7e5wHtnChYhOF2SDdGTsd4H_UxwZXLlgQzHyVTI8SMiHS6TB7bgdE1gwJtovQ3owG9k-bgo4MkFoXBUzlxt5s8xpWx5dt3SU-TrpfBdwa5gf0nn9duqSCsyxzbXh4K986o83nrpc1VuCnZ9C_VMGA0SWdIr5dn796iZpc6hnPlP3d1Pgr8AAAD__22SROg" style="color:#ffffff;"><strong>Marian Memorial Grotto – St. Mary Catholic Parish</strong></a></span></div>
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+										<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" height="20" width="20">&nbsp;</td>
+										</tr>
+										<tr>
+											<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#434343">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#434343">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:640px; max-width:640px;" width="640" border="0" src="https://d6iyrqjd26xke.cloudfront.net/separatorwhite142/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#434343">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#434343">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:640px; max-width:640px;" width="640" border="0" src="https://d6iyrqjd26xke.cloudfront.net/classroomnewswhite/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="padding:20px;">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							            		<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+												</tr>
+												<tr>		
+							                	<td class="spacer" style="font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" width="20">&nbsp;</td>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#434343">
+										                	<tr>
+										
+										        <td width="290" style="width:290px; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_half">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#434343">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="padding-bottom: 20px;">
+<div class="image" style="text-align:center;">
+	<a href="https://email-mg.flocknote.com/c/eJwcjs1OhDAYAJ-mPZK2X7flO_SwZsNBE5P1oMbLpvSHbQSK0IXI0xu5T2bGG81BaEmD4bpWyLhSmt4NBB0jSAQHnp-kR-TO8dhasC0DizQZwYRiNVdcgxSqQm7biBq8DSCCrYlksc_ue8wlVC4PtDf3UqaFwJmIhojGz2kNVZdz1x8AEU2ewkigSZ7AhT99XmdgeOu6n5ev4WNT--v7-XnfTlt33dftjQj1WCYCl0N0iwv9TyVvoGaAyJHOxuVheIzJ2ZLySCRbymDn3z6V0oeSx-NrNeIvAAD__xgFUgQ">
+		<img class="image_img" style="display:block; margin:0 auto; width:290px; max-width:290px;" width="290" border="0" src="https://d6iyrqjd26xke.cloudfront.net/kindergarten101/full.png">
+	</a>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	<a href="https://email-mg.flocknote.com/c/eJwcjs1SwyAYAJ8Gbnbg-wg_Bw46NePBi7aHeuoQIA1jAjGhtfr0jrnv7G6wiiMoQaPlSkvDuJSKDhZ555kQqKIWLOhGeDDeMdbzppONEjRZYCCZ5pIrFCB3hruuNwqDiwjRaSJYPxb_mUuNO18mOtqh1nkl-EigJdCGJd3i7lLKZdwAAm2ZYybYpkBwz186_L6fhqev18PbweSpfzib4_tJhue7kMePXwLyus4E95vo3K_0P5WCRc3QGG7oYn2ZpmtO3tVUMhFsrZNbfsZU6xhrydvXzcJfAAAA__8N1VBS">
+		<img class="image_img" style="display:block; margin:0 auto; width:290px; max-width:290px;" width="290" border="0" src="https://d6iyrqjd26xke.cloudfront.net/5thgrade64/full.png">
+	</a>
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+<!--[if (gte mso 12)]>			
+	<td width="20" style="width:20px;">&nbsp;</td>
+<![endif]--><td width="290" style="width:290px; padding-left:20px;" valign="top" class="fn_email_column fn_email_column_2 fn_email_column_half">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#434343">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="padding-bottom: 20px;">
+<div class="image" style="text-align:center;">
+	<a href="https://email-mg.flocknote.com/c/eJwcjsFq7SAUAL9Glxf1GPUsXFzIC49S6LLQTTFqErlGQ2IC_fvS7IeZCVZzEFrSaLk2ChlXStPFGgzop9FLkDCqsZsQfNDCAY-m08zTZAUTihmuuAYp1AO5GyfUEFwEEZ0hkk25-lepLT58XWm2S2vbQeBJxEDEEPZ0xcdc65xvgIihbrEQGFIg0HOpenz76OZ99td2Jb-l5T0d-VU-zy_8__xHhDqPjUB_i76ng_6lUrBgGCBypLv1dV3PkrxrqRYi2dFWt__k1FqOrZb767LiNwAA__8DOlHb">
+		<img class="image_img" style="display:block; margin:0 auto; width:290px; max-width:290px;" width="290" border="0" src="https://d6iyrqjd26xke.cloudfront.net/4thgrade83/full.png">
+	</a>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	<a href="https://email-mg.flocknote.com/c/eJwcjr1OwzAYAJ_G3qjsz65_Bg-INl3KAkJCLJV_vqSGxI4StwKeHpH9dHfJaS5AS4qOa6Ms40ppenV7w2KIoQ8yMmVTSohagwgJjNwnbmh2wEAxwxXXQoLaWe5Db7VIHgWgN0Syfqzxq9SGu1gnOrpra_NKxCOBjkCXlnzH3VDrMG4Aga7OWIjociLiwM9P5wFf7OnkMX7_PsyX8M6On23f3l6fy3r8IKBu60zEYRNd-pX-p3JywjBhLbd0cbFO063k6FuuhUi2tskvP2NubcRWy_Z1d_AXAAD__zO4Udo">
+		<img class="image_img" style="display:block; margin:0 auto; width:290px; max-width:290px;" width="290" border="0" src="https://d6iyrqjd26xke.cloudfront.net/middleschool265/full.png">
+	</a>
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+										<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" height="20" width="20">&nbsp;</td>
+										</tr>
+										<tr>
+											<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#434343; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#434343">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#434343">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:640px; max-width:640px;" width="640" border="0" src="https://d6iyrqjd26xke.cloudfront.net/separatorwhite144/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:0px; border-bottom-right-radius:0px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="padding:20px;">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							            		<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+												</tr>
+												<tr>		
+							                	<td class="spacer" style="font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" width="20">&nbsp;</td>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#222222">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#222222">
+<![endif]--><div class="fn_note_item fn_note_item_photo" style="padding-bottom: 20px;">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:191px; max-width:191px;" width="191" border="0" src="https://d6iyrqjd26xke.cloudfront.net/crest115/full.png">
+	
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_text" style="">
+<div style="font-size: 16px; line-height: 1.4em; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; -ms-hyphens: auto; color:#222222;">
+	<div class="text_large" style="text-align:center;font-size:24px;line-height:32px;"><em><span style="color:#16335b;">In Mary, Christ;</span></em></div><div class="text_large" style="text-align:center;font-size:24px;line-height:32px;"><em><span style="color:#16335b;">through Christ to the Father </span></em></div>
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+										<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" height="20" width="20">&nbsp;</td>
+										</tr>
+										<tr>
+											<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div> <div class="email_section_around">
+    <!--[if (gte mso 9)|(IE)]>
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+                	<td>&nbsp;</td>
+                <td class="email_section" width="640" style="width:640px;background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:5px; border-bottom-right-radius:5px;" bgcolor="#FFFFFF">
+
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		            <tr>
+		            	
+		                	<td>&nbsp;</td>
+		               <td class="email_section_inside" width="640" style="width:640px;">
+
+    <![endif]-->
+					<div class="email_section email_section_size_normal" style="max-width:640px; margin:0 auto; background-color:#FFFFFF; color:#222222; border-top-right-radius:0px; border-top-left-radius:0px; border-bottom-left-radius:5px; border-bottom-right-radius:5px;">
+						<div class="email_section_inner_width email_section_size_normal" style="max-width:640px; margin:0 auto;">
+							<div class="email_section_inside" style="padding:20px;">
+								<!--[if (gte mso 12)]>
+							        <table border="0" cellspacing="0" cellpadding="0" width="640">
+							            <tr>
+							            		<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+												</tr>
+												<tr>		
+							                	<td class="spacer" style="font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" width="20">&nbsp;</td>
+							                <td>
+								<![endif]-->
+												
+										            	<table border="0" cellspacing="0" cellpadding="0" width="100%" color="#222222">
+										                	<tr>
+										
+										        <td width="100%" style="width:100%; " valign="top" class="fn_email_column fn_email_column_1 fn_email_column_full">
+<!--[if (gte mso 9)|(IE)]>
+    	<font color="#222222">
+<![endif]--><div class="fn_note_item fn_note_item_text" style="padding-bottom: 20px;">
+<div style="font-size: 16px; line-height: 1.4em; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; -ms-hyphens: auto; color:#222222;">
+	<div class="text_small" style="text-align:center;font-size:12px;line-height:18px;">Consistent with applicable exemptions and non-discrimination statements from the Office of Catholic Schools of the Archdiocese of Denver, the Catholic schools of the Archdiocese of Denver, under the jurisdiction of the Archbishop, and at the direction of the Superintendent, state that all of their Catholic schools admit students of any race, color, national or ethnic origin to all the rights, privileges, programs and activities generally accorded or made available to students at the schools. Furthermore, Archdiocesan schools admit disabled students in accordance with the policy on Admissions in the Archdiocese of Denver Catholic Schools Administrator’s Manual. These schools do not discriminate on the basis of race, age, disability, color, and national or ethnic origin in the administration of their educational policies, employment practices, scholarship and loan programs, athletic or other school-administered programs.</div>
+</div>		<!--[if (gte mso 12)]>
+			<table border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20">&nbsp;</td>
+				</tr>
+			</table>
+		<![endif]-->
+</div>
+	
+<div class="fn_note_item fn_note_item_photo" style="">
+<div class="image" style="text-align:center;">
+	
+		<img class="image_img" style="display:block; margin:0 auto; width:600px; max-width:600px;" width="600" border="0" src="https://d6iyrqjd26xke.cloudfront.net/footer323/full.png">
+	
+</div></div>
+	
+<!--[if (gte mso 9)|(IE)]>
+	</font>
+<![endif]-->
+</td>
+													
+											            	</tr>
+														</table>
+									<!--[if (gte mso 12)]>
+									</td>
+										<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px; width:20" height="20" width="20">&nbsp;</td>
+										</tr>
+										<tr>
+											<td class="spacer" style="height:20px; font-size:10px; mso-line-height-rule:exactly; line-height:10px;" height="20" colspan="3">&nbsp;</td>
+							
+									</tr>
+						        </table>
+						        <![endif]-->
+					        </div>
+				        </div>
+					</div>
+    <!--[if (gte mso 9)|(IE)]>
+	    				</td>
+	    				<td>&nbsp;</td>
+						</tr>
+						</table>
+	
+	    		</td>
+                	<td>&nbsp;</td>
+            </tr>
+        </table>
+    <![endif]-->					
+</div>		    </td>
+	</tr>
+</table>
+
+
+<table cellpadding="0" cellspacing="0" border="0" class="hide">
+<tr>
+    <td height="1" class="hide" style="min-width:680px; font-size:0px;line-height:0px;">
+       &nbsp;
+    </td>
+</tr>
+</table>
+
+
+
+
+<img width="1" height="1" alt="" src="https://email-mg.flocknote.com/o/eJwcy0mqAyEQANDTtMumBil14WHKiS-_VeiYQG4fkt3bvBIdMjlrakTnJQCKOPMXs4egBIQsHpJqksaQW3a2Npu0mB4JSMCjoGNLcgbU1ILjopWpqj8stGvl_7l2PfMa5oteInvgEDCYO-Y1xnP2rLuveVh47KH3--p7X3Wv-VuvSJ8AAAD__3naMWA">
+<script>
+(function () {
+  function postHeight() {
+    var h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    window.parent.postMessage({ messengerResize: true, height: h }, '*');
+  }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+  document.querySelectorAll('img').forEach(function (img) {
+    if (!img.complete) img.addEventListener('load', postHeight);
+  });
+  setTimeout(postHeight, 300);
+  setTimeout(postHeight, 1000);
+  setTimeout(postHeight, 2500);
+})();
+</script>
+</body>
+</html>
