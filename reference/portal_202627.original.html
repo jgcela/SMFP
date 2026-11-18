@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Parent Portal — St. Mary Catholic Virtue School</title>
+<meta name="description" content="Calendar, forms and school updates for St. Mary Catholic Virtue School families, school year 2026–27.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap">
+<style>
+/* ===== St. Mary design system tokens ===== */
+:root{
+  --navy:#16335B; --gold:#FCBC40; --cerulean:#006D8F; --aero:#44B8DA;
+  --light-blue:#B1DBE9; --azure:#D5ECF3; --sky:#80B6C7; --jet:#333333;
+  --gray:#C5CCD6; --white:#FFFFFF; --warn-row:#FFF6E0;
+  --font-brand:"Inter",system-ui,sans-serif;
+  --font-text:"Open Sans",system-ui,sans-serif;
+  --r-sm:4px; --r-md:8px; --r-pill:999px;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;font:400 16px/24px var(--font-text);color:var(--jet);background:var(--white)}
+img{max-width:100%;display:block}
+a{color:var(--cerulean);text-underline-offset:3px}
+a:hover{color:var(--navy)}
+h1,h2,h3{font-family:var(--font-brand);color:var(--navy);margin:0}
+p{margin:0}
+:focus-visible{outline:2px solid var(--cerulean);outline-offset:2px}
+.on-navy :focus-visible{outline-color:var(--gold)}
+section[id],main,footer[id],.row,.cat{scroll-margin-top:136px}
+@media (max-width:900px){section[id],main,footer[id],.row,.cat{scroll-margin-top:84px}}
+abbr[title]{text-decoration:none}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.wrap{max-width:1264px;margin:0 auto;padding:0 32px} /* 1200px of content + 32px padding each side */
+@media (max-width:640px){.wrap{padding:0 16px}}
+.skip{position:absolute;left:16px;top:-60px;z-index:100;background:var(--gold);color:var(--navy);padding:10px 16px;border-radius:var(--r-md);font:600 15px/20px var(--font-brand)}
+.skip:focus{top:12px}
+.eyebrow{font:500 13px/16px var(--font-brand);letter-spacing:.08em;text-transform:uppercase;color:var(--cerulean)}
+.on-navy .eyebrow{color:var(--gold)}
+.rule{width:48px;height:4px;background:var(--gold);border-radius:2px}
+.h2{font:700 28px/34px var(--font-brand)}
+.h3{font:700 20px/28px var(--font-brand)}
+.small{font-size:14px;line-height:20px}
+.caption{font:600 12px/16px var(--font-text);letter-spacing:.02em;text-transform:uppercase;color:var(--cerulean)}
+.sec-head{display:flex;flex-direction:column;gap:8px}
+.icon{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:var(--r-md);font:600 15px/20px var(--font-brand);text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn--primary{background:var(--navy);color:var(--white)}
+.btn--primary:hover{background:#0f2643;color:var(--white)}
+.btn--gold{background:var(--gold);color:var(--navy);font-weight:700}
+.btn--gold:hover{background:#f5ad22;color:var(--navy)}
+.btn--outline{background:var(--white);color:var(--navy);border-color:var(--cerulean)}
+.btn--outline:hover{background:var(--azure);color:var(--navy)}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.linkbtn{background:none;border:0;padding:12px 0;min-height:44px;color:var(--cerulean);font:600 15px/20px var(--font-brand);text-decoration:underline;cursor:pointer}
+
+/* Header */
+.site-header{background:var(--navy);color:var(--white);position:sticky;top:0;z-index:50}
+.util{border-bottom:1px solid var(--cerulean)}
+.util .wrap{display:flex;justify-content:flex-end;gap:24px}
+.util a{color:var(--azure);font:500 13px/36px var(--font-brand)}
+.util a:hover{color:var(--white)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:80px}
+.logo img{height:52px;width:auto}
+.main-nav{display:flex;gap:4px}
+.main-nav a{color:var(--white);font:500 15px/20px var(--font-brand);padding:12px;text-decoration:none;border-radius:var(--r-sm)}
+.main-nav a:hover{text-decoration:underline;text-underline-offset:6px}
+.bar-actions{display:flex;align-items:center;gap:8px}
+.menu-btn{display:none;width:44px;height:44px;align-items:center;justify-content:center;border:1px solid var(--sky);border-radius:var(--r-md);background:transparent;color:var(--white);cursor:pointer}
+.mobile-menu{display:none}
+@media (max-width:900px){
+  .util,.main-nav{display:none}
+  .menu-btn{display:inline-flex}
+  .bar .wrap{min-height:68px}
+  .logo img{height:42px}
+  .mobile-menu:not([hidden]){display:block;border-top:1px solid var(--cerulean);padding:8px 0 16px}
+  .mobile-menu ul{list-style:none;margin:0;padding:0}
+  .mobile-menu a{display:flex;align-items:center;min-height:48px;color:var(--white);font:500 16px/20px var(--font-brand);text-decoration:none;border-bottom:1px solid #22477a}
+  .mobile-menu .sub a{color:var(--azure);font-size:15px}
+}
+@media (max-width:380px){.btn-facts .lbl-long{display:none}}
+
+/* Alert */
+.alert{background:var(--gold);color:var(--navy)}
+.alert .wrap{display:flex;align-items:center;gap:12px 16px;padding-top:14px;padding-bottom:14px;flex-wrap:wrap}
+.alert p{flex:1 1 240px}
+.alert strong{font-family:var(--font-brand)}
+.alert a{color:var(--navy);font:600 15px/20px var(--font-brand);padding:12px 0}
+
+/* Hero */
+.hero{background:var(--navy);color:var(--white)}
+.hero .wrap{padding-top:56px;padding-bottom:64px;display:flex;flex-direction:column;gap:24px}
+.hero h1{color:var(--white);font:800 48px/54px var(--font-brand);letter-spacing:-.01em;max-width:760px}
+.hero .lead{font-size:18px;line-height:28px;color:var(--azure);max-width:760px}
+@media (max-width:640px){.hero .wrap{padding-top:32px;padding-bottom:36px;gap:16px}.hero h1{font-size:32px;line-height:38px}.hero .lead{display:none}}
+.search{max-width:760px;display:flex;flex-direction:column;gap:8px;position:relative}
+.search label{font:600 15px/20px var(--font-brand)}
+.search-field{display:flex;align-items:center;gap:12px;background:var(--white);border-radius:var(--r-md);padding:0 16px;min-height:56px;color:var(--cerulean)}
+.search-field input{flex:1;min-width:0;border:0;font:400 17px/24px var(--font-text);color:var(--jet);background:transparent;padding:14px 0}
+.search-field input:focus{outline:none}
+.search-field:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+.results{background:var(--white);color:var(--jet);border-radius:var(--r-md);margin-top:4px;overflow:hidden}
+.results ul{list-style:none;margin:0;padding:0}
+.results li+li{border-top:1px solid var(--gray)}
+.results a{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;min-height:48px;color:var(--navy);text-decoration:none;font-weight:600}
+.results a:hover,.results a:focus-visible{background:var(--azure)}
+.results .kind{font-weight:400;font-size:13px;color:var(--cerulean);white-space:nowrap}
+.results .empty{padding:14px 16px}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.chips span{font:500 14px/20px var(--font-brand);color:var(--azure);margin-right:4px}
+.chip-link{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--sky);border-radius:var(--r-pill);color:var(--white);text-decoration:none;font:500 14px/20px var(--font-brand)}
+.chip-link:hover{background:#22477a;color:var(--white)}
+.quick-nav{display:none}
+@media (max-width:640px){.chips{display:none}.quick-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.quick-nav a{display:flex;align-items:center;justify-content:center;min-height:48px;border:1px solid var(--sky);border-radius:var(--r-md);color:var(--white);text-decoration:none;font:600 14px/20px var(--font-brand)}}
+
+/* Sections */
+.section{padding:56px 0}
+@media (max-width:640px){.section{padding:32px 0}}
+.section--tint{background:var(--azure)}
+
+/* This week */
+.week-grid{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start}
+.week-main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:24px}
+.week-aside{flex:1 1 320px;display:flex;flex-direction:column;gap:24px}
+.ev-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--gray)}
+.ev-list>li{border-bottom:1px solid var(--gray)}
+.ev-card{display:flex;align-items:center;gap:20px;padding:16px 4px;text-decoration:none;color:var(--jet)}
+.ev-card:hover .ev-title{text-decoration:underline}
+.date-chip{flex:0 0 64px;height:68px;border-radius:var(--r-md);background:var(--azure);color:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-brand)}
+.date-chip.is-soon{background:var(--gold)}
+.date-chip .m{font:600 12px/16px var(--font-brand);letter-spacing:.08em;text-transform:uppercase}
+.date-chip .d{font:800 26px/30px var(--font-brand)}
+.ev-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ev-title{font:700 18px/24px var(--font-brand);color:var(--navy)}
+.ev-meta{font-size:14px;line-height:20px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.tag{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:var(--r-sm);font:600 12px/16px var(--font-brand);letter-spacing:.02em;white-space:nowrap;border:1px solid transparent}
+.tag--noschool{background:var(--gold);color:var(--navy)}
+.tag--faith{background:var(--navy);color:var(--white)}
+.tag--academic{background:var(--cerulean);color:var(--white)}
+.tag--community{background:var(--light-blue);color:var(--navy)}
+.tag--health{background:var(--azure);color:var(--navy);border-color:var(--sky)}
+.tag--important{background:var(--white);color:var(--navy);border-color:var(--navy)}
+@media (max-width:640px){.ev-card{align-items:flex-start;gap:14px}.date-chip{flex-basis:52px;height:58px}.date-chip .d{font-size:22px;line-height:26px}.ev-title{font-size:16px;line-height:22px}.ev-card .tags{display:none}}
+.empty-note{padding:16px 4px;color:var(--jet)}
+.card{border:1px solid var(--gray);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:12px;background:var(--white)}
+.card--tint{background:var(--azure);border-color:var(--azure);gap:16px}
+.contact-line{display:flex;align-items:center;gap:12px;min-height:44px;font-weight:600;overflow-wrap:anywhere}
+.contact-line .icon{color:var(--navy)}
+p.contact-line{font-weight:400}
+
+/* Documents */
+.docs-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px}
+.docs-head .sec-head{flex:1 1 420px}
+.filter{flex:0 1 360px;display:flex;flex-direction:column;gap:6px}
+.filter label{font:600 14px/20px var(--font-brand);color:var(--navy)}
+.filter input{min-height:48px;padding:0 14px;border:1px solid var(--cerulean);border-radius:var(--r-sm);background:var(--white);font:400 16px/24px var(--font-text);color:var(--jet)}
+.most{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.most a{height:100%;display:flex;flex-direction:column;gap:12px;padding:20px;background:var(--white);border:1px solid var(--gray);border-radius:var(--r-md);text-decoration:none}
+.most a:hover{border-color:var(--cerulean)}
+.most .t{font:700 16px/22px var(--font-brand);color:var(--navy);flex:1}
+.most .meta{font-size:14px;line-height:20px;color:var(--cerulean);text-decoration:underline}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px}
+@media (max-width:420px){.cats{grid-template-columns:1fr}}
+.cat{background:var(--white);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:12px}
+.cat-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.doc-list{list-style:none;margin:4px 0 0;padding:0;border-top:1px solid var(--gray)}
+.doc-list li{border-bottom:1px solid var(--gray)}
+.doc-list a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:8px 0;color:var(--navy);font-weight:600;font-size:15px;line-height:20px}
+.doc-meta{display:inline-flex;align-items:center;gap:6px;flex:none;font-weight:400;font-size:13px;color:var(--cerulean)}
+.doc-meta .icon{width:16px;height:16px;stroke-width:2}
+.badge-new{display:inline-flex;align-items:center;height:20px;padding:0 6px;margin-left:8px;border-radius:var(--r-sm);background:var(--gold);color:var(--navy);font:600 12px/16px var(--font-brand)}
+.docs-empty{background:var(--white);border-radius:var(--r-md);padding:24px}
+
+/* Calendar */
+.cal-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px}
+.cal-tools{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.seg{display:inline-flex;border:1px solid var(--cerulean);border-radius:var(--r-md);overflow:hidden}
+.seg button{min-height:44px;padding:0 18px;border:0;background:var(--white);color:var(--navy);font:600 14px/20px var(--font-brand);cursor:pointer}
+.seg button+button{border-left:1px solid var(--cerulean)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--white)}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+@media (max-width:640px){.filters{flex-wrap:nowrap;overflow-x:auto;padding:2px 2px 6px;margin:0 -16px;padding-left:16px;padding-right:16px}}
+.fchip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:var(--r-pill);border:1px solid var(--cerulean);background:var(--white);color:var(--navy);font:600 14px/20px var(--font-brand);cursor:pointer}
+.fchip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.sw{width:12px;height:12px;border-radius:3px;border:1px solid transparent}
+.sw--noschool{background:var(--gold)}.sw--faith{background:var(--navy);border-color:var(--white)}.sw--academic{background:var(--cerulean)}.sw--community{background:var(--sky)}.sw--health{background:var(--aero)}
+.cal-status{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;background:var(--azure);border-radius:var(--r-md)}
+.month{display:flex;flex-wrap:wrap;gap:16px 32px;padding-top:8px}
+.month h3{flex:0 0 180px}
+.month .rows{flex:999 1 560px;min-width:0;list-style:none;margin:0;padding:0;border-top:1px solid var(--gray)}
+.row{display:flex;align-items:flex-start;gap:20px;padding:14px 4px;border-bottom:1px solid var(--gray)}
+.row.is-noschool{background:var(--warn-row)}
+.row.is-past{opacity:.75}
+.row.is-target{outline:2px solid var(--gold);outline-offset:-2px}
+.row-date{flex:0 0 56px;display:flex;flex-direction:column;align-items:center;color:var(--navy)}
+.row-date .d{font:800 24px/28px var(--font-brand)}
+.row-date .w{font:600 12px/16px var(--font-brand);letter-spacing:.08em;color:var(--cerulean)}
+.row-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row-title{font:700 17px/24px var(--font-brand);color:var(--navy)}
+a.row-title{text-decoration:underline}
+@media (max-width:640px){.row{gap:14px;flex-wrap:wrap}.row-date{flex-basis:44px}.row-date .d{font-size:20px;line-height:24px}.row-title{font-size:15px;line-height:20px}.row .tags{flex-basis:100%;justify-content:flex-start;padding-left:58px}}
+.more{align-self:center}
+/* Month grid */
+.mgrid-wrap{display:flex;flex-direction:column;gap:16px}
+.mgrid-nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mgrid-nav button{width:44px;height:44px;border:1px solid var(--cerulean);border-radius:var(--r-md);background:var(--white);color:var(--navy);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.mgrid-nav button:disabled{opacity:.4;cursor:not-allowed}
+.mgrid{width:100%;border-collapse:collapse;table-layout:fixed}
+.mgrid th{font:600 12px/16px var(--font-brand);letter-spacing:.08em;color:var(--cerulean);padding:8px 0}
+.mgrid td{border:1px solid var(--gray);height:88px;vertical-align:top;padding:4px}
+.mgrid td.out{background:#f7f9fb}
+.dbtn{width:100%;height:100%;min-height:78px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:6px;border:0;border-radius:var(--r-sm);background:transparent;text-align:left;cursor:pointer;color:var(--navy);font:600 15px/20px var(--font-brand)}
+.dbtn:hover{background:var(--azure)}
+.dbtn[aria-pressed="true"]{background:var(--azure);box-shadow:inset 0 0 0 2px var(--cerulean)}
+.dnum{font:700 15px/20px var(--font-brand)}
+.is-today .dnum{background:var(--navy);color:var(--white);border-radius:var(--r-pill);min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center}
+.dots{display:flex;flex-wrap:wrap;gap:3px}
+.dot{width:10px;height:10px;border-radius:2px}
+.dot--noschool{background:var(--gold)}.dot--faith{background:var(--navy)}.dot--academic{background:var(--cerulean)}.dot--community{background:var(--sky)}.dot--health{background:var(--aero)}
+.dcount{font:500 12px/16px var(--font-text);color:var(--jet)}
+.dplain{display:block;padding:6px;font:500 15px/20px var(--font-brand);color:#5b6675}
+@media (max-width:640px){.mgrid td{height:56px;padding:2px}.dbtn{min-height:50px;padding:4px}.dcount{display:none}.dot{width:8px;height:8px}}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.daylist h3{margin-bottom:8px}
+
+/* Footer */
+.site-footer{background:var(--navy);color:var(--white)}
+.site-footer .wrap{padding-top:56px;padding-bottom:32px;display:flex;flex-direction:column;gap:32px}
+.site-footer h2{color:var(--white)}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.ctile{display:flex;flex-direction:column;gap:4px;padding:20px;border:1px solid var(--cerulean);border-radius:var(--r-md);color:var(--white);text-decoration:none}
+a.ctile:hover{background:#1d3f6e;color:var(--white)}
+.ctile .k{font:500 13px/16px var(--font-brand);letter-spacing:.08em;color:var(--azure)}
+.ctile .v{font:700 18px/28px var(--font-brand);overflow-wrap:anywhere}
+a.ctile .v{text-decoration:underline}
+.legal{padding-top:24px;border-top:1px solid var(--cerulean);font-size:14px;line-height:20px;color:var(--azure)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-mobile" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+</svg>
+
+<header class="site-header on-navy">
+  <div class="util">
+    <div class="wrap">
+      <a href="messenger-archive_202627.html">School Messenger</a>
+      <a href="volunteer-opportunities_202627.html">Volunteer</a>
+      <a href="teacher-wishlists_202627.html">Teacher wishlists</a>
+      <a href="staff-favorites_202627.html">Staff favorites</a>
+    </div>
+  </div>
+  <div class="bar">
+    <div class="wrap">
+      <a class="logo" href="#top"><img src="https://stmarycommunication.javiercela.me/portal/assets/logo_white.png" alt="St. Mary Catholic Virtue School, Littleton — Parent Portal home" width="140" height="52"></a>
+      <nav class="main-nav" aria-label="Portal sections">
+        <a href="#this-week">This week</a>
+        <a href="#documents">Documents</a>
+        <a href="#calendar">Calendar</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="bar-actions">
+        <a class="btn btn--gold btn-facts" href="https://sis.factsmgt.com/accounts/Account/Login" target="_blank" rel="noopener">FACTS<span class="lbl-long">&nbsp;Login</span>
+          <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr-only">(opens in a new tab)</span></a>
+        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu">
+          <svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg><span class="sr-only">Menu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Menu" hidden>
+    <div class="wrap">
+      <ul>
+        <li><a href="#this-week">This week</a></li>
+        <li><a href="#documents">Documents</a></li>
+        <li><a href="#calendar">Calendar</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <ul class="sub">
+        <li><a href="messenger-archive_202627.html">School Messenger</a></li>
+        <li><a href="volunteer-opportunities_202627.html">Volunteer opportunities</a></li>
+        <li><a href="teacher-wishlists_202627.html">Teacher wishlists</a></li>
+        <li><a href="staff-favorites_202627.html">Staff favorite things</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div id="alert" class="alert" role="status" hidden>
+  <div class="wrap">
+    <svg class="icon" style="width:22px;height:22px;stroke-width:2" aria-hidden="true"><use href="#i-cal"/></svg>
+    <p id="alert-text"></p>
+    <a href="#calendar" id="alert-link">See all breaks</a>
+  </div>
+</div>
+
+<main id="main">
+  <section id="top" class="hero on-navy" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Parent Portal · School year 2026–27</p>
+        <h1 id="hero-title">Everything your family needs, in one place.</h1>
+        <p class="lead" style="margin-top:8px">Find a form, check what's on this week, or add the school calendar to your phone.</p>
+      </div>
+      <form class="search" role="search" id="site-search" autocomplete="off">
+        <label for="q">Search forms, events and policies</label>
+        <div class="search-field">
+          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <input id="q" type="search" placeholder="Try &quot;physical form&quot; or &quot;spring break&quot;" aria-describedby="q-status">
+        </div>
+        <p id="q-status" class="sr-only" aria-live="polite"></p>
+        <div id="q-results" class="results" hidden></div>
+      </form>
+      <div class="chips">
+        <span>Popular:</span>
+        <a class="chip-link" href="handbook_202627.html">Student Handbook</a>
+        <a class="chip-link" href="#cat-health">Health forms</a>
+        <a class="chip-link" href="supply-list_202627.html">Supply list</a>
+        <a class="chip-link" href="assets/flyers/schooleatery.pdf">Lunch menu</a>
+        <a class="chip-link" href="teacher-wishlists_202627.html">Teacher wishlists</a>
+      </div>
+      <nav class="quick-nav" aria-label="Jump to">
+        <a href="#this-week">This week</a>
+        <a href="#documents">Documents</a>
+        <a href="#calendar">Calendar</a>
+      </nav>
+    </div>
+  </section>
+
+  <section id="this-week" class="section" aria-labelledby="week-title">
+    <div class="wrap week-grid">
+      <div class="week-main">
+        <div class="sec-head">
+          <p class="eyebrow" id="today-label"></p>
+          <h2 class="h2" id="week-title">This week and next</h2>
+          <div class="rule"></div>
+        </div>
+        <h3 class="caption" id="wk1-label"></h3>
+        <ul class="ev-list" id="wk1" style="margin-top:-12px"></ul>
+        <h3 class="caption" id="wk2-label" style="margin-top:8px"></h3>
+        <ul class="ev-list" id="wk2" style="margin-top:-12px"></ul>
+        <a href="#calendar" class="linkbtn" style="align-self:flex-start;text-decoration:underline">See the full calendar</a>
+      </div>
+      <aside class="week-aside" aria-label="Calendar subscription and office contact">
+        <div class="card card--tint">
+          <svg class="icon" style="width:28px;height:28px;color:var(--navy)" aria-hidden="true"><use href="#i-mobile"/></svg>
+          <h3 class="h3">Get the calendar on your phone</h3>
+          <p style="font-size:15px;line-height:22px">Subscribe once. Every Mass, break and early dismissal appears in your own calendar and updates when the school changes it.</p>
+          <a class="btn btn--primary js-sub-google" href="#">Add to Google Calendar</a>
+          <a class="btn btn--outline js-sub-ics" href="#">Apple or Outlook (iCal)</a>
+        </div>
+        <div class="card">
+          <h3 class="h3">Need the front office?</h3>
+          <a class="contact-line" href="tel:+13037982375"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>(303) 798-2375</a>
+          <a class="contact-line js-email" href="mailto:officemanager@stmarylittleton.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><span class="js-email-text">officemanager@stmarylittleton.com</span></a>
+          <p class="contact-line"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Monday–Friday, 7:30 a.m.–4:00 p.m.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="documents" class="section section--tint" aria-labelledby="docs-title">
+    <div class="wrap" style="display:flex;flex-direction:column;gap:32px">
+      <div class="docs-head">
+        <div class="sec-head">
+          <p class="eyebrow">Resource center</p>
+          <h2 class="h2" id="docs-title">Family documents</h2>
+          <div class="rule"></div>
+          <p style="margin-top:8px" id="docs-intro"></p>
+        </div>
+        <div class="filter">
+          <label for="doc-filter">Filter documents</label>
+          <input id="doc-filter" type="search" placeholder="e.g. uniform, medication" aria-describedby="doc-status">
+          <p id="doc-status" class="sr-only" aria-live="polite"></p>
+        </div>
+      </div>
+      <div id="most-wrap" style="display:flex;flex-direction:column;gap:12px">
+        <h3 class="h3">Most used</h3>
+        <ul class="most" id="most"></ul>
+      </div>
+      <div class="cats" id="cats"></div>
+      <div class="docs-empty" id="docs-empty" hidden>
+        <p><strong>No documents match your search.</strong> Try another word or <a href="#contact">contact the front office</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="calendar" class="section" aria-labelledby="cal-title">
+    <div class="wrap" style="display:flex;flex-direction:column;gap:24px">
+      <div class="cal-head">
+        <div class="sec-head">
+          <p class="eyebrow">Academic calendar</p>
+          <h2 class="h2" id="cal-title">School calendar 2026–27</h2>
+          <div class="rule"></div>
+        </div>
+        <div class="cal-tools">
+          <div class="seg" role="group" aria-label="Calendar view">
+            <button type="button" id="view-list" aria-pressed="true">List</button>
+            <button type="button" id="view-month" aria-pressed="false">Month</button>
+          </div>
+          <a class="btn btn--outline js-sub-ics" href="#" style="min-height:44px"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Subscribe</a>
+          <a href="assets/documents/Calendar_2026-27.pdf" style="font:600 14px/20px var(--font-brand);padding:12px 0">Full calendar PDF · 2.4 MB</a>
+        </div>
+      </div>
+
+      <div class="filters" role="group" aria-label="Filter events by type" id="filters"></div>
+
+      <div id="list-view" style="display:flex;flex-direction:column;gap:24px">
+        <div class="cal-status">
+          <p id="cal-status-text" style="font-size:15px"></p>
+          <button type="button" class="linkbtn" id="toggle-past" aria-expanded="false" aria-controls="past-months"></button>
+        </div>
+        <div id="past-months" hidden style="display:flex;flex-direction:column;gap:24px"></div>
+        <div id="upcoming-months" style="display:flex;flex-direction:column;gap:24px"></div>
+        <button type="button" class="btn btn--outline more" id="show-more" hidden></button>
+      </div>
+
+      <div id="month-view" class="mgrid-wrap" hidden>
+        <div class="mgrid-nav">
+          <button type="button" id="m-prev"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg><span class="sr-only">Previous month</span></button>
+          <h3 class="h3" id="m-title" aria-live="polite"></h3>
+          <button type="button" id="m-next"><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg><span class="sr-only">Next month</span></button>
+        </div>
+        <table class="mgrid" id="m-grid">
+          <caption class="sr-only">Events by day. Select a day to see its events.</caption>
+          <thead><tr><th scope="col"><abbr title="Sunday">SU</abbr></th><th scope="col"><abbr title="Monday">MO</abbr></th><th scope="col"><abbr title="Tuesday">TU</abbr></th><th scope="col"><abbr title="Wednesday">WE</abbr></th><th scope="col"><abbr title="Thursday">TH</abbr></th><th scope="col"><abbr title="Friday">FR</abbr></th><th scope="col"><abbr title="Saturday">SA</abbr></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="legend" aria-hidden="true">
+          <span><i class="dot dot--noschool"></i>No school &amp; early dismissal</span>
+          <span><i class="dot dot--faith"></i>Faith</span>
+          <span><i class="dot dot--academic"></i>Academic</span>
+          <span><i class="dot dot--community"></i>Community</span>
+          <span><i class="dot dot--health"></i>Health</span>
+        </div>
+        <div class="daylist" id="m-day" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact" class="site-footer on-navy" aria-labelledby="contact-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Need help?</p>
+      <h2 class="h2" id="contact-title">We're here for your family.</h2>
+    </div>
+    <div class="contact-grid">
+      <a class="ctile" href="tel:+13037982375"><span class="k">CALL THE OFFICE</span><span class="v">(303) 798-2375</span></a>
+      <a class="ctile js-email" href="mailto:officemanager@stmarylittleton.com"><span class="k">EMAIL</span><span class="v js-email-text">officemanager@stmarylittleton.com</span></a>
+      <div class="ctile"><span class="k">OFFICE HOURS</span><span class="v">Monday–Friday, 7:30 a.m.–4:00 p.m.</span></div>
+    </div>
+    <p class="legal">St. Mary Catholic Virtue School · Littleton, Colorado · Parent Portal, school year 2026–27</p>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   CONFIGURATION — edit these before publishing
+   ========================================================= */
+const CONFIG = {
+  // Public Google Calendar ID of the school calendar (Google Calendar › Settings › Integrate calendar › Calendar ID).
+  // While empty, the "Subscribe" buttons show as unavailable.
+  googleCalendarId: 'c_f07a110ada3d1ed8b37e3b1ff883d525166b81bf6847a3cfa10d01eec228a92e@group.calendar.google.com', // 2026-2027 St. Mary Catholic Virtue School Calendar
+  // Front office email. The previous page showed one address and linked to another (families@stmary.edu). Confirm which is correct.
+  officeEmail: 'officemanager@stmarylittleton.com',
+  // Days ahead to show the "No school" alert banner.
+  alertDays: 14
+};
+
+/* =========================================================
+   DOCUMENTS — "added" (YYYY-MM-DD) is optional: documents added
+   in the last 30 days show a "New" badge.
+   ========================================================= */
+const DOCS = [
+  { id:'forms', name:'Forms to return', desc:'Print, fill in and send back to the front office.', items:[
+    { t:'Milk Order Form', h:'assets/documents/2026-27_Milk_Order_Form.pdf', m:'PDF · 1.8 MB', k:'milk lunch order' },
+    { t:'Physical Exam Form', h:'assets/documents/Physical_Exam_Form.pdf', m:'PDF · 0.4 MB', k:'health physical exam doctor' },
+    { t:'Authorization to Administer Medication', h:'assets/documents/Authorization to Administer Medication.pdf', m:'PDF · 0.2 MB', k:'medication medicine health nurse' },
+    { t:'SMEED Form', h:'assets/documents/SMEED/SMEED Form.pdf', m:'PDF · 0.3 MB', k:'smeed extended day after school care' },
+    { t:'Family Covenant Agreements', h:'assets/documents/2026-27_Family_Covenant_Agreements.pdf', m:'PDF · 0.2 MB', k:'covenant agreement' }
+  ]},
+  { id:'handbooks', name:'Handbooks & policies', desc:'Read online or download the PDF.', items:[
+    { t:'Student Handbook 2026–27', h:'handbook_202627.html', m:'Web page', type:'web', k:'handbook rules policy conduct uniform' },
+    { t:'Student Handbook 2026–27', h:'assets/documents/2026-2027_Parent_Handbook.pdf', m:'PDF · 0.8 MB', k:'handbook rules policy conduct uniform' },
+    { t:'Preschool Handbook 2026–27', h:'preschool-handbook_202627.html', m:'Web page', type:'web', k:'preschool handbook' },
+    { t:'Preschool Handbook 2026–27', h:'assets/documents/2026-2027_Parent_Handbook_Preschool.pdf', m:'PDF · 0.5 MB', k:'preschool handbook' },
+    { t:'SMEED Handbook 2026–27', h:'assets/documents/SMEED/SMEED Handbook 26-27.pdf', m:'PDF · 0.4 MB', k:'smeed extended day handbook' },
+    { t:'Cell Phone Policy (Middle School)', h:'assets/documents/Cell_Phone_Policy.pdf', m:'PDF · 0.3 MB', k:'phone policy middle school' }
+  ]},
+  { id:'health', name:'Health & safety', desc:'Medical information and emergency procedures.', items:[
+    { t:'Health Information 2026–27', h:'assets/documents/Medical_Information_26-27.pdf', m:'PDF · 0.6 MB', k:'health medical immunization vaccine nurse' },
+    { t:'SMEED Emergency Information', h:'assets/documents/SMEED/SMEED Emergency Information.pdf', m:'PDF · 0.1 MB', k:'emergency smeed' }
+  ]},
+  { id:'preschool', name:'Preschool', desc:'Uniform, vocabulary and the drop-off route.', items:[
+    { t:'Preschool Uniform 2026–27', h:'assets/documents/Preschool Uniform 26-27.pdf', m:'PDF · 0.7 MB', k:'uniform preschool' },
+    { t:'Preschool Dictionary', h:'assets/documents/Preschool Dictionary.pdf', m:'PDF · 4.7 MB', k:'preschool dictionary vocabulary' },
+    { t:'Preschool Drop-Off Map', h:'assets/documents/Map Preschool Drop Off.pdf', m:'PDF · 2.8 MB', k:'map drop off pick up preschool' }
+  ]},
+  { id:'academics', name:'Academics', desc:'Calendar, standards, supplies and summer work.', items:[
+    { t:'Academic Calendar 2026–27', h:'assets/documents/Calendar_2026-27.pdf', m:'PDF · 2.4 MB', k:'calendar dates schedule' },
+    { t:'Curriculum Standards', h:'https://www.denvercatholicschools.com/why-catholic-education/curriculum', m:'External site', type:'ext', k:'curriculum standards archdiocese' },
+    { t:'School Supply List by Grade', h:'supply-list_202627.html', m:'Web page', type:'web', k:'supplies supply list' },
+    { t:'Summer Math, incoming 6th grade', h:'assets/documents/6th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 6th' },
+    { t:'Summer Math, incoming 7th grade', h:'assets/documents/7th Grade.pdf', m:'PDF · 1.0 MB', k:'summer math 7th' },
+    { t:'Summer Math, incoming 8th grade', h:'assets/documents/8th Grade.pdf', m:'PDF · 0.7 MB', k:'summer math 8th' }
+  ]},
+  { id:'flyers', name:'Flyers', desc:'Menus and school-wide announcements.', items:[
+    { t:'School Eatery 2026–27', h:'assets/flyers/schooleatery.pdf', m:'PDF · 3.0 MB', k:'lunch menu eatery food' }
+  ]}
+];
+const MOST_USED = [
+  ['handbooks',1], ['health',0], ['forms',1], ['forms',0], ['academics',2]
+];
+
+/* =========================================================
+   EVENTS — [date, category, title, details, badges, link, alertEnd]
+   alertEnd (optional): last day with no school, used only by the alert banner
+   category: noclasses | faith | academic | community | health
+   ========================================================= */
+const EVENTS = [
+["2026-06-30","health","Exemption certificates","Nonmedical: K-8 must renew annually after June 30 (see CDPHE)","Health|Important","https://cdphe.colorado.gov/exemptions-to-school-required-vaccines"],
+["2026-08-03","health","Immunization records due","Up-to-date records or valid CO exemption certificate","Health|Important",""],
+["2026-08-03","health","Health appraisal due","New, preschool & K students: new provider form (exam within 12 mo.)","Health|Important",""],
+["2026-08-03","health","Medication forms drop off at office","Two-part authorization form per medication, incl. OTC","Health|Important",""],
+["2026-08-05","community","New Family Orientation","6:30 pm","Community",""],
+["2026-08-07","health","Tdap booster — 7th grade","Schedule appointment before Aug 7, 2026","Health|Important",""],
+["2026-08-10","community","Teacher's Return","","Community",""],
+["2026-08-13","community","Welcome Night","4:00-7:00 pm","Community",""],
+["2026-08-14","noclasses","Teacher Retreat","Staff only","No School",""],
+["2026-08-17","academic","First Day of School","Welcome back — school begins","Academic|Important",""],
+["2026-08-21","faith","All School Mass K-8","Mass Uniform","Faith",""],
+["2026-08-28","faith","All School Mass K-8","Mass Uniform","Faith",""],
+["2026-08-28","community","Back to School Night","5:00 pm","Community|Important",""],
+["2026-09-02","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2026-09-04","community","Bookends of Beauty at 7PM","Night Flight by Anthoine Saint-Exupery","Community","assets/events/Bookends of Beauty 26-27.pdf"],
+["2026-09-04","faith","All School Mass K-8","Mass Uniform","Faith",""],
+["2026-09-07","noclasses","Labor Day — No School","Observed Holiday","No School|Important",""],
+["2026-09-08","faith","All School Mass K-8","Mass Uniform","Faith",""],
+["2026-09-12","faith","Marian Festival","All-school celebration","Faith|Important",""],
+["2026-09-13","community","Sapientia Sunday","9:30 am","Community",""],
+["2026-09-15","academic","8th Grade FOCUS Field Trip","Sep 15-16","Academic",""],
+["2026-09-16","academic","7th Grade FOCUS Field Trip","Sep 16-17","Academic",""],
+["2026-09-18","community","Picture Day","Mass Uniform required","Community",""],
+["2026-09-24","faith","All School Mass K-8","Mass Uniform","Faith",""],
+["2026-09-25","noclasses","No School — Teacher In-Service","Staff only","No School",""],
+["2026-09-29","faith","Sacraments Intro Parent Workshop","6:30 pm, Joachim Hall · Mandatory for parents of children receiving any sacrament this year","Faith",""],
+["2026-09-30","academic","6th Grade FOCUS Field Trip","Sep 30-Oct 1","Academic",""],
+["2026-10-02","faith","All School Mass","Preschool-8","Faith",""],
+["2026-10-05","community","Last Day to Buy Gala Tickets","Click to buy tickets","Community","https://event.auctria.com/b5c3b286-c2e4-4fce-957e-265942a01e78/a809178051b511ea91bae14d12592328"],
+["2026-10-07","faith","All School Mass","","Faith",""],
+["2026-10-07","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2026-10-08","noclasses","Parent/Teacher Conferences — No School","Schedule your appointment through the portal","No School|Important",""],
+["2026-10-09","noclasses","Parent/Teacher Conferences — No School","Schedule your appointment through the portal","No School|Important",""],
+["2026-10-10","faith","125th Parish Celebration Mass","4:30 pm","Faith|Important",""],
+["2026-10-11","community","Sapientia Sunday","9:30 am","Community",""],
+["2026-10-12","noclasses","No School","","No School",""],
+["2026-10-16","faith","All School Mass","Preschool-8","Faith",""],
+["2026-10-18","community","Sapientia Sunday","9:30 am","Community",""],
+["2026-10-22","faith","All School Mass — St. John Paul II Day","Preschool-8, Mass Uniform","Faith",""],
+["2026-10-24","community","School Gala — Ken Caryl Ranch","Annual fundraising gala","Community|Important",""],
+["2026-10-28","community","Last Day for Shorts","","Community",""],
+["2026-10-29","faith","All Saints Day Celebration — All School Mass","9:30 am, Mass Uniform","Faith",""],
+["2026-10-30","noclasses","No School — AoD Teacher Inservice","Staff only","No School",""],
+["2026-10-31","community","Trunk-or-Treat","2:00 pm, Blacktop","Community",""],
+["2026-11-04","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2026-11-06","faith","Picture Retakes","All School Mass","Faith",""],
+["2026-11-06","community","Bookends of Beauty at 7PM","All The Lights We Cannot See by Anthony Doerr","Community","assets/events/Bookends of Beauty 26-27.pdf"],
+["2026-11-08","community","Sapientia Sunday","9:30 am","Community",""],
+["2026-11-13","faith","All School Mass","Preschool-8","Faith",""],
+["2026-11-13","academic","End of Trimester","Report cards to follow","Academic|Important",""],
+["2026-11-19","community","Preschool Nina Maria","8:30 am","Community",""],
+["2026-11-20","faith","All School Mass","Preschool-8","Faith",""],
+["2026-11-20","community","Spirit Night — Red Robin","All day · 63 Centennial Blvd., Highlands Ranch · 20% of sales supports St. Mary","Community",""],
+["2026-11-24","faith","All School Mass","Preschool-8","Faith",""],
+["2026-11-25","noclasses","Thanksgiving Break — No School","Nov 25-27. School resumes Monday, Nov 30","No School|Important","","2026-11-29"],
+["2026-12-01","faith","Reconciliation Parent Workshop","6:30 pm, Joachim Hall · Mandatory for parents","Faith",""],
+["2026-12-02","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2026-12-04","faith","All School Mass","Preschool-8","Faith",""],
+["2026-12-08","faith","All School Mass","Preschool-8","Faith",""],
+["2026-12-10","academic","Advent Production K-2","6:00 pm — Families welcome","Academic|Faith",""],
+["2026-12-10","community","Spirit Night — Chick-fil-A","All day · Chick-fil-A Aspen Grove","Community",""],
+["2026-12-13","community","Sapientia Sunday","9:30 am","Community",""],
+["2026-12-18","community","Classroom Christmas Parties / Noon Dismissal","Pick-up at 12:00 pm","Community|Important",""],
+["2026-12-21","noclasses","Christmas Break — No School","Dec 21-Jan 1. School resumes January 5","No School|Important","","2027-01-04"],
+["2027-01-04","noclasses","No School — Teacher In-Service","Staff only","No School",""],
+["2027-01-05","academic","School Resumes — Students Return","Regular schedule begins 7:45 am","Academic|Important",""],
+["2027-01-06","academic","Spelling Bee","All grades","Academic|Important",""],
+["2027-01-08","faith","All School Mass","Preschool-8","Faith",""],
+["2027-01-09","community","Father/Daughter Dance","5:30 pm","Community",""],
+["2027-01-13","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2027-01-15","faith","All School Mass","Preschool-8","Faith",""],
+["2027-01-18","noclasses","Martin Luther King Jr. Day — No School","Observed Holiday","No School",""],
+["2027-01-21","community","Spirit Night — Freddy's (Highlands Ranch)","11:00 am-9:00 pm · 900 Sgt Jon Stiles Dr., Highlands Ranch","Community",""],
+["2027-01-21","community","Spirit Night — Freddy's (Littleton)","4:00-8:00 pm · 2660 W. Belleview Ave., Littleton","Community",""],
+["2027-01-22","faith","All School Mass","Preschool-8","Faith",""],
+["2027-01-29","faith","All School Mass","Preschool-8","Faith",""],
+["2027-01-31","community","Catholic Schools Week","Jan 31 – Feb 5","Community",""],
+["2027-01-31","community","Sapientia Sunday Open House","9:30 am — Prospective families welcome","Community",""],
+["2027-02-02","faith","Presentation of the Lord — All School Mass","Noon Dismissal, 9:30 am Mass","Faith|Important",""],
+["2027-02-02","faith","Confirmation Parent Workshop","6:30 pm, Joachim Hall · Mandatory · Sponsor attendance highly encouraged","Faith",""],
+["2027-02-03","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2027-02-10","faith","Ash Wednesday — All School Mass","Preschool-8, Mass Uniform","Faith|Important",""],
+["2027-02-11","noclasses","Parent/Teacher Conferences — No School","Feb 11-12. Schedule through the portal","No School|Important","","2027-02-15"],
+["2027-02-15","noclasses","Presidents Day — No School","Observed Holiday","No School",""],
+["2027-02-16","faith","1st Communion Parent Workshop","6:30 pm, Joachim Hall · Mandatory for parents","Faith",""],
+["2027-02-19","community","Bookends of Beauty at 7PM","The Secret Diary of Elisabeth Leseur: The Woman whose Goodness Changed Her Husband from Atheist to Priest","Community","assets/events/Bookends of Beauty 26-27.pdf"],
+["2027-02-19","faith","All School Mass","Preschool-8","Faith",""],
+["2027-02-23","faith","1st Reconciliation — SMS","6:30 pm, in the church","Faith",""],
+["2027-02-26","academic","End of Trimester","Report cards to follow","Academic|Important",""],
+["2027-03-02","faith","1st Reconciliation — Bethlehem / Home School","6:30 pm, in the church","Faith",""],
+["2027-03-03","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2027-03-03","faith","All School Mass","","Faith",""],
+["2027-03-04","noclasses","No School — Teacher Retreat","Staff only","No School",""],
+["2027-03-05","noclasses","No School — AoD In-Service","Staff only","No School",""],
+["2027-03-06","faith","Reconciliation Celebration (Festival of Forgiveness)","6–9 pm","Faith",""],
+["2027-03-09","community","Financial Aid Support Night","5:00 pm","Community",""],
+["2027-03-12","faith","All School Mass","Preschool-8","Faith",""],
+["2027-03-13","faith","Confirmation / 1st Communion Day Retreat","9 am–1 pm, in the church · Mandatory for children receiving First Communion & Confirmation","Faith",""],
+["2027-03-14","community","Sapientia Sunday","9:30 am","Community",""],
+["2027-03-15","academic","8th Grade Washington D.C. Trip","Mar 15-19","Academic",""],
+["2027-03-19","faith","All School Mass","Preschool-8","Faith",""],
+["2027-03-23","faith","Stations of the Cross","2:15 pm","Faith",""],
+["2027-03-25","faith","Holy Thursday — Mass / Noon Dismissal","Mass Uniform, pick-up at 12:00 pm","Faith|Important",""],
+["2027-03-26","noclasses","Good Friday — No School","Spring Break begins","No School|Important","","2027-04-04"],
+["2027-03-29","noclasses","Spring Break — No School","Mar 29-Apr 2. School resumes April 5","No School|Important",""],
+["2027-04-05","faith","All School Mass","Preschool-8","Faith",""],
+["2027-04-06","community","Shorts Resume","","Community",""],
+["2027-04-07","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2027-04-09","academic","5th Grade Play","6:00 pm, Ave Maria Hall","Academic",""],
+["2027-04-11","community","Sapientia Sunday","9:30 am","Community",""],
+["2027-04-16","faith","All School Mass","Preschool-8","Faith",""],
+["2027-04-21","academic","JPII Outdoor Lab — 7th Grade Only","Apr 21-23, off campus","Academic",""],
+["2027-04-23","academic","6th Grade Musical","6:00 pm, Ave Maria Hall","Academic",""],
+["2027-04-27","faith","Confirmation & 1st Communion Rehearsal","6:30–8 pm, in the church · Mandatory · Sponsor attendance required","Faith",""],
+["2027-04-28","academic","Taste Star — 4th Grade","10:00 am, Marian Hall","Academic|Community",""],
+["2027-04-29","faith","All School Mass","Preschool-8","Faith",""],
+["2027-04-30","noclasses","No School — Teacher In-Service","Staff only","No School",""],
+["2027-04-30","community","Bookends of Beauty at 7PM","Theo of Golden by Allen Levi","Community","assets/events/Bookends of Beauty 26-27.pdf"],
+["2027-05-01","faith","Confirmation & First Communion Mass","10 am: Homeschool & SMS Class 1 (arrive 9:30) · 2 pm: Bethlehem & SMS Class 2 (arrive 1:30)","Faith|Important",""],
+["2027-05-03","faith","May Crowning","9:30 am, All School Mass · Wear 1st Communion gear","Faith",""],
+["2027-05-04","community","SMPA Meeting","6:00 pm, Library","Community",""],
+["2027-05-05","community","Step Into the Story","","Community",""],
+["2027-05-09","community","Sapientia Sunday","9:30 am","Community",""],
+["2027-05-12","community","New Parent & Kindergarten Welcome Night","","Community",""],
+["2027-05-13","faith","All School Mass","Preschool-8","Faith",""],
+["2027-05-14","noclasses","No School — School Golf Tournament","Faculty fundraising event","No School",""],
+["2027-05-20","community","Lakeside Night — TBD","","Community",""],
+["2027-05-21","faith","All School Mass","Preschool-8","Faith",""],
+["2027-05-26","community","Preschool St. Sebastian Day","","Community",""],
+["2027-05-27","community","8th Grade Graduation Dance","","Community",""],
+["2027-05-28","faith","8th Grade Graduation Mass","Parish Church — invitations required","Faith|Academic|Important",""],
+["2027-05-28","academic","Saints in Action & Last Day of School — Noon Dismissal","Pick-up at 12:00 pm. Final report cards available","Academic|Important",""]
+];
+
+/* =========================================================
+   APP
+   ========================================================= */
+(function () {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])).replace(/(\d)–(\d)/g, '$1–\u2060$2');
+
+  // ---- Dates (AP style, as the St. Mary style guide asks) ----
+  const MON_AP = ['Jan.','Feb.','March','April','May','June','July','Aug.','Sept.','Oct.','Nov.','Dec.'];
+  const MON_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MON_SHORT = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const DOW_S = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+  const key = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const fmtLong = (d) => `${DOW[d.getDay()]}, ${MON_AP[d.getMonth()]} ${d.getDate()}`;
+  const fmtShort = (d) => `${MON_AP[d.getMonth()]} ${d.getDate()}`;
+  const cleanTime = (s) => s.replace(/(\d)\s?(am|pm)\b/gi, (m, n, ap) => `${n} ${ap.toLowerCase() === 'am' ? 'a.m.' : 'p.m.'}`);
+
+  // "Today" — can be overridden for testing with ?today=2026-11-10
+  const qsToday = new URLSearchParams(location.search).get('today');
+  const now = new Date();
+  const today = qsToday && /^\d{4}-\d{2}-\d{2}$/.test(qsToday) ? parse(qsToday) : new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // ---- Event model ----
+  const CAT_LABEL = { noschool:'No school', faith:'Faith', academic:'Academic', community:'Community', health:'Health' };
+  const BADGE_CAT = { 'No School':'noschool', 'Faith':'faith', 'Academic':'academic', 'Community':'community', 'Health':'health' };
+  const events = EVENTS.map((e, i) => {
+    const [date, cat, title, detail, badges, url, end] = e;
+    const b = badges ? badges.split('|') : [];
+    const noon = /noon dismissal/i.test(title + ' ' + detail);
+    const main = cat === 'noclasses' ? 'noschool' : cat;
+    const cats = new Set([main, ...b.map(x => BADGE_CAT[x]).filter(Boolean)]);
+    if (noon) cats.add('noschool');
+    const tags = [...new Set(b.map(x => BADGE_CAT[x]).filter(Boolean))];
+    if (!tags.length) tags.push(main);
+    return { i, id:`ev-${i}`, d: parse(date), end: end ? parse(end) : null, date, cat: main, cats, title, detail: cleanTime(detail), url, important: b.includes('Important'), noon, tags };
+  }).sort((a, b) => a.d - b.d || a.i - b.i);
+
+  const tagHTML = (e) => {
+    const t = e.tags.map(c => `<span class="tag tag--${c}">${c === 'noschool' ? 'No school' : CAT_LABEL[c]}</span>`);
+    if (e.noon && !e.tags.includes('noschool')) t.unshift('<span class="tag tag--noschool">Noon dismissal</span>');
+    if (e.important) t.push('<span class="tag tag--important">Important</span>');
+    return `<span class="tags">${t.join('')}</span>`;
+  };
+  const isNoSchool = (e) => e.cats.has('noschool');
+
+  // ---- Config-driven bits ----
+  $$('.js-email').forEach(a => a.href = `mailto:${CONFIG.officeEmail}`);
+  $$('.js-email-text').forEach(s => s.textContent = CONFIG.officeEmail);
+  const calId = CONFIG.googleCalendarId.trim();
+  $$('.js-sub-google').forEach(a => {
+    if (calId) { a.href = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(calId)}`; a.target = '_blank'; a.rel = 'noopener'; }
+    else { a.setAttribute('aria-disabled', 'true'); a.removeAttribute('href'); a.title = 'Coming soon'; }
+  });
+  $$('.js-sub-ics').forEach(a => {
+    if (calId) a.href = `webcal://calendar.google.com/calendar/ical/${encodeURIComponent(calId)}/public/basic.ics`;
+    else { a.setAttribute('aria-disabled', 'true'); a.removeAttribute('href'); a.title = 'Coming soon'; }
+  });
+
+  // ---- Mobile menu ----
+  const menuBtn = $('.menu-btn'), menu = $('#mobile-menu');
+  const setMenu = (open) => { menuBtn.setAttribute('aria-expanded', String(open)); menu.hidden = !open;
+    menuBtn.querySelector('use').setAttribute('href', open ? '#i-close' : '#i-menu'); menuBtn.querySelector('.sr-only').textContent = open ? 'Close menu' : 'Menu'; };
+  menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
+  menu.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); } });
+
+  // ---- Alert banner: next no-school day within CONFIG.alertDays ----
+  const soon = events.find(e => isNoSchool(e) && e.d >= today && e.d <= addDays(today, CONFIG.alertDays));
+  if (soon) {
+    const ord = (n) => n + ([11,12,13].includes(n % 100) ? 'th' : ({1:'st',2:'nd',3:'rd'}[n % 10] || 'th'));
+    const MON3 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const s0 = soon.d, s1 = soon.end;
+    const when = s1 && key(s1) !== key(s0)
+      ? `${MON3[s0.getMonth()]} ${ord(s0.getDate())}–${s1.getMonth() !== s0.getMonth() ? MON3[s1.getMonth()] + ' ' : ''}${ord(s1.getDate())}`
+      : `${MON3[s0.getMonth()]} ${ord(s0.getDate())}`;
+    $('#alert-text').innerHTML = `<strong>${when}: ${esc(soon.title.replace(/\s*—\s*/g, ' – '))}</strong>`;
+    $('#alert-link').href = `#${soon.id}`;
+    $('#alert').hidden = false;
+  }
+
+  // ---- This week / next week ----
+  const weekStart = addDays(today, -today.getDay());
+  const w1End = addDays(weekStart, 6), w2Start = addDays(weekStart, 7), w2End = addDays(weekStart, 13);
+  $('#today-label').textContent = `Today is ${fmtLong(today)}`;
+  $('#wk1-label').textContent = `This week · ${fmtShort(weekStart)}–${w1End.getMonth() === weekStart.getMonth() ? w1End.getDate() : fmtShort(w1End)}`;
+  $('#wk2-label').textContent = `Next week · ${fmtShort(w2Start)}–${w2End.getMonth() === w2Start.getMonth() ? w2End.getDate() : fmtShort(w2End)}`;
+  const weekItem = (e, isSoon) => `<li><a class="ev-card" href="#${e.id}">
+      <span class="date-chip${isSoon ? ' is-soon' : ''}"><span class="m">${MON_SHORT[e.d.getMonth()]}</span><span class="d">${e.d.getDate()}</span></span>
+      <span class="ev-body"><span class="ev-title">${esc(e.title)}</span><span class="ev-meta">${DOW[e.d.getDay()]}${e.detail ? ' · ' + esc(e.detail) : ''}</span></span>
+      ${tagHTML(e)}</a></li>`;
+  const w1 = events.filter(e => e.d >= today && e.d <= w1End);
+  const w2 = events.filter(e => e.d >= w2Start && e.d <= w2End);
+  $('#wk1').innerHTML = w1.length ? w1.map(e => weekItem(e, true)).join('') : '<li class="empty-note">Nothing else on the calendar this week.</li>';
+  $('#wk2').innerHTML = w2.length ? w2.map(e => weekItem(e, false)).join('') : '<li class="empty-note">Nothing on the calendar next week.</li>';
+
+  // ---- Documents ----
+  const DAY_MS = 864e5;
+  const isNew = (it) => it.added && (today - parse(it.added)) / DAY_MS <= 30;
+  const icon = (it) => it.type === 'ext' ? 'i-ext' : it.type === 'web' ? 'i-arrow' : 'i-dl';
+  const docTotal = DOCS.reduce((n, c) => n + c.items.length, 0);
+  $('#docs-intro').textContent = `${docTotal} forms, handbooks and flyers for 2026–27, grouped by what you need to do.`;
+  $('#most').innerHTML = MOST_USED.map(([c, i]) => { const it = DOCS.find(x => x.id === c).items[i];
+    return `<li><a href="${esc(it.h)}"><svg class="icon" style="color:var(--navy);width:24px;height:24px" aria-hidden="true"><use href="#i-doc"/></svg><span class="t">${esc(it.t)}</span><span class="meta">${esc(it.m)}</span></a></li>`; }).join('');
+  const renderDocs = (q = '') => {
+    const words = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    const match = (it) => !words.length || words.every(w => (it.t + ' ' + (it.k || '')).toLowerCase().includes(w));
+    let shown = 0;
+    $('#cats').innerHTML = DOCS.map(c => {
+      const items = c.items.filter(match); shown += items.length;
+      if (!items.length) return '';
+      const noun = c.id === 'forms' ? 'form' : c.id === 'flyers' ? 'flyer' : 'document';
+      return `<section class="cat" id="cat-${c.id}" aria-labelledby="cat-${c.id}-t">
+        <div class="cat-top"><h3 class="h3" id="cat-${c.id}-t">${esc(c.name)}</h3><span class="caption">${items.length} ${noun}${items.length > 1 ? 's' : ''}</span></div>
+        <p class="small">${esc(c.desc)}</p>
+        <ul class="doc-list">${items.map(it => `<li><a href="${esc(it.h)}"${it.type === 'ext' ? ' target="_blank" rel="noopener"' : ''}>
+          <span>${esc(it.t)}${isNew(it) ? '<span class="badge-new">New</span>' : ''}</span>
+          <span class="doc-meta">${esc(it.m)}<svg class="icon" aria-hidden="true"><use href="#${icon(it)}"/></svg>${it.type === 'ext' ? '<span class="sr-only">(opens in a new tab)</span>' : ''}</span></a></li>`).join('')}</ul></section>`;
+    }).join('');
+    $('#most-wrap').hidden = words.length > 0;
+    $('#docs-empty').hidden = shown > 0;
+    $('#doc-status').textContent = words.length ? `${shown} document${shown === 1 ? '' : 's'} found` : '';
+  };
+  renderDocs();
+  $('#doc-filter').addEventListener('input', (e) => renderDocs(e.target.value));
+
+  // ---- Calendar ----
+  const FILTERS = [['all','All events'],['noschool','No school & early dismissal'],['faith','Faith'],['academic','Academic'],['community','Community'],['health','Health']];
+  let filter = 'all', showAll = false, view = 'list';
+  $('#filters').innerHTML = FILTERS.map(([k, l]) => `<button type="button" class="fchip" data-f="${k}" aria-pressed="${k === 'all'}">${k === 'all' ? '' : `<span class="sw sw--${k}" aria-hidden="true"></span>`}${l}</button>`).join('');
+  $('#filters').addEventListener('click', (e) => { const b = e.target.closest('.fchip'); if (!b) return;
+    filter = b.dataset.f; $$('.fchip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); renderList(); renderMonth(); });
+  const passes = (e) => filter === 'all' || e.cats.has(filter);
+
+  const monthKey = (d) => d.getFullYear() * 12 + d.getMonth();
+  const rowHTML = (e, past) => `<li class="row${isNoSchool(e) ? ' is-noschool' : ''}${past ? ' is-past' : ''}" id="${e.id}">
+      <span class="row-date"><span class="d">${e.d.getDate()}</span><span class="w">${DOW_S[e.d.getDay()]}</span></span>
+      <span class="row-body">${e.url ? `<a class="row-title" href="${esc(e.url)}"${/^https?:/.test(e.url) ? ' target="_blank" rel="noopener"' : ''}>${esc(e.title)}</a>` : `<span class="row-title">${esc(e.title)}</span>`}
+      ${e.detail ? `<span class="small">${esc(e.detail)}</span>` : ''}<span class="sr-only">${fmtLong(e.d)}</span></span>${tagHTML(e)}</li>`;
+  const groupHTML = (list, past) => {
+    const groups = new Map();
+    list.forEach(e => { const k = monthKey(e.d); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
+    return [...groups.values()].map(g => `<div class="month"><h3 class="h3">${MON_FULL[g[0].d.getMonth()]} ${g[0].d.getFullYear()}</h3><ul class="rows">${g.map(e => rowHTML(e, past)).join('')}</ul></div>`).join('');
+  };
+  const renderList = () => {
+    const past = events.filter(e => e.d < today && passes(e));
+    const up = events.filter(e => e.d >= today && passes(e));
+    const months = [...new Set(up.map(e => monthKey(e.d)))];
+    const limit = showAll ? Infinity : (months[1] ?? months[0] ?? 0);
+    const visible = up.filter(e => monthKey(e.d) <= limit);
+    $('#upcoming-months').innerHTML = visible.length ? groupHTML(visible, false) : '<p class="empty-note">No upcoming events of this type.</p>';
+    $('#past-months').innerHTML = groupHTML(past, true);
+    const tp = $('#toggle-past');
+    tp.hidden = past.length === 0;
+    const open = tp.getAttribute('aria-expanded') === 'true';
+    tp.textContent = open ? `Hide ${past.length} past events` : `Show ${past.length} past events`;
+    $('#cal-status-text').textContent = `Showing upcoming events from today, ${fmtLong(today)}.`;
+    const rest = up.length - visible.length, more = $('#show-more');
+    more.hidden = rest <= 0;
+    if (rest > 0) { const lastM = up[up.length - 1].d; const nextM = up.find(e => monthKey(e.d) > limit).d;
+      more.textContent = `Show ${MON_FULL[nextM.getMonth()]}–${MON_FULL[lastM.getMonth()]} ${lastM.getFullYear()} (${rest} more events)`; }
+  };
+  $('#toggle-past').addEventListener('click', (e) => { const b = e.currentTarget; const open = b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', String(open)); $('#past-months').hidden = !open; renderList(); });
+  $('#show-more').addEventListener('click', () => { showAll = true; renderList(); });
+
+  // Jump from "This week" / alert to a row, even if it is in a collapsed range
+  const reveal = (id) => {
+    const ev = events.find(e => e.id === id); if (!ev) return;
+    if (view !== 'list') setView('list');
+    if (!passes(ev)) { filter = 'all'; $$('.fchip').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.f === 'all'))); }
+    if (ev.d < today) { $('#toggle-past').setAttribute('aria-expanded', 'true'); $('#past-months').hidden = false; }
+    else showAll = true;
+    renderList();
+    const row = document.getElementById(id); if (!row) return;
+    $$('.row.is-target').forEach(r => r.classList.remove('is-target'));
+    row.classList.add('is-target'); row.setAttribute('tabindex', '-1');
+    row.scrollIntoView({ block: 'center' }); row.focus({ preventScroll: true });
+  };
+  document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#ev-"]'); if (!a) return; e.preventDefault(); reveal(a.getAttribute('href').slice(1)); });
+
+  // Month view
+  const first = events[0].d, last = events[events.length - 1].d;
+  const minM = monthKey(first), maxM = monthKey(last);
+  let curM = Math.min(Math.max(monthKey(today), minM), maxM);
+  let selDay = null;
+  const renderMonth = () => {
+    const y = Math.floor(curM / 12), m = curM % 12;
+    $('#m-title').textContent = `${MON_FULL[m]} ${y}`;
+    $('#m-prev').disabled = curM <= minM; $('#m-next').disabled = curM >= maxM;
+    const start = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+    const byDay = {};
+    events.filter(e => e.d.getFullYear() === y && e.d.getMonth() === m && passes(e)).forEach(e => (byDay[e.d.getDate()] ||= []).push(e));
+    let html = '<tr>', col = 0;
+    for (let i = 0; i < start.getDay(); i++, col++) html += '<td class="out"></td>';
+    for (let d = 1; d <= days; d++, col++) {
+      if (col && col % 7 === 0) html += '</tr><tr>';
+      const date = new Date(y, m, d), list = byDay[d] || [], isToday = key(date) === key(today);
+      if (list.length) {
+        const label = `${fmtLong(date)}${isToday ? ' (today)' : ''}: ${list.length} event${list.length > 1 ? 's' : ''}`;
+        html += `<td class="${isToday ? 'is-today' : ''}"><button type="button" class="dbtn" data-day="${d}" aria-pressed="${selDay === key(date)}" aria-label="${label}">
+          <span class="dnum">${d}</span><span class="dots">${list.slice(0, 4).map(e => `<i class="dot dot--${isNoSchool(e) ? 'noschool' : e.cat}"></i>`).join('')}</span>
+          <span class="dcount">${list.length === 1 ? esc(list[0].title.length > 22 ? list[0].title.slice(0, 21) + '…' : list[0].title) : list.length + ' events'}</span></button></td>`;
+      } else {
+        html += `<td class="${isToday ? 'is-today' : ''}"><span class="dplain"><span class="dnum">${d}</span>${isToday ? '<span class="sr-only"> (today)</span>' : ''}</span></td>`;
+      }
+    }
+    while (col % 7) { html += '<td class="out"></td>'; col++; }
+    $('#m-grid tbody').innerHTML = html + '</tr>';
+    const sel = selDay && parse(selDay);
+    if (sel && sel.getFullYear() === y && sel.getMonth() === m && byDay[sel.getDate()]) {
+      $('#m-day').innerHTML = `<h3 class="h3">${fmtLong(sel)}</h3><ul class="rows" style="list-style:none;margin:0;padding:0;border-top:1px solid var(--gray)">${byDay[sel.getDate()].map(e => rowHTML(e, e.d < today).replace(`id="${e.id}"`, '')).join('')}</ul>`;
+    } else $('#m-day').innerHTML = '<p class="small">Select a highlighted day to see its events.</p>';
+  };
+  $('#m-grid').addEventListener('click', (e) => { const b = e.target.closest('.dbtn'); if (!b) return;
+    const y = Math.floor(curM / 12), m = curM % 12; selDay = key(new Date(y, m, Number(b.dataset.day))); renderMonth();
+    const again = $(`.dbtn[data-day="${b.dataset.day}"]`); again && again.focus(); });
+  $('#m-prev').addEventListener('click', () => { if (curM > minM) { curM--; selDay = null; renderMonth(); } });
+  $('#m-next').addEventListener('click', () => { if (curM < maxM) { curM++; selDay = null; renderMonth(); } });
+
+  const setView = (v) => { view = v; $('#view-list').setAttribute('aria-pressed', String(v === 'list')); $('#view-month').setAttribute('aria-pressed', String(v === 'month'));
+    $('#list-view').hidden = v !== 'list'; $('#month-view').hidden = v !== 'month'; if (v === 'month') renderMonth(); };
+  $('#view-list').addEventListener('click', () => setView('list'));
+  $('#view-month').addEventListener('click', () => setView('month'));
+  renderList();
+
+  // ---- Site search (documents + events) ----
+  const index = [
+    ...DOCS.flatMap(c => c.items.map(it => ({ title: it.t, kind: it.m, href: it.h, text: (it.t + ' ' + (it.k || '') + ' ' + c.name).toLowerCase(), ext: it.type === 'ext' }))),
+    ...events.filter(e => e.d >= today).map(e => ({ title: e.title, kind: fmtShort(e.d), href: '#' + e.id, text: (e.title + ' ' + e.detail + ' ' + [...e.cats].map(c => CAT_LABEL[c]).join(' ')).toLowerCase() }))
+  ];
+  const q = $('#q'), res = $('#q-results'), status = $('#q-status');
+  const runSearch = () => {
+    const words = q.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    if (!words.length) { res.hidden = true; status.textContent = ''; return; }
+    const hits = index.filter(r => words.every(w => r.text.includes(w))).slice(0, 8);
+    res.hidden = false;
+    res.innerHTML = hits.length
+      ? `<ul>${hits.map(h => `<li><a href="${esc(h.href)}"${h.ext ? ' target="_blank" rel="noopener"' : ''}><span>${esc(h.title)}</span><span class="kind">${esc(h.kind)}</span></a></li>`).join('')}</ul>`
+      : `<p class="empty">No results for “${esc(q.value)}”. Try another word or <a href="#contact">contact the front office</a>.</p>`;
+    status.textContent = hits.length ? `${hits.length} result${hits.length > 1 ? 's' : ''}` : 'No results';
+  };
+  q.addEventListener('input', runSearch);
+  $('#site-search').addEventListener('submit', (e) => { e.preventDefault(); const firstLink = $('a', res); if (firstLink) firstLink.focus(); });
+  q.addEventListener('keydown', (e) => { if (e.key === 'Escape') { q.value = ''; runSearch(); } if (e.key === 'ArrowDown') { const a = $('a', res); if (a) { e.preventDefault(); a.focus(); } } });
+  res.addEventListener('click', (e) => { if (e.target.closest('a[href^="#"]')) { res.hidden = true; } });
+})();
+</script>
+</body>
+</html>
