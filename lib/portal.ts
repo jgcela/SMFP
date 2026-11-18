@@ -22,7 +22,7 @@ export type PortalData = {
   // Active notices; the page shows the newest one whose dates include today
   // (checked in the browser, like every other date on the page).
   notices: { message: string; linkLabel: string; linkHref: string; from: string; until: string }[];
-  docs: { id: string; name: string; desc: string; items: { t: string; h: string; m: string; type?: string; k: string; added?: string }[] }[];
+  docs: { id: string; name: string; desc: string; items: { t: string; h: string; m: string; d?: string; type?: string; k: string; added?: string }[] }[];
   mostUsed: [string, number][];
   // [date, category, title, details, badges, link, endDate]
   events: [string, string, string, string, string, string, string?][];
@@ -78,8 +78,9 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
     docs: docGroups.map(({ cat, items }) => ({
       id: cat.key, name: cat.name, desc: cat.description,
       items: items.map((d) => ({
-        // The optional short description goes before the file type ("Due Sept 4 · PDF · 0.2 MB").
-        t: d.title, h: d.href, m: d.description ? `${d.description} · ${d.meta}` : d.meta,
+        // The optional short description is shown as plain text under the title, not inside the link line.
+        t: d.title, h: d.href, m: d.meta,
+        ...(d.description ? { d: d.description } : {}),
         k: [d.keywords, d.description].filter(Boolean).join(" "),
         ...(d.kind !== "file" ? { type: d.kind } : {}),
         ...(d.added_on ? { added: iso(d.added_on) } : {}),
