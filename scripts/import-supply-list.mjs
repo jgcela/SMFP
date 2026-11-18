@@ -37,11 +37,16 @@ for (const g of SUPPLIES) {
 
 const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
 console.error(`${SUPPLIES.length} grades, ${items} items, PDF link: ${pdf ? "yes" : "no"}`);
+// Repeated checklist markup is shortened to § and ¶ so the SQL stays small.
+const ITEM_OPEN = '<li data-type="taskItem" data-checked="false"><label><input type="checkbox"><span></span></label><div><p>';
+const ITEM_CLOSE = '</p></div></li>';
+if (/[§¶]/.test(html)) throw new Error('page text uses § or ¶');
 console.log(`with s as (select id from schools where slug = ${q(school)}),
+c as (select ${q(title)}::text as title, ${q(summary)}::text as summary, replace(replace(${q(html.split(ITEM_OPEN).join("§").split(ITEM_CLOSE).join("¶"))}, '§', ${q(ITEM_OPEN)}), '¶', ${q(ITEM_CLOSE)}) as html),
 p as (
   insert into pages (school_id, slug, legacy_path, draft_title, draft_summary, draft_html, title, summary, html, published_at)
-  select s.id, 'supply-list', 'supply-list_202627.html', ${q(title)}, ${q(summary)}, ${q(html)}, ${q(title)}, ${q(summary)}, ${q(html)}, now() from s
+  select s.id, 'supply-list', 'supply-list_202627.html', c.title, c.summary, c.html, c.title, c.summary, c.html, now() from s, c
   returning id
 )
 insert into page_versions (page_id, kind, title, summary, html, author)
-select p.id, 'imported', ${q(title)}, ${q(summary)}, ${q(html)}, 'Imported from the old page' from p;`);
+select p.id, 'imported', c.title, c.summary, c.html, 'Imported from the old page' from p, c;`);
