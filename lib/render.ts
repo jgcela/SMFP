@@ -4,11 +4,14 @@ import { opensInNewTabByDefault } from "./links";
 import { mapsHref } from "./contact";
 import { absolutePaths } from "./page-html";
 import type { ContactPerson, Link, School } from "./portal";
+import { KINDS, spotsLabel, spotsLeft, whenLabel, type Opportunity, type VLink } from "./volunteer";
 
 // The page markup, with {{...}} where each school's content goes.
 const template = readFileSync(path.join(process.cwd(), "content/portal-template.html"), "utf8");
 // Step 4e: the school's own text pages (Supply list, Handbook...).
 const pageTemplate = readFileSync(path.join(process.cwd(), "content/page-template.html"), "utf8");
+// Step 6b: the Volunteer page, built from volunteer_opportunities.
+const volunteerTemplate = readFileSync(path.join(process.cwd(), "content/volunteer-template.html"), "utf8");
 
 export const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
@@ -111,13 +114,20 @@ export type PagePart = { title: string; summary: string; body: string; headings:
 
 // A text page: the same header and footer as the portal's other pages, and the
 // handbook layout (contents on the side, search) when the page has enough headings.
-export function renderSchoolPage(school: School, links: Link[], people: ContactPerson[], page: PagePart) {
+// Header and footer of the portal's inner pages (text pages, Volunteer).
+function innerPageValues(school: School, links: Link[], people: ContactPerson[], current = "") {
   const values = schoolValues(school, links, people);
   const logo = school.logo_url;
   values["school.logo_url"] = esc(logo && !/^(https?:)?\/\//.test(logo) && !logo.startsWith("/") ? `/${logo}` : logo);
   const top = links.filter((l) => l.placement === "top");
-  values["links.nav"] = top.map((l) => `        ${a(l, l.short_label || l.label)}\n`).join("");
-  values["links.mobile"] = top.map((l) => `        <li>${a(l, l.label)}</li>\n`).join("");
+  const cur = (l: Link, html: string) => (current && l.href.replace(/^\//, "") === current ? html.replace("<a ", '<a aria-current="page" ') : html);
+  values["links.nav"] = top.map((l) => `        ${cur(l, a(l, l.short_label || l.label))}\n`).join("");
+  values["links.mobile"] = top.map((l) => `        <li>${cur(l, a(l, l.label))}</li>\n`).join("");
+  return values;
+}
+
+export function renderSchoolPage(school: School, links: Link[], people: ContactPerson[], page: PagePart) {
+  const values = innerPageValues(school, links, people);
   const toc = page.headings >= 3;
   values["page.title"] = esc(page.title);
   values["page.summary"] = esc(page.summary);
@@ -153,4 +163,85 @@ export function renderSchoolPage(school: School, links: Link[], people: ContactP
     : "";
   // Pages live under /pages/, so the portal's relative links (menu, contact...) must start at the site root.
   return absolutePaths(fill(pageTemplate, values));
+}
+
+// ---------- Volunteer (step 6b) ----------
+export type VolunteerState = {
+  signedIn: "family" | "other" | null; // a family of this school, someone else (staff), or nobody
+  mine: Set<number>;                   // opportunities this family signed up for
+  notice?: { text: string; error?: boolean };
+  today: string;                       // YYYY-MM-DD in the school's time zone
+};
+
+const ext = (href: string) => /^https?:/i.test(href);
+const icon = (name: string) => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+const btn = (l: VLink, cls: string) =>
+  `<a class="btn ${cls}" href="${esc(l.href)}"${ext(l.href) ? ' target="_blank" rel="noopener"' : ""}>${esc(l.label)}${ext(l.href) ? `${icon("ext")}<span class="sr-only">(opens in a new tab)</span>` : ""}</a>`;
+// One line of the details: escaped, with **text** in bold (as the old page had <strong>).
+const detailLine = (l: string) => esc(l).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+function signupBlock(o: Opportunity, st: VolunteerState) {
+  const left = spotsLeft(o);
+  const spots = `<p class="vol-spots${left === 0 ? " is-full" : ""}">${icon("users")}${esc(spotsLabel(o))}</p>`;
+  const past = !!o.eventDate && o.eventDate < st.today;
+  const form = (action: "join" | "leave", label: string, cls: string, disabled = false) =>
+    `<form class="vol-form" method="post" action="/volunteer/signup"><input type="hidden" name="id" value="${o.id}"><input type="hidden" name="do" value="${action}"><button type="submit" class="btn ${cls}"${disabled ? " disabled" : ""}>${label}</button></form>`;
+  let action: string;
+  if (st.signedIn === "family" && st.mine.has(o.id)) {
+    action = `<p class="vol-in">${icon("check")}You’re signed up</p>${past ? "" : form("leave", "Cancel my sign-up", "btn--outline")}`;
+  } else if (past) {
+    action = `<p class="small">This date has passed.</p>`;
+  } else if (left === 0) {
+    action = `<button type="button" class="btn btn--primary" disabled>Full</button>`;
+  } else if (st.signedIn === "family") {
+    action = form("join", "Sign up", "btn--primary");
+  } else if (st.signedIn === "other") {
+    action = `<p class="small">Families sign up here after signing in to their family account.</p>`;
+  } else {
+    action = `<a class="btn btn--primary" href="/family?next=${encodeURIComponent(`/volunteer#opp-${o.id}`)}">Sign in to sign up</a>`;
+  }
+  return `${spots}\n        <div class="card-actions vol-form">${action}</div>`;
+}
+
+// Like the old page: "8–15" never breaks across lines (a word joiner after the dash).
+const ve = (s: string) => esc(s).replace(/(\d)–(\d)/g, "$1–\u2060$2");
+
+function card(o: Opportunity, st: VolunteerState) {
+  const when = whenLabel(o);
+  const meta = [o.location && `<span>${icon("pin")}${ve(o.location)}</span>`, when && `<span>${icon("cal")}${ve(when)}</span>`, o.whoText && `<span>${icon("users")}${ve(o.whoText)}</span>`].filter(Boolean).join("");
+  const links = o.portalSignup ? o.links : o.links.slice(1);
+  const main = o.portalSignup ? signupBlock(o, st) : o.links[0] ? `<p class="card-actions">${btn(o.links[0], "btn--primary")}</p>` : "";
+  const contact = [o.contactName && ve(o.contactName), o.contactEmail && `<a href="mailto:${ve(o.contactEmail)}">${ve(o.contactEmail)}</a>`, o.contactPhone && `<a href="tel:${ve(o.contactPhone.replace(/[^\d+]/g, ""))}">${ve(o.contactPhone)}</a>`].filter(Boolean).join(" — ");
+  const lines = o.details.split("\n").filter(Boolean);
+  const more = [
+    o.description && `<p class="small">${ve(o.description)}</p>`,
+    lines.length ? `<h4 class="caption">${ve(o.detailsTitle)}</h4>\n        <ul class="list">${lines.map((l) => `<li>${detailLine(l)}</li>`).join("")}</ul>` : "",
+    contact && `<p class="small vol-contact"><strong>Contact:</strong> ${contact}</p>`,
+    links.length || o.flyer ? `<p class="card-actions">${links.map((l) => btn(l, "btn--outline")).join("")}${o.flyer ? `<a class="btn btn--outline" href="${ve(o.flyer)}">View flyer</a>` : ""}</p>` : "",
+  ].filter(Boolean).join("\n        ");
+  return `      <article class="card" id="opp-${o.id}" data-kind="${o.kind}" aria-labelledby="opp-${o.id}-t">
+      <span class="tag">${ve(o.area || KINDS[o.kind])}</span>
+      <div><h3 id="opp-${o.id}-t">${ve(o.title)}</h3>${o.organizer ? `<p class="small">${ve(o.organizer)}</p>` : ""}</div>
+      ${meta ? `<p class="meta">${meta}</p>` : ""}
+      ${main}
+      ${more ? `<details class="more"><summary>Details and contacts</summary><div class="body">
+        ${more}
+      </div></details>` : ""}
+    </article>
+`;
+}
+
+export type VolunteerPage = { title: string; lead: string; intro: string };
+
+export function renderVolunteerPage(school: School, links: Link[], people: ContactPerson[], page: VolunteerPage, opps: Opportunity[], st: VolunteerState) {
+  const values = innerPageValues(school, links, people, "volunteer");
+  values["page.title"] = esc(page.title || "Volunteer");
+  values["page.summary"] = esc(`Volunteer opportunities for ${school.name} families, ${school.school_year}.`);
+  values["page.lead"] = page.lead ? `      <p class="lead" id="page-lead">${esc(page.lead)}</p>\n` : "";
+  values["volunteer.intro"] = page.intro ? `  ${page.intro}\n` : "";
+  values["volunteer.notice"] = st.notice ? `      <p class="vol-note${st.notice.error ? " vol-note--err" : ""}" role="status">${esc(st.notice.text)}</p>\n` : "";
+  values["volunteer.chips"] = Object.entries(KINDS).map(([k, l]) => `          <button type="button" class="fchip" data-f="${k}" aria-pressed="false">${esc(l)}</button>\n`).join("");
+  values["volunteer.count"] = opps.length ? `Showing ${opps.length} of ${opps.length} opportunities` : "No opportunities right now. Check back soon.";
+  values["volunteer.cards"] = opps.map((o) => card(o, st)).join("");
+  return absolutePaths(fill(volunteerTemplate, values));
 }

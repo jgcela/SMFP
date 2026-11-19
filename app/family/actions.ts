@@ -86,7 +86,9 @@ export async function familySignIn(_prev: FamilyFormState, fd: FormData): Promis
   } catch {
     return { error: "You could not be signed in. Try again in a moment." };
   }
-  redirect("/family");
+  // Back to the page that asked them to sign in (e.g. the Volunteer page), if it is on this site.
+  const next = String(fd.get("next") ?? "");
+  redirect(/^\/(?!\/)[\w\-./#?=&%]*$/.test(next) && !next.includes("\\") ? next : "/family");
 }
 
 export async function familySignOut() {

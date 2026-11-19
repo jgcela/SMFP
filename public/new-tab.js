@@ -14,7 +14,7 @@
     var url = new URL(a.href, location.href);
     if (url.origin === location.origin) {
       if (url.hash && url.pathname === location.pathname && url.search === location.search) return;
-      if (url.pathname === "/" || /_202627\.html$/.test(url.pathname) || url.pathname.indexOf("/pages/") === 0) return; // a portal page
+      if (url.pathname === "/" || /_202627\.html$/.test(url.pathname) || url.pathname.indexOf("/pages/") === 0 || /^\/(volunteer|family)(\/|$)/.test(url.pathname)) return; // a portal page
     }
     a.target = "_blank";
     a.rel = "noopener";
