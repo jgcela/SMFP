@@ -183,3 +183,11 @@ Migration: `db/migrations/2026-11-19-step6d-wishlists.sql` (`wishlists`, and the
 - Import: `scripts/seed-wishlists.mjs` (prebuild, after the Staff favorites import) reads the old page in `content/wishlists/` once per school: the 18 lists, joined by surname (`content/wishlists/links.json` settles a surname with two cards), Amazon links without their `?ref=` part. It sends `teacher-wishlists_202627.html` to `/wishlists`, moves menu links there, and points each card's "Classroom wishlist" button to its list.
 - No emails are sent.
 - Staff favorites: a second card with the same surname now gets its own anchor (`staff-<surname>-<id>`).
+
+## Step 7: look of the private panels
+
+The staff area (/admin) and "My family" (/family) share one look: a sidebar (a "Menu" button on phones), page headings with the school's name, white cards, one main button per screen, rows with Edit and a "…" menu.
+
+- Colours, short name and emblem come from `schools.panel_theme` (jsonb), per school. `content/panel/theme.json` fills in missing keys once at build time (`scripts/seed-panel-theme.mjs`); what the school already has is never changed. `categories` gives one colour per calendar category; the pill text is darkened until it reads at 4.5:1.
+- Code: `lib/panel-theme.ts`, `app/admin/panel.css`, `app/admin/chrome.tsx`, `app/admin/ui.tsx`, `app/admin/icons.tsx` (one icon per section).
+- No functions, data or addresses changed. The public portal is untouched.
