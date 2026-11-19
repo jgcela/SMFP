@@ -145,3 +145,12 @@ that says whether someone is an approved family; FACTS sign-in (SSO) can later
 link to the same row through `families.sso_provider` / `sso_subject` without
 changing the approval flow.
 Database change: `db/migrations/2026-11-18-step5-families.sql`.
+
+## Step 6a: My family
+
+Migration: `db/migrations/2026-11-19-step6a-my-family.sql` (family contact columns, `children`, `family_submissions`).
+
+- `/family`, for an approved family: report an absence, make a request (both lists show the status), its children (read only) and family details (parents, phone, optional second adult). Actions in `app/family/my-actions.ts`; every query is limited to the signed-in family (`currentFamily()`).
+- `/admin/requests` ("Absences & requests"): everything families of this school send. Filters by date (Today, Tomorrow, Next 7 days, or from/to), status and type, kept in the address. Each row has Received / In progress / Resolved buttons.
+- `/admin/families/[id]` ("Children & details" in Families): a family's contact details, and its children. Only the school adds, edits and removes children (`updated_by` keeps who did it); families cannot.
+- Children have a `facts_id` column for when they come from FACTS. No emails or automatic notices yet.
