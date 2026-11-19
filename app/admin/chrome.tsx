@@ -4,7 +4,7 @@ import { familySignOut } from "../family/actions";
 import { signOut } from "./actions";
 import { loadSchoolHeader } from "./school";
 
-export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages" | "families" | "requests" | "volunteer" | "staff-favorites";
+export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages" | "families" | "requests" | "volunteer" | "staff-favorites" | "wishlists";
 
 export async function AdminTop({ signedIn, section, area = "staff" }: { signedIn: boolean; section?: Section; area?: "staff" | "family" }) {
   const school = await loadSchoolHeader();
@@ -33,6 +33,7 @@ export async function AdminTop({ signedIn, section, area = "staff" }: { signedIn
             <Link href="/admin/pages" aria-current={section === "pages" ? "page" : undefined}>Pages</Link>
             <Link href="/admin/volunteer" aria-current={section === "volunteer" ? "page" : undefined}>Volunteer</Link>
             <Link href="/admin/staff-favorites" aria-current={section === "staff-favorites" ? "page" : undefined}>Staff favorites</Link>
+            <Link href="/admin/wishlists" aria-current={section === "wishlists" ? "page" : undefined}>Wishlists</Link>
             <Link href="/admin/families" aria-current={section === "families" ? "page" : undefined}>Families</Link>
             <Link href="/admin/requests" aria-current={section === "requests" ? "page" : undefined}>Absences &amp; requests</Link>
           </div>

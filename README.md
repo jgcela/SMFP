@@ -172,3 +172,14 @@ Migration: `db/migrations/2026-11-19-step6c-staff-favorites.sql` (`staff_favorit
 - Optional photo per card, in private storage (`staff/<school>/…`), served by `/staff-favorites/photo/[id]` only to someone who may see the page.
 - Staff: `/admin/staff-favorites` to create, edit (name, role, group, photo, favorites in order: the first 4 visible, the rest under "More favorites", wishlist link), hide, move up/down within a group, and delete (with confirmation).
 - Import: `scripts/seed-staff-favorites.mjs` (prebuild) reads the old page in `content/staff-favorites/` once per school, WITHOUT birthdays, the Allergies field and the health details in `content/staff-favorites/redactions.json` (the import stops if one of those is not found). It then sends the old address `staff-favorites_202627.html` to `/staff-favorites` and moves menu links there.
+
+## Step 6d: Teacher wishlists
+
+Migration: `db/migrations/2026-11-19-step6d-wishlists.sql` (`wishlists`, and the page's groups, title, lead and notes on `schools`).
+
+- `/wishlists` (`app/wishlists/route.ts`, `content/wishlists-template.html`, `renderWishlistPage` in `lib/render.ts`): only families the school approved, and the school's staff, see the lists, with the old look, search by teacher, class or group, and group filters (`public/wishlists.js`). Anyone else gets the same sign-in notice as Staff favorites.
+- Each list is joined to the teacher's Staff favorites card, so the name is written once (changing it there changes it here); "Favorite things" opens that card. A list can also have its own name for someone who is not in Staff favorites.
+- Staff: `/admin/wishlists` to create, edit (teacher, class, group, store link), hide, move up/down within a group, and delete (with confirmation). There are no items on the portal: the school decided the teacher's store list (Amazon) is where items are kept.
+- Import: `scripts/seed-wishlists.mjs` (prebuild, after the Staff favorites import) reads the old page in `content/wishlists/` once per school: the 18 lists, joined by surname (`content/wishlists/links.json` settles a surname with two cards), Amazon links without their `?ref=` part. It sends `teacher-wishlists_202627.html` to `/wishlists`, moves menu links there, and points each card's "Classroom wishlist" button to its list.
+- No emails are sent.
+- Staff favorites: a second card with the same surname now gets its own anchor (`staff-<surname>-<id>`).

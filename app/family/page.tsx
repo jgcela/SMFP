@@ -66,6 +66,7 @@ export default async function FamilyPage({ searchParams }: { searchParams: Promi
           <p className="lead">For families of the school. The Parent Portal itself is open to everyone without signing in.</p>
           {next.startsWith("/volunteer") && <p className="adm-msg adm-msg--ok">Sign in with your family account to sign up for volunteer opportunities. You will go back to the Volunteer page.</p>}
           {next.startsWith("/staff-favorites") && <p className="adm-msg adm-msg--ok">Sign in with your family account to see the staff favorites. You will go back to that page.</p>}
+          {next.startsWith("/wishlists") && <p className="adm-msg adm-msg--ok">Sign in with your family account to see the teacher wishlists. You will go back to that page.</p>}
           <FamilySignInForm next={next} />
         </div>
       </main>

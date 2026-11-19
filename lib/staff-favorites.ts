@@ -50,3 +50,21 @@ export function readStaffCard(fd: FormData, teams: Team[]):
     return { error: "The wishlist link must be a full address that starts with https:// (or a page of the portal).", field: "wishlist_href" };
   return { value: { team, name, role, favorites, wishlistHref, hidden: fd.get("hidden") === "on" } };
 }
+
+/** The anchor of each card shown on the Staff favorites page, in page order (groups, then
+ *  their order): the first card of a surname gets "staff-<surname>" like the old page,
+ *  a second one "staff-<surname>-<id>". Cards with no favorites are not shown, so get none. */
+export function staffAnchors(cards: StaffCard[], teams: Team[]) {
+  const known = (c: StaffCard) => teams.some((t) => t.key === c.team);
+  const ordered = [...teams.map((t) => t.key), ""].flatMap((k) =>
+    cards.filter((c) => c.favorites.length && !c.hidden && (known(c) ? c.team === k : k === "")));
+  const used = new Set<string>();
+  const out = new Map<number, string>();
+  for (const c of ordered) {
+    let id = anchorOf(c.name);
+    if (used.has(id)) id = `${id}-${c.id}`;
+    used.add(id);
+    out.set(c.id, id);
+  }
+  return out;
+}

@@ -30,7 +30,7 @@ const PAGE_NAMES: Record<string, string> = {
   "messenger-archive_202627.html": "School Messenger",
 };
 // Pages the app builds itself (not files): Volunteer (step 6b).
-const APP_PAGES: Record<string, string> = { volunteer: "Volunteer opportunities", "staff-favorites": "Staff favorite things" };
+const APP_PAGES: Record<string, string> = { volunteer: "Volunteer opportunities", "staff-favorites": "Staff favorite things", wishlists: "Teacher wishlists" };
 export const PORTAL_PAGES = [
   ...Object.entries(PAGE_NAMES).filter(([href]) => (publicFiles as string[]).includes(href)),
   ...Object.entries(APP_PAGES),
