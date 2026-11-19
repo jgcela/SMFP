@@ -21,7 +21,7 @@ export default async function FamiliesPage() {
   return (
     <>
       <AdminTop signedIn section="families" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <FamiliesManager families={[...families]} code={school?.family_code ?? ""} />
       </main>
     </>

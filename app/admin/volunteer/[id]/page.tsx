@@ -27,7 +27,7 @@ export default async function SignupsPage({ params }: { params: Promise<{ id: st
   return (
     <>
       <AdminTop signedIn section="volunteer" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <p className="adm-back"><Link href="/admin/volunteer">← All opportunities</Link></p>
         <div className="adm-card">
           <div className="adm-head">

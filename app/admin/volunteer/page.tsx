@@ -14,7 +14,7 @@ export default async function VolunteerAdmin() {
   return (
     <>
       <AdminTop signedIn section="volunteer" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <VolunteerManager opps={opps.map((o) => ({ ...o }))} />
       </main>
     </>

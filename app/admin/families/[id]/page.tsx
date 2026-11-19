@@ -30,7 +30,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
   return (
     <>
       <AdminTop signedIn section="families" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <p className="adm-back"><Link href="/admin/families">← All families</Link></p>
         <div className="adm-card">
           <h1>{f.name}</h1>

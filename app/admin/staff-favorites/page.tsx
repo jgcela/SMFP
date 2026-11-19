@@ -19,7 +19,7 @@ export default async function StaffFavoritesAdmin() {
   return (
     <>
       <AdminTop signedIn section="staff-favorites" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <StaffFavoritesManager cards={cards.map((c) => ({ ...c }))} teams={page.teams} storageReady={storageReady} />
       </main>
     </>

@@ -19,7 +19,7 @@ export default async function WishlistsAdmin() {
   return (
     <>
       <AdminTop signedIn section="wishlists" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <WishlistsManager
           lists={lists.map((l) => ({ ...l }))}
           groups={page.groups}

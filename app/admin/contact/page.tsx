@@ -18,7 +18,7 @@ export default async function ContactPage() {
   return (
     <>
       <AdminTop signedIn section="contact" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <ContactManager details={{ ...school }} people={[...people]} />
       </main>
     </>

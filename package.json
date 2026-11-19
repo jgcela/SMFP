@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/list-public.mjs && node scripts/seed-legacy-pages.mjs && node scripts/seed-volunteer.mjs && node scripts/seed-staff-favorites.mjs && node scripts/seed-wishlists.mjs",
+    "prebuild": "node scripts/list-public.mjs && node scripts/seed-legacy-pages.mjs && node scripts/seed-volunteer.mjs && node scripts/seed-staff-favorites.mjs && node scripts/seed-wishlists.mjs && node scripts/seed-panel-theme.mjs",
     "build": "next build",
     "start": "next start",
     "import-original": "python3 scripts/import-original.py"

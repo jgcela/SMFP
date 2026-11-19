@@ -74,37 +74,71 @@ export function SetPasswordForm({ token }: { token: string }) {
 
 export type NoticeValues = { message: string; linkLabel: string; linkHref: string; show: boolean };
 
-export function NoticeForm({ initial }: { initial: NoticeValues }) {
+// The notice form and, next to it, how the top of the family portal will look.
+export function NoticeForm({ initial, preview }: { initial: NoticeValues; preview: { name: string; logoUrl: string | null } }) {
   const { state, onSubmit, pending } = useForm(saveNotice);
   const [show, setShow] = useState(initial.show);
+  const [message, setMessage] = useState(initial.message);
+  const [linkLabel, setLinkLabel] = useState(initial.linkLabel);
+  const [linkHref, setLinkHref] = useState(initial.linkHref);
   return (
-    <form onSubmit={onSubmit} className="adm-f">
-      <Message state={state} />
-      <label>
-        Notice text
-        <span className="hint">Shown in the yellow bar at the top of the portal. Up to 300 characters.</span>
-        <textarea name="message" maxLength={300} defaultValue={initial.message} />
-      </label>
-      <fieldset>
-        <legend>Link (optional)</legend>
-        <label>
-          Link text
-          <input type="text" name="link_label" maxLength={60} defaultValue={initial.linkLabel} placeholder="Read more" />
-        </label>
-        <label>
-          Link address
-          <input type="text" name="link_href" inputMode="url" maxLength={500} defaultValue={initial.linkHref} placeholder="https://" />
-        </label>
-      </fieldset>
-      <label className="adm-switch">
-        <input type="checkbox" name="show" role="switch" checked={show} onChange={(e) => setShow(e.target.checked)} />
-        <span aria-hidden="true" />
-        {show ? "Shown on the portal" : "Hidden from the portal"}
-      </label>
-      <div className="adm-actions">
-        <Submit pending={pending} busy="Saving…">Save</Submit>
-        <a href="/" target="_blank" rel="noopener">Open the portal</a>
-      </div>
-    </form>
+    <div className="sp-split">
+      <section className="adm-card" aria-labelledby="nf-title">
+        <h2 className="sp-card-h" id="nf-title">Edit featured notice</h2>
+        <form onSubmit={onSubmit} className="adm-f">
+          <Message state={state} />
+          <label>
+            Notice text
+            <span className="hint">Shown in the bar at the top of the portal. Up to 300 characters.</span>
+            <textarea name="message" maxLength={300} value={message} onChange={(e) => setMessage(e.target.value)} />
+            <span className="sp-count" aria-live="polite">{message.length} / 300</span>
+          </label>
+          <fieldset>
+            <legend>Link (optional)</legend>
+            <div className="adm-row">
+              <label>
+                Link text
+                <input type="text" name="link_label" maxLength={60} value={linkLabel} onChange={(e) => setLinkLabel(e.target.value)} placeholder="Read more" />
+              </label>
+              <label>
+                Link address
+                <input type="text" name="link_href" inputMode="url" maxLength={500} value={linkHref} onChange={(e) => setLinkHref(e.target.value)} placeholder="https://" />
+              </label>
+            </div>
+          </fieldset>
+          <label className="adm-switch">
+            <input type="checkbox" name="show" role="switch" checked={show} onChange={(e) => setShow(e.target.checked)} />
+            <span aria-hidden="true" />
+            {show ? "Shown on the portal" : "Hidden from the portal"}
+          </label>
+          <div className="adm-actions">
+            <Submit pending={pending} busy="Saving…">Save changes</Submit>
+          </div>
+        </form>
+      </section>
+      <section className="adm-card sp-preview" aria-labelledby="nf-prev">
+        <h2 className="sp-card-h" id="nf-prev">Family portal preview</h2>
+        <p className="sp-note">Updates as you type. Families see it after you save.</p>
+        <div className="sp-pv" aria-hidden="true">
+          <div className="sp-pv-top">
+            {preview.logoUrl ? <img src={preview.logoUrl} alt="" /> : <strong>{preview.name}</strong>}
+            <span className="sp-pv-burger"><i /><i /><i /></span>
+          </div>
+          {show && message.trim() ? (
+            <div className="sp-pv-bar">
+              <p>
+                <strong>{message}</strong>
+              </p>
+              {linkHref.trim() && linkLabel.trim() && <span className="sp-pv-link">{linkLabel} →</span>}
+            </div>
+          ) : (
+            <div className="sp-pv-none">
+              {show ? "Write the notice text to see it here." : "No notice from you. The portal may still show its automatic reminder of the next day with no school."}
+            </div>
+          )}
+          <div className="sp-pv-rest"><i /><i /><i /></div>
+        </div>
+      </section>
+    </div>
   );
 }

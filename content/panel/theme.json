@@ -1,0 +1,16 @@
+{
+  "_note": "Look of the private panels (staff area and My family) for the school in PORTAL_SCHOOL. Imported once into schools.panel_theme; after that the database copy is the one used.",
+  "shortName": "St. Mary",
+  "markUrl": "assets/favicon.png",
+  "colors": {
+    "page": "#EEF0F9",
+    "surface": "#FFFFFF",
+    "ink": "#16335B",
+    "text": "#2B3445",
+    "muted": "#5B6478",
+    "line": "#E2E5F0",
+    "soft": "#E2E6FB",
+    "accent": "#FCBC40",
+    "link": "#006D8F"
+  }
+}

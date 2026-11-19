@@ -11,7 +11,7 @@ export default async function SetPasswordPage({ searchParams }: { searchParams: 
   return (
     <>
       <AdminTop signedIn={false} />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <div className="adm-card adm-card--narrow">
           <h1>Choose your password</h1>
           <p className="lead">This link works once. After saving, sign in with your email and this password.</p>

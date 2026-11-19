@@ -438,3 +438,6 @@ alter table schools add column if not exists wishlist_groups jsonb not null defa
 alter table schools add column if not exists wishlist_title text not null default '';
 alter table schools add column if not exists wishlist_lead text not null default '';
 alter table schools add column if not exists wishlist_intro_html text not null default '';
+
+-- Step 7: look of the private panels (colours, short name, emblem), per school.
+alter table schools add column if not exists panel_theme jsonb not null default '{}'::jsonb;
