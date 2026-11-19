@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { checkEmail, checkPhone } from "../../../lib/contact";
 import { deletePerson, movePerson, saveContact, savePerson, type ContactState } from "./actions";
+import { Head } from "../ui";
 
 export type ContactDetails = { phone: string; email: string; address: string; officeHours: string };
 export type Person = { id: number; name: string; role: string; email: string };
@@ -131,13 +132,9 @@ export function ContactManager({ details, people }: { details: ContactDetails; p
   const done = (text: string) => { setEditing(null); if (text) { setMsg({ text }); router.refresh(); } };
 
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Contact</h1>
-          <p className="lead">Shown in “Need the front office?” and in “We’re here for your family.” on the portal. One change updates both.</p>
-        </div>
-      </div>
+    <>
+      <Head title="Contact" lead={<>Shown in “Need the front office?” and in “We’re here for your family.” on the portal. One change updates both.</>} />
+      <div className="adm-card">
       {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
       <DetailsForm details={details} report={report} />
 
@@ -179,6 +176,7 @@ export function ContactManager({ details, people }: { details: ContactDetails; p
           <p className="adm-empty">No contact people. The portal only shows the office details.</p>
         )}
       </section>
-    </div>
+      </div>
+    </>
   );
 }

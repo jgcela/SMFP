@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { KINDS, spotsLabel, whenLabel, type Opportunity } from "../../../lib/volunteer";
 import { deleteOpportunity, saveOpportunity, setOpportunityHidden, type VolResult } from "./actions";
+import { Badge, Head, PencilIcon, RowMenu } from "../ui";
 
 const LINK_ROWS = 4;
 
@@ -115,14 +116,9 @@ export function VolunteerManager({ opps }: { opps: Opportunity[] }) {
   const done = (r?: VolResult) => { setEditing(null); setMsg(r ?? null); };
   const current = opps.find((o) => o.id === editing);
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Volunteer</h1>
-          <p className="lead">The opportunities on the portal’s <a href="/volunteer" target="_blank" rel="noopener">Volunteer page</a>. Families who signed in can sign up; you see who did.</p>
-        </div>
-        {editing === null && <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}>New opportunity</button>}
-      </div>
+    <>
+      <Head title="Volunteer" lead={<>The opportunities on the portal’s <a href="/volunteer" target="_blank" rel="noopener">Volunteer page</a>. Families who signed in can sign up; you see who did.</>} actions={<>{editing === null && <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}>New opportunity</button>}</>} />
+      <div className="adm-card">
       {msg && <p className={`adm-msg ${msg.error ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.error ?? msg.ok}</p>}
       {editing === "new" && <OppForm onDone={done} />}
       {current && <OppForm key={current.id} o={current} onDone={done} />}
@@ -131,7 +127,7 @@ export function VolunteerManager({ opps }: { opps: Opportunity[] }) {
           {opps.map((o) => (
             <li key={o.id} className={`adm-doc${o.hidden ? " is-hidden" : ""}`}>
               <div className="what">
-                <strong>{o.title}{o.hidden && <span className="pill pill--muted">Hidden</span>}</strong>
+                <strong>{o.title}</strong>
                 <span className="note">{KINDS[o.kind]} · {whenLabel(o) || "No date"}{o.location && <> · {o.location}</>}</span>
                 <span className="note">
                   {o.portalSignup
@@ -147,15 +143,19 @@ export function VolunteerManager({ opps }: { opps: Opportunity[] }) {
                     <button type="button" onClick={() => setConfirm(null)}>Cancel</button>
                   </span>
                 ) : (<>
-                  <button type="button" onClick={() => { setMsg(null); setEditing(o.id); }}>Edit</button>
-                  <button type="button" disabled={busy} onClick={() => run(setOpportunityHidden(o.id, !o.hidden))}>{o.hidden ? "Show" : "Hide"}</button>
-                  <button type="button" onClick={() => { setMsg(null); setConfirm(o.id); }}>Delete</button>
+                  <Badge on={!o.hidden} />
+                  <button type="button" className="sp-edit" aria-label={`Edit ${o.title}`} onClick={() => { setMsg(null); setEditing(o.id); }}><PencilIcon />Edit</button>
+                  <RowMenu label={o.title} items={[
+                    { label: o.hidden ? "Show on the portal" : "Hide from the portal", disabled: busy, onSelect: () => run(setOpportunityHidden(o.id, !o.hidden)) },
+                    { label: "Delete", danger: true, onSelect: () => { setMsg(null); setConfirm(o.id); } },
+                  ]} />
                 </>)}
               </div>
             </li>
           ))}
         </ul>
       ) : <p className="adm-empty">No opportunities yet. Create the first one with “New opportunity”.</p>)}
-    </div>
+      </div>
+    </>
   );
 }

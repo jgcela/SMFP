@@ -23,7 +23,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <AdminTop signedIn section="calendar" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <CalendarManager events={[...events]} notice={notice} />
       </main>
     </>

@@ -49,7 +49,7 @@ export default async function FamilyPage({ searchParams }: { searchParams: Promi
     return (
       <>
         <AdminTop signedIn area="family" />
-        <main className="adm-main">
+        <main id="main" className="adm-main">
           <MyFamily name={family.name} email={family.email} {...data} />
         </main>
       </>
@@ -59,7 +59,7 @@ export default async function FamilyPage({ searchParams }: { searchParams: Promi
   return (
     <>
       <AdminTop signedIn={false} area="family" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <div className="adm-card adm-card--narrow">
           <h1>Family sign-in</h1>
           {user && staff && <p className="adm-msg adm-msg--ok">You are signed in as school staff. <Link href="/admin">Go to the staff area</Link>.</p>}

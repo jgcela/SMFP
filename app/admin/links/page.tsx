@@ -22,7 +22,7 @@ export default async function LinksPage() {
   return (
     <>
       <AdminTop signedIn section="links" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <LinksManager links={[...links]} categories={[...cats]} pages={[...pages]} />
       </main>
     </>

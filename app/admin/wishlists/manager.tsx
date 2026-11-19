@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { Group, Wishlist } from "../../../lib/wishlists";
 import { deleteWishlist, moveWishlist, saveWishlist, setWishlistHidden, type WlResult } from "./actions";
+import { Badge, Head, Initials, PencilIcon, RowMenu } from "../ui";
 
 type Teacher = { id: number; name: string; role: string };
 
@@ -74,14 +75,9 @@ export function WishlistsManager({ lists, groups, teachers }: { lists: Wishlist[
   const known = (l: Wishlist) => groups.some((g) => g.key === l.grp);
   const sections = [...groups, { key: "", label: "Other" }].map((g) => ({ ...g, lists: shown.filter((l) => (known(l) ? l.grp === g.key : g.key === "")) })).filter((g) => g.lists.length);
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Wishlists</h1>
-          <p className="lead">The teachers’ lists on the portal’s <a href="/wishlists" target="_blank" rel="noopener">Teacher wishlists page</a>. Only families who signed in can see it.</p>
-        </div>
-        {editing === null && <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}>New wishlist</button>}
-      </div>
+    <>
+      <Head title="Wishlists" lead={<>The teachers’ lists on the portal’s <a href="/wishlists" target="_blank" rel="noopener">Teacher wishlists page</a>. Only families who signed in can see it.</>} actions={<><a className="btn btn--outline" href="/wishlists" target="_blank" rel="noopener">View family page<span className="sr-only"> (opens in a new tab)</span></a>{editing === null && <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}>New wishlist</button>}</>} />
+      <div className="adm-card">
       {msg && (msg.error || msg.ok) && <p className={`adm-msg ${msg.error ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.error ?? msg.ok}</p>}
       {editing === "new" && <ListForm groups={groups} teachers={teachers} onDone={done} />}
       {current && <ListForm key={current.id} w={current} groups={groups} teachers={teachers} onDone={done} />}
@@ -90,38 +86,43 @@ export function WishlistsManager({ lists, groups, teachers }: { lists: Wishlist[
         {sections.length ? sections.map((g) => (
           <section key={g.key || "-"} aria-label={g.label}>
             <h2 className="adm-h2">{g.label} <span className="note">{g.lists.length}</span></h2>
-            <ul className="adm-list">
-              {g.lists.map((l, i) => {
-                return (
-                  <li key={l.id} className={`adm-doc${l.hidden ? " is-hidden" : ""}`}>
-                    <div className="what">
-                      <strong>{l.name}{l.hidden && <span className="pill pill--muted">Hidden</span>}</strong>
-                      <span className="note">{l.classText}{l.classText && " · "}{l.storeUrl ? "store link" : "no store link yet"}{!l.staffId && " · not in Staff favorites"}</span>
-                    </div>
-                    <div className="act">
-                      {confirm === l.id ? (
-                        <span className="confirm">
-                          <span>Delete {l.name}’s list? This cannot be undone.</span>
-                          <button type="button" className="danger" autoFocus disabled={busy} onClick={() => run(deleteWishlist(l.id))}>Delete</button>
-                          <button type="button" onClick={() => setConfirm(null)}>Cancel</button>
-                        </span>
-                      ) : (<>
-                        {!q && <>
-                          <button type="button" aria-label={`Move ${l.name} up`} disabled={busy || i === 0} onClick={() => run(moveWishlist(l.id, -1))}>↑</button>
-                          <button type="button" aria-label={`Move ${l.name} down`} disabled={busy || i === g.lists.length - 1} onClick={() => run(moveWishlist(l.id, 1))}>↓</button>
-                        </>}
-                        <button type="button" onClick={() => { setMsg(null); setEditing(l.id); }}>Edit</button>
-                        <button type="button" disabled={busy} onClick={() => run(setWishlistHidden(l.id, !l.hidden))}>{l.hidden ? "Show" : "Hide"}</button>
-                        <button type="button" onClick={() => { setMsg(null); setConfirm(l.id); }}>Delete</button>
-                      </>)}
-                    </div>
-                  </li>
-                );
-              })}
+            <ul className="sp-rows">
+              {g.lists.map((l, i) => (
+                <li key={l.id} className={`sp-row${l.hidden ? " is-hidden" : ""}`}>
+                  <div className="sp-person">
+                    <Initials name={l.name} />
+                    <span>
+                      <strong>{l.name}</strong>
+                      <span className="note">{l.classText}{l.classText && " · "}{l.storeUrl ? <a href={l.storeUrl} target="_blank" rel="noopener">store list<span className="sr-only"> (opens in a new tab)</span></a> : "no store link yet"}{!l.staffId && " · not in Staff favorites"}</span>
+                    </span>
+                  </div>
+                  <div className="sp-act">
+                    {confirm === l.id ? (
+                      <span className="sp-confirm">
+                        <span>Delete {l.name}’s list? This cannot be undone.</span>
+                        <button type="button" className="danger" autoFocus disabled={busy} onClick={() => run(deleteWishlist(l.id))}>Delete</button>
+                        <button type="button" onClick={() => setConfirm(null)}>Cancel</button>
+                      </span>
+                    ) : (<>
+                      <Badge on={!l.hidden} />
+                      <button type="button" className="sp-edit" aria-label={`Edit ${l.name}’s list`} onClick={() => { setMsg(null); setEditing(l.id); }}><PencilIcon />Edit</button>
+                      <RowMenu label={`${l.name}’s list`} items={[
+                        ...(q ? [] : [
+                          { label: "Move up", disabled: busy || i === 0, onSelect: () => run(moveWishlist(l.id, -1)) },
+                          { label: "Move down", disabled: busy || i === g.lists.length - 1, onSelect: () => run(moveWishlist(l.id, 1)) },
+                        ]),
+                        { label: l.hidden ? "Show on the portal" : "Hide from the portal", disabled: busy, onSelect: () => run(setWishlistHidden(l.id, !l.hidden)) },
+                        { label: "Delete", danger: true, onSelect: () => { setMsg(null); setConfirm(l.id); } },
+                      ]} />
+                    </>)}
+                  </div>
+                </li>
+              ))}
             </ul>
           </section>
         )) : <p className="adm-empty">Nobody matches “{q}”.</p>}
       </>) : <p className="adm-empty">No wishlists yet. Create the first one with “New wishlist”.</p>)}
-    </div>
+      </div>
+    </>
   );
 }

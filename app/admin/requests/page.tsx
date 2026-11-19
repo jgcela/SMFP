@@ -48,7 +48,7 @@ export default async function RequestsPage({ searchParams }: { searchParams: Sea
   return (
     <>
       <AdminTop signedIn section="requests" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <RequestsList rows={list} filters={{ from, to, status, kind }} today={todayIn(tz)} tomorrow={todayIn(tz, 1)} week={todayIn(tz, 6)} />
       </main>
     </>

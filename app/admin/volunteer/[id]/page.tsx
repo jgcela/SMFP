@@ -7,6 +7,7 @@ import { currentStaff } from "../../../../lib/staff";
 import { OPP_COLUMNS, spotsLabel, whenLabel, type Opportunity } from "../../../../lib/volunteer";
 import { AdminTop } from "../../chrome";
 import { loadSignups } from "./signups";
+import { Head } from "../../ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Volunteer sign-ups" };
@@ -27,16 +28,12 @@ export default async function SignupsPage({ params }: { params: Promise<{ id: st
   return (
     <>
       <AdminTop signedIn section="volunteer" />
-      <main className="adm-main">
-        <p className="adm-back"><Link href="/admin/volunteer">← All opportunities</Link></p>
+      <main id="main" className="adm-main">
+        <Head back={<Link href="/admin/volunteer">← All opportunities</Link>} title={o.title}
+          lead={<>{[whenLabel(o), o.location, spotsLabel(o)].filter(Boolean).join(" · ")}{o.hidden && " · hidden"}</>}
+          actions={rows.length > 0 ? <a className="btn btn--outline" href={`/admin/volunteer/${o.id}/csv`} download>Download CSV</a> : undefined} />
         <div className="adm-card">
-          <div className="adm-head">
-            <div>
-              <h1>{o.title}</h1>
-              <p className="lead">{[whenLabel(o), o.location, spotsLabel(o)].filter(Boolean).join(" · ")}{o.hidden && " · hidden"}</p>
-            </div>
-            {rows.length > 0 && <a className="btn btn--outline" href={`/admin/volunteer/${o.id}/csv`} download>Download CSV</a>}
-          </div>
+          <h2 className="sp-card-h">Who signed up</h2>
           {rows.length ? (
             <div className="adm-tablewrap">
               <table className="adm-table">

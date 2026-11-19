@@ -5,6 +5,7 @@ import { db } from "../../../../lib/db";
 import { currentStaff } from "../../../../lib/staff";
 import { AdminTop } from "../../chrome";
 import { ChildrenFixer, type KidRow } from "./fixer";
+import { Head } from "../../ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Family" };
@@ -30,11 +31,10 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
   return (
     <>
       <AdminTop signedIn section="families" />
-      <main className="adm-main">
-        <p className="adm-back"><Link href="/admin/families">← All families</Link></p>
+      <main id="main" className="adm-main">
+        <Head back={<Link href="/admin/families">← All families</Link>} title={f.name} lead={<>{f.email}{f.status === "disabled" && " · turned off"}</>} />
         <div className="adm-card">
-          <h1>{f.name}</h1>
-          <p className="lead">{f.email}{f.status === "disabled" && " · turned off"}</p>
+          <h2 className="sp-card-h">Contact details</h2>
           <dl className="my-dl">
             <dt>Parents</dt><dd>{dash(f.parentNames)}</dd>
             <dt>Phone</dt><dd>{f.phone ? <a href={`tel:${f.phone.replace(/[^\d+]/g, "")}`}>{f.phone}</a> : dash("")}</dd>

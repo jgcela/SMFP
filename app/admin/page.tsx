@@ -1,6 +1,8 @@
 import { db } from "../../lib/db";
 import { currentStaff } from "../../lib/staff";
-import { AdminTop } from "./chrome";
+import { Icon } from "./icons";
+import { AdminTop, PageHead } from "./chrome";
+import { loadSchoolHeader } from "./school";
 import { NoticeForm, SignInForm } from "./forms";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +14,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     return (
       <>
         <AdminTop signedIn={false} />
-        <main className="adm-main">
+        <main id="main" className="adm-main">
           <div className="adm-card adm-card--narrow">
             <h1>Staff sign-in</h1>
             <p className="lead">For school staff only. Families do not need to sign in.</p>
@@ -27,7 +29,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     return (
       <>
         <AdminTop signedIn />
-        <main className="adm-main">
+        <main id="main" className="adm-main">
           <div className="adm-card adm-card--narrow">
             <h1>No access</h1>
             <p className="lead">This account cannot edit this school&apos;s portal.</p>
@@ -44,15 +46,22 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     ? { message: n.message, linkLabel: n.link_href ? n.link_label : "", linkHref: n.link_href, show: n.is_active }
     : { message: "", linkLabel: "", linkHref: "", show: false };
 
+  const school = await loadSchoolHeader();
   return (
     <>
       <AdminTop signedIn section="notice" />
-      <main className="adm-main">
-        <div className="adm-card">
-          <h1>Featured notice</h1>
-          <p className="lead">Signed in as {staff.email}.</p>
-          <NoticeForm initial={initial} />
-        </div>
+      <main id="main" className="adm-main">
+        <PageHead
+          title="Featured notice"
+          lead={<>The bar at the top of the family portal. Signed in as {staff.email}.</>}
+          actions={
+            <a className="btn btn--outline" href="/" target="_blank" rel="noopener">
+              <Icon name="external" />
+              Open family portal<span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          }
+        />
+        <NoticeForm initial={initial} preview={{ name: school.name, logoUrl: school.logoUrl }} />
       </main>
     </>
   );

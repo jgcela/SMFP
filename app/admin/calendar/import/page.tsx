@@ -12,7 +12,7 @@ export default async function ImportPage() {
   return (
     <>
       <AdminTop signedIn section="calendar" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <Importer />
       </main>
     </>

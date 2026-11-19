@@ -23,7 +23,7 @@ export default async function DocumentsPage() {
   return (
     <>
       <AdminTop signedIn section="documents" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <DocumentsManager categories={[...cats]} docs={[...docs]} storageReady={storageReady} />
       </main>
     </>

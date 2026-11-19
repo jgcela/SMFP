@@ -17,7 +17,7 @@ export default async function PagesPage() {
   return (
     <>
       <AdminTop signedIn section="pages" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <PagesList pages={[...pages]} />
       </main>
     </>

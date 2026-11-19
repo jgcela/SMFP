@@ -23,7 +23,7 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
   return (
     <>
       <AdminTop signedIn section="pages" />
-      <main className="adm-main adm-main--wide">
+      <main id="main" className="adm-main adm-main--wide">
         <PageEditor page={{ ...page }} versions={[...versions]} />
       </main>
     </>
