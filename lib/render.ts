@@ -355,22 +355,12 @@ export function renderStaffPage(school: School, links: Link[], people: ContactPe
 export type WishlistPage = { title: string; lead: string; intro: string; groups: Group[] };
 
 function wishCard(w: Wishlist, groupLabel: string, favAnchor: string) {
-  const items = w.items.length
-    ? `<ul class="wl-items">${w.items.map((i) => {
-        const label = i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">${ve(i.name)}<span class="sr-only"> (opens in a new tab)</span></a>` : ve(i.name);
-        const qty = i.quantity > 1 ? ` <span class="wl-qty">× ${i.quantity}</span>` : "";
-        return i.done
-          ? `<li class="is-done"><s>${label}${qty}</s> <span class="wl-got">${icon("check")}Got it<span class="sr-only">: no longer needed</span></span></li>`
-          : `<li>${label}${qty}</li>`;
-      }).join("")}</ul>`
-    : "";
   const store = w.storeUrl
     ? `<a class="btn btn--primary" href="${esc(w.storeUrl)}" target="_blank" rel="noopener">${esc(storeLabel(w.storeUrl))}${icon("ext")}<span class="sr-only">(opens in a new tab)</span></a>`
     : "";
   const fav = favAnchor ? `<a class="btn btn--outline" href="/staff-favorites#${esc(favAnchor)}">Favorite things</a>` : "";
   return `          <article class="card wl" id="wl-${w.id}" aria-label="${esc(w.name)}" data-group="${esc(w.grp)}" data-text="${esc(norm(`${w.name} ${w.classText} ${groupLabel}`))}">
       <div><h3>${ve(w.name)}</h3>${w.classText ? `<p class="small">${ve(w.classText)}</p>` : ""}</div>
-      ${items}
       ${store || fav ? `<p class="card-actions">${store}${fav}</p>` : ""}
     </article>
 `;

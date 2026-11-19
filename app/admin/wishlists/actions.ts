@@ -29,29 +29,14 @@ export async function saveWishlist(fd: FormData): Promise<WlResult> {
         name = card.name; // a copy, used only if the card is deleted later
       }
       const cols = { staff_id: v.staffId, name, class_text: v.classText, grp: v.grp, store_url: v.storeUrl, hidden: v.hidden, updated_by: by };
-      let listId = id;
       if (id) {
         const u = await tx`update wishlists set ${tx(cols)}, updated_at = now() where id = ${id} and school_id = ${staff.schoolId}`;
         if (!u.count) throw new Error(GONE);
       } else {
         const [n] = await tx<{ id: number }[]>`insert into wishlists ${tx({ ...cols, school_id: staff.schoolId })} returning id`;
-        listId = n.id;
-        await tx`update wishlists set sort_order = (select coalesce(max(sort_order), 0) + 1 from wishlists where school_id = ${staff.schoolId}) where id = ${listId}`;
+        await tx`update wishlists set sort_order = (select coalesce(max(sort_order), 0) + 1 from wishlists where school_id = ${staff.schoolId}) where id = ${n.id}`;
       }
-      // Items: keep the ones still in the form (by id), add the new ones, remove the rest.
-      const keep = v.items.map((i) => i.id).filter((x): x is number => x !== null);
-      await tx`delete from wishlist_items where wishlist_id = ${listId} and school_id = ${staff.schoolId}
-        ${keep.length ? tx`and id not in ${tx(keep)}` : tx``}`;
-      for (const [n, it] of v.items.entries()) {
-        const row = { name: it.name, url: it.url, quantity: it.quantity, done: it.done, sort_order: n + 1 };
-        const u = it.id
-          ? await tx`update wishlist_items set ${tx(row)}, done_at = case when ${it.done} then coalesce(done_at, now()) else null end
-              where id = ${it.id} and wishlist_id = ${listId} and school_id = ${staff.schoolId}`
-          : { count: 0 };
-        if (!u.count) await tx`insert into wishlist_items ${tx({ ...row, wishlist_id: listId, school_id: staff.schoolId, done_at: it.done ? new Date() : null })}`;
-      }
-      const got = v.items.filter((i) => i.done).length;
-      saved = `${name}’s list ${id ? "saved" : "created"}${v.items.length ? ` (${v.items.length} item${v.items.length === 1 ? "" : "s"}${got ? `, ${got} got` : ""})` : ""}${v.hidden ? ", hidden" : ""}.`;
+      saved = `${name}’s list ${id ? "saved" : "created"}${v.hidden ? " (hidden)" : ""}.`;
     });
     refresh();
     return { ok: saved };
@@ -68,19 +53,6 @@ export async function setWishlistHidden(id: number, hidden: boolean): Promise<Wl
     if (!w) return { error: GONE };
     refresh();
     return { ok: hidden ? `${w.name}’s list is hidden. Families no longer see it.` : `${w.name}’s list is visible again.` };
-  } catch (e) { return fail(e); }
-}
-
-/** Marks one item as got (or needed again) straight from the list in the panel. */
-export async function setItemDone(itemId: number, done: boolean): Promise<WlResult> {
-  try {
-    const staff = await requireStaff();
-    const [i] = await db()<{ name: string }[]>`
-      update wishlist_items set done = ${done}, done_at = ${done ? new Date() : null}
-      where id = ${itemId} and school_id = ${staff.schoolId} returning name`;
-    if (!i) return { error: "This item is no longer there. Reload the page." };
-    refresh();
-    return { ok: done ? `“${i.name}” marked as got. Families see it crossed out.` : `“${i.name}” is needed again.` };
   } catch (e) { return fail(e); }
 }
 
@@ -117,6 +89,6 @@ export async function deleteWishlist(id: number): Promise<WlResult> {
       returning coalesce((select f.name from staff_favorites f where f.id = w.staff_id), w.name) as name`;
     if (!w) return { error: GONE };
     refresh();
-    return { ok: `${w.name}’s list deleted, with its items.` };
+    return { ok: `${w.name}’s list deleted.` };
   } catch (e) { return fail(e); }
 }

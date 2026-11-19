@@ -6,9 +6,7 @@ export async function loadWishlists(schoolId: number, opts: { includeHidden?: bo
   const sql = db();
   return sql<Wishlist[]>`
     select w.id, w.staff_id as "staffId", coalesce(f.name, w.name) as name, w.name as "ownName", w.class_text as "classText",
-      w.grp, w.store_url as "storeUrl", w.hidden, w.imported,
-      coalesce((select json_agg(json_build_object('id', i.id, 'name', i.name, 'url', i.url, 'quantity', i.quantity, 'done', i.done)
-        order by i.done, i.sort_order, i.id) from wishlist_items i where i.wishlist_id = w.id), '[]') as items
+      w.grp, w.store_url as "storeUrl", w.hidden, w.imported
     from wishlists w left join staff_favorites f on f.id = w.staff_id and f.school_id = w.school_id
     where w.school_id = ${schoolId} ${opts.includeHidden ? sql`` : sql`and not w.hidden`}
     order by w.sort_order, w.id`;

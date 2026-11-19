@@ -308,12 +308,3 @@ a.ctile .v{text-decoration:underline}
 .staff-photo{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none;background:var(--tint)}
 .sf-lock{max-width:720px}
 .sf-lock .h3{margin:0}
-/* Step 6d: Teacher wishlists — the items of a list */
-.wl-items{list-style:none;margin:0;padding:12px 0 0;border-top:1px solid var(--gray);display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:22px}
-.wl-items li{overflow-wrap:anywhere}
-.wl-items a{color:var(--cerulean)}
-.wl-qty{font-weight:600;color:var(--navy);white-space:nowrap}
-.wl-items .is-done{color:#5b6470}
-.wl-items .is-done a{color:#5b6470}
-.wl-got{display:inline-flex;align-items:center;gap:4px;font:600 13px/18px var(--font-brand);color:#2f6b3a;white-space:nowrap}
-.wl-got .icon{width:14px;height:14px}
