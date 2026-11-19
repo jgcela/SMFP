@@ -263,3 +263,13 @@
   .my-sent .act{justify-content:flex-start}
 }
 .rq .note a[href^="tel:"]{white-space:nowrap}
+/* Volunteer (step 6b) */
+.vol-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.vol-link{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:12px}
+.vol-more{border:1px solid var(--gray);border-radius:var(--r-md);padding:4px 14px}
+.vol-more>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font:600 15px/20px var(--font-brand);color:var(--cerulean)}
+.vol-more[open]{padding-bottom:14px}
+.adm-f input[type=number]{font:400 16px/24px var(--font-text);color:var(--jet);border:1px solid var(--gray);border-radius:var(--r-md);padding:10px 12px;background:var(--white);width:100%;box-sizing:border-box}
+.adm-panel h2{margin:0}
+.adm-doc .what .note a,.adm-head .lead a{color:var(--cerulean)}
+@media (max-width:640px){.vol-3,.vol-link{grid-template-columns:1fr}}

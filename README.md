@@ -154,3 +154,12 @@ Migration: `db/migrations/2026-11-19-step6a-my-family.sql` (family contact colum
 - `/admin/requests` ("Absences & requests"): everything families of this school send. Filters by date (Today, Tomorrow, Next 7 days, or from/to), status and type, kept in the address. Each row has Received / In progress / Resolved buttons.
 - `/admin/families/[id]` ("Children & details" in Families): a family's contact details, and its children. Only the school adds, edits and removes children (`updated_by` keeps who did it); families cannot.
 - Children have a `facts_id` column for when they come from FACTS. No emails or automatic notices yet.
+
+## Step 6b: Volunteer
+
+Migration: `db/migrations/2026-11-19-step6b-volunteer.sql` (`volunteer_opportunities`, `volunteer_signups`, and the page's title, lead and "steps" part on `schools`).
+
+- `/volunteer` (`app/volunteer/route.ts`, `content/volunteer-template.html`, `renderVolunteerPage` in `lib/render.ts`): the page, built from the data, with the old look and filters (`public/volunteer.js`). Open to everyone. Opportunities with "Families sign up on the portal" show the spots left: a signed-in family signs up or cancels (`/volunteer/signup`, a plain form post); a full one cannot be joined (checked inside a transaction, so two families never get the last spot); visitors see "Sign in to sign up", which brings them back after signing in.
+- Staff: `/admin/volunteer` to create, edit, hide and delete (with confirmation); `/admin/volunteer/[id]` lists who signed up, with a CSV download.
+- Import: `scripts/seed-volunteer.mjs` (prebuild) reads the old page in `content/volunteer/` once per school: its 12 opportunities (with their own sign-up buttons, portal sign-up off, no spot limit), the title, lead and steps. It then sends the old address `volunteer-opportunities_202627.html` to `/volunteer` and moves menu links there. It never runs again for that school.
+- No emails or reminders yet.

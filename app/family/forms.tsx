@@ -24,12 +24,13 @@ function Status({ text, title }: { text: string; title: string }) {
   );
 }
 
-export function FamilySignInForm() {
+export function FamilySignInForm({ next = "" }: { next?: string }) {
   const { state, onSubmit, pending } = useForm(familySignIn);
   return (
     <form onSubmit={onSubmit} className="adm-f">
       {state?.error && <p className="adm-msg adm-msg--err" role="alert" id="form-error">{state.error}</p>}
       {state?.done === "status" && <Status title="You cannot sign in yet" text={state.message ?? ""} />}
+      {next && <input type="hidden" name="next" value={next} />}
       <label>
         Email
         <input type="email" name="email" autoComplete="username" required autoFocus />

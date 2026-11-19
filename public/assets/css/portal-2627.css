@@ -291,3 +291,15 @@ a.ctile .v{text-decoration:underline}
 }
 .linkbtn{background:none;border:0;padding:12px 0;min-height:44px;color:var(--cerulean);font:600 15px/20px var(--font-brand);text-decoration:underline;cursor:pointer}
 .sl-group h4{margin:0}
+/* Volunteer sign-up on the portal (step 6b) */
+.card[hidden]{display:none}
+.vol-spots{display:inline-flex;align-items:center;gap:6px;font:600 14px/20px var(--font-brand);color:var(--navy)}
+.vol-spots .icon{width:16px;height:16px;color:var(--cerulean)}
+.vol-spots.is-full{color:#8a1c12}
+.vol-in{display:inline-flex;align-items:center;gap:6px;font:700 15px/20px var(--font-brand);color:#14532d}
+.vol-in .icon{width:18px;height:18px}
+.vol-form{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0}
+.vol-form .btn[disabled]{opacity:.55;cursor:not-allowed}
+.vol-note{border-radius:var(--r-md);padding:12px 16px;font:500 15px/22px var(--font-text);background:#e6f4ea;color:#14532d}
+.vol-note--err{background:#fdecea;color:#8a1c12}
+.vol-contact a{color:var(--cerulean)}

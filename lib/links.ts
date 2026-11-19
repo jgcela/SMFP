@@ -25,14 +25,16 @@ const PAGE_NAMES: Record<string, string> = {
   "handbook_202627.html": "Handbook",
   "preschool-handbook_202627.html": "Preschool handbook",
   "supply-list_202627.html": "Supply list",
-  "volunteer-opportunities_202627.html": "Volunteer opportunities",
   "teacher-wishlists_202627.html": "Teacher wishlists",
   "staff-favorites_202627.html": "Staff favorite things",
   "messenger-archive_202627.html": "School Messenger",
 };
-export const PORTAL_PAGES = Object.entries(PAGE_NAMES)
-  .filter(([href]) => (publicFiles as string[]).includes(href))
-  .map(([href, name]) => ({ href, name }));
+// Pages the app builds itself (not files): Volunteer (step 6b).
+const APP_PAGES: Record<string, string> = { volunteer: "Volunteer opportunities" };
+export const PORTAL_PAGES = [
+  ...Object.entries(PAGE_NAMES).filter(([href]) => (publicFiles as string[]).includes(href)),
+  ...Object.entries(APP_PAGES),
+].map(([href, name]) => ({ href, name }));
 
 const FILES = new Set(publicFiles as string[]);
 
@@ -43,7 +45,7 @@ export function opensInNewTabByDefault(href: string) {
   if (/^(#|mailto:|tel:|sms:)/i.test(h)) return false;
   if (/^https?:\/\//i.test(h)) return true;
   const path = h.replace(/^\//, "").split("#")[0];
-  return !(path === "" || /_202627\.html$/.test(path) || path.startsWith("pages/"));
+  return !(path === "" || /_202627\.html$/.test(path) || path.startsWith("pages/") || path in APP_PAGES);
 }
 
 const HOST = /^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:[a-z]{2,24}|xn--[a-z0-9-]{2,59})$/i;
@@ -81,6 +83,6 @@ export function checkHref(raw: string, categoryKeys: string[], pagePaths: string
   } catch {
     return "This address is not written correctly.";
   }
-  if (path === "" || FILES.has(path) || pagePaths.includes(path)) return null;
+  if (path === "" || FILES.has(path) || pagePaths.includes(path) || path in APP_PAGES) return null;
   return "There is no page or file with that name on the portal. Check the spelling, or use a full address that starts with https://";
 }

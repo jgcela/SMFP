@@ -38,7 +38,9 @@ async function load(f: Family) {
   return { details, children: [...children], sent: rows, today: todayIn(tz), tomorrow: todayIn(tz, 1) };
 }
 
-export default async function FamilyPage() {
+export default async function FamilyPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const n = (await searchParams).next;
+  const next = typeof n === "string" && n.startsWith("/") && !n.startsWith("//") ? n : "";
   const { user, staff } = await currentStaff();
   const family = user ? await familyOfUser(user.id) : null;
 
@@ -62,7 +64,8 @@ export default async function FamilyPage() {
           <h1>Family sign-in</h1>
           {user && staff && <p className="adm-msg adm-msg--ok">You are signed in as school staff. <Link href="/admin">Go to the staff area</Link>.</p>}
           <p className="lead">For families of the school. The Parent Portal itself is open to everyone without signing in.</p>
-          <FamilySignInForm />
+          {next.startsWith("/volunteer") && <p className="adm-msg adm-msg--ok">Sign in with your family account to sign up for volunteer opportunities. You will go back to the Volunteer page.</p>}
+          <FamilySignInForm next={next} />
         </div>
       </main>
     </>
