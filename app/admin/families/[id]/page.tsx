@@ -1,4 +1,4 @@
-// One family, as the school sees it: contact details and children (which the school can correct).
+// One family, as the school sees it: contact details, and its children (kept by the school).
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { db } from "../../../../lib/db";
@@ -22,7 +22,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
         f.contact2_name as "c2Name", f.contact2_phone as "c2Phone", f.contact2_relation as "c2Rel"
       from families f join auth_user u on u.id = f.user_id
       where f.id = ${id} and f.school_id = ${staff.schoolId}`,
-    db()<KidRow[]>`select id, name, grade, teacher, updated_by as "updatedBy" from children where family_id = ${id} and school_id = ${staff.schoolId} order by id`,
+    db()<KidRow[]>`select id, name, grade, teacher from children where family_id = ${id} and school_id = ${staff.schoolId} order by id`,
     db()<{ open: number }[]>`select count(*)::int as open from family_submissions where family_id = ${id} and school_id = ${staff.schoolId} and status <> 'resolved'`,
   ]);
   if (!f) notFound();
@@ -45,8 +45,8 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
         </div>
         <div className="adm-card">
           <h2 className="adm-h2">Children</h2>
-          <p className="lead">The family adds them. Correct a name, grade or teacher if it does not match the school’s records; the family sees the change.</p>
-          <ChildrenFixer kids={[...kids]} />
+          <p className="lead">The school keeps this list; the family sees it on “My family” and chooses from it when reporting an absence. Later it will come from FACTS.</p>
+          <ChildrenFixer familyId={f.id} kids={[...kids]} />
         </div>
       </main>
     </>

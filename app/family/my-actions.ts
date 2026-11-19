@@ -1,6 +1,7 @@
 "use server";
 // What an approved family can do on "My family". Every action reads the family
 // from the session (currentFamily) and only touches rows of that family.
+// Children are added by the school (later they will come from FACTS), not here.
 import { revalidatePath } from "next/cache";
 import { checkPhone } from "../../lib/contact";
 import { db } from "../../lib/db";
@@ -39,40 +40,6 @@ export async function saveFamilyDetails(fd: FormData): Promise<MyResult> {
       where id = ${f.id}`;
     revalidatePath("/family");
     return { ok: "Family details saved." };
-  } catch (e) { return fail(e); }
-}
-
-export async function saveChild(fd: FormData): Promise<MyResult> {
-  try {
-    const f = await family();
-    const id = Number(fd.get("id") || 0);
-    const name = text(fd, "name", 100);
-    const grade = text(fd, "grade", 40);
-    const teacher = text(fd, "teacher", 100);
-    if (!name) return { error: "Write your child's name.", field: "name" };
-    if (!grade) return { error: "Write the grade (for example: 3rd grade).", field: "grade" };
-    if (id) {
-      const r = await db()`
-        update children set name = ${name}, grade = ${grade}, teacher = ${teacher}, updated_at = now(), updated_by = 'family'
-        where id = ${id} and family_id = ${f.id}`;
-      if (!r.count) return { error: "This child is no longer on your list. Reload the page." };
-    } else {
-      const [{ n }] = await db()<{ n: number }[]>`select count(*)::int as n from children where family_id = ${f.id}`;
-      if (n >= 15) return { error: "A family can have at most 15 children on the list." };
-      await db()`insert into children (school_id, family_id, name, grade, teacher, updated_by) values (${f.schoolId}, ${f.id}, ${name}, ${grade}, ${teacher}, 'family')`;
-    }
-    revalidatePath("/family");
-    return { ok: id ? `${name}: saved.` : `${name} added.` };
-  } catch (e) { return fail(e); }
-}
-
-export async function removeChild(id: number): Promise<MyResult> {
-  try {
-    const f = await family();
-    const [c] = await db()<{ name: string }[]>`delete from children where id = ${id} and family_id = ${f.id} returning name`;
-    if (!c) return { error: "This child is no longer on your list. Reload the page." };
-    revalidatePath("/family");
-    return { ok: `${c.name} removed from your list.` };
   } catch (e) { return fail(e); }
 }
 

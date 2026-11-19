@@ -150,7 +150,7 @@ Database change: `db/migrations/2026-11-18-step5-families.sql`.
 
 Migration: `db/migrations/2026-11-19-step6a-my-family.sql` (family contact columns, `children`, `family_submissions`).
 
-- `/family`, for an approved family: report an absence, make a request (both lists show the status), children (add, edit, remove) and family details (parents, phone, optional second adult). Actions in `app/family/my-actions.ts`; every query is limited to the signed-in family (`currentFamily()`).
+- `/family`, for an approved family: report an absence, make a request (both lists show the status), its children (read only) and family details (parents, phone, optional second adult). Actions in `app/family/my-actions.ts`; every query is limited to the signed-in family (`currentFamily()`).
 - `/admin/requests` ("Absences & requests"): everything families of this school send. Filters by date (Today, Tomorrow, Next 7 days, or from/to), status and type, kept in the address. Each row has Received / In progress / Resolved buttons.
-- `/admin/families/[id]`: a family's contact details, and its children, which staff can correct (`updated_by` keeps who did it; the family sees "updated by the school").
+- `/admin/families/[id]` ("Children & details" in Families): a family's contact details, and its children. Only the school adds, edits and removes children (`updated_by` keeps who did it); families cannot.
 - Children have a `facts_id` column for when they come from FACTS. No emails or automatic notices yet.

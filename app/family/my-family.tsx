@@ -3,12 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import {
-  ABSENCE_REASONS, categoryLabel, GRADE_SUGGESTIONS, REQUEST_TYPES, STATUS_LABEL, type SubmissionRow,
+  ABSENCE_REASONS, categoryLabel, REQUEST_TYPES, STATUS_LABEL, type SubmissionRow,
 } from "../../lib/my-family";
-import { makeRequest, removeChild, reportAbsence, saveChild, saveFamilyDetails, type MyResult } from "./my-actions";
+import { makeRequest, reportAbsence, saveFamilyDetails, type MyResult } from "./my-actions";
 
 export type Details = { parentNames: string; phone: string; contact2Name: string; contact2Phone: string; contact2Relation: string };
-export type ChildRow = { id: number; name: string; grade: string; teacher: string; bySchool: boolean };
+export type ChildRow = { id: number; name: string; grade: string; teacher: string };
 export type Sent = SubmissionRow & { dates: string; sentAt: string; changedAt: string };
 
 type Props = { name: string; email: string; details: Details; children: ChildRow[]; sent: Sent[]; today: string; tomorrow: string };
@@ -117,7 +117,7 @@ function AbsenceCard({ kids, absences, today, tomorrow }: { kids: ChildRow[]; ab
           </div>
         </form>
       ) : (
-        <p className="adm-empty">First add your children in <a href="#children">Children</a>. Then you can report an absence here.</p>
+        <p className="adm-empty">The school has not added your children to your account yet. Until it does, call the school office to report an absence.</p>
       )}
       <h3 className="my-h3">Your absences</h3>
       <SentList rows={absences} empty="You have not reported any absences yet." />
@@ -193,83 +193,24 @@ function SentList({ rows, empty }: { rows: Sent[]; empty: string }) {
   );
 }
 
-// ---------- Children ----------
-function ChildForm({ child, onDone }: { child?: ChildRow; onDone: (ok?: string) => void }) {
-  const formRef = useRef<HTMLFormElement>(null);
-  const { res, pending, onSubmit, bad } = useAct(saveChild, (r) => { formRef.current?.reset(); onDone(r.ok); });
-  return (
-    <form ref={formRef} className="adm-f adm-panel" onSubmit={onSubmit} noValidate>
-      <h3 className="my-h3" style={{ margin: 0 }}>{child ? `Edit ${child.name}` : "Add a child"}</h3>
-      {res?.error && <Msg res={res} />}
-      {child && <input type="hidden" name="id" value={child.id} />}
-      <label>
-        Name
-        <input type="text" name="name" defaultValue={child?.name} maxLength={100} autoComplete="off" autoFocus {...bad("name")} />
-      </label>
-      <div className="adm-row">
-        <label>
-          Grade
-          <input type="text" name="grade" defaultValue={child?.grade} maxLength={40} list="grades" placeholder="For example: 3rd grade" {...bad("grade")} />
-        </label>
-        <label>
-          Teacher <span className="hint">Optional</span>
-          <input type="text" name="teacher" defaultValue={child?.teacher} maxLength={100} autoComplete="off" />
-        </label>
-      </div>
-      <div className="adm-actions">
-        <button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Saving…" : child ? "Save" : "Add child"}</button>
-        <button type="button" className="btn btn--outline" onClick={() => onDone()}>Cancel</button>
-      </div>
-    </form>
-  );
-}
-
+// ---------- Children (added by the school; later from FACTS) ----------
 function ChildrenCard({ kids }: { kids: ChildRow[] }) {
-  const router = useRouter();
-  const [editing, setEditing] = useState<number | "new" | null>(kids.length ? null : "new");
-  const [confirm, setConfirm] = useState<number | null>(null);
-  const [msg, setMsg] = useState<MyResult | null>(null);
-  const [busy, start] = useTransition();
-  const remove = (id: number) => start(async () => { setConfirm(null); setMsg(await removeChild(id)); router.refresh(); });
-  const done = (text?: string) => { setEditing(null); if (text) setMsg({ ok: text }); };
   return (
     <section className="adm-card" id="children" aria-labelledby="children-h">
-      <div className="adm-head">
-        <div>
-          <h2 className="adm-h2" id="children-h">Children</h2>
-          <p className="lead">The school office can correct these details if something does not match its records.</p>
-        </div>
-        {editing === null && <button type="button" className="btn btn--outline" onClick={() => { setMsg(null); setEditing("new"); }}>Add a child</button>}
-      </div>
-      <datalist id="grades">{GRADE_SUGGESTIONS.map((g) => <option key={g} value={g} />)}</datalist>
-      <Msg res={msg} />
-      {editing === "new" && <ChildForm onDone={done} />}
+      <h2 className="adm-h2" id="children-h">Children</h2>
+      <p className="lead">The school office keeps this list. If something is missing or wrong, contact the office.</p>
       {kids.length ? (
         <ul className="adm-list">
-          {kids.map((k) => editing === k.id ? (
-            <li key={k.id} style={{ listStyle: "none" }}><ChildForm child={k} onDone={done} /></li>
-          ) : (
+          {kids.map((k) => (
             <li key={k.id} className="adm-doc">
               <div className="what">
                 <strong>{k.name}</strong>
-                <span className="note">{k.grade}{k.teacher && <> · {k.teacher}</>}{k.bySchool && <> · updated by the school</>}</span>
-              </div>
-              <div className="act">
-                {confirm === k.id ? (
-                  <span className="confirm">
-                    <span>Remove {k.name}? Past absences stay in your list.</span>
-                    <button type="button" className="danger" autoFocus disabled={busy} onClick={() => remove(k.id)}>Remove</button>
-                    <button type="button" onClick={() => setConfirm(null)}>Cancel</button>
-                  </span>
-                ) : (<>
-                  <button type="button" onClick={() => { setMsg(null); setEditing(k.id); }} disabled={editing !== null}>Edit</button>
-                  <button type="button" onClick={() => { setMsg(null); setConfirm(k.id); }} disabled={editing !== null}>Remove</button>
-                </>)}
+                <span className="note">{k.grade}{k.teacher && <> · {k.teacher}</>}</span>
               </div>
             </li>
           ))}
         </ul>
-      ) : editing === null && <p className="adm-empty">No children on your list yet.</p>}
+      ) : <p className="adm-empty">The school has not added your children yet.</p>}
     </section>
   );
 }

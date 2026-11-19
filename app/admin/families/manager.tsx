@@ -62,11 +62,11 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
       <button type="button" onClick={() => setConfirm({ id: f.id, status: "rejected", question: `Reject ${f.name}?` })} disabled={busy}>Reject</button>
     </>);
     if (f.status === "approved") return (<>
-      <Link href={`/admin/families/${f.id}`}>Details</Link>
+      <Link href={`/admin/families/${f.id}`}>Children &amp; details</Link>
       <button type="button" onClick={() => setConfirm({ id: f.id, status: "disabled", question: `Turn off ${f.name}? They will be signed out.` })} disabled={busy}>Turn off</button>
     </>);
     if (f.status === "disabled") return (<>
-      <Link href={`/admin/families/${f.id}`}>Details</Link>
+      <Link href={`/admin/families/${f.id}`}>Children &amp; details</Link>
       <button type="button" onClick={() => change(f.id, "approved")} disabled={busy}>Turn back on</button>
     </>);
     return <button type="button" onClick={() => change(f.id, "approved")} disabled={busy}>Approve</button>;

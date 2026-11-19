@@ -19,7 +19,7 @@ async function load(f: Family) {
       select parent_names as "parentNames", phone, contact2_name as "contact2Name", contact2_phone as "contact2Phone", contact2_relation as "contact2Relation"
       from families where id = ${f.id}`,
     db()<ChildRow[]>`
-      select id, name, grade, teacher, (updated_by <> 'family') as "bySchool"
+      select id, name, grade, teacher
       from children where family_id = ${f.id} order by id`,
     db()<SubmissionRow[]>`
       select id, kind, category, child_name as "childName", date_from::text as "dateFrom", date_to::text as "dateTo",
