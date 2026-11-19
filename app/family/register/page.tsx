@@ -9,7 +9,7 @@ export default function RegisterPage() {
   return (
     <>
       <AdminTop signedIn={false} area="family" />
-      <main className="adm-main">
+      <main id="main" className="adm-main">
         <div className="adm-card adm-card--narrow">
           <p className="adm-back"><Link href="/family">← Family sign-in</Link></p>
           <h1>Create a family account</h1>

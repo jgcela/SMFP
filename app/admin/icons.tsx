@@ -1,7 +1,8 @@
 // One icon per section, used everywhere the section appears (sidebar, menu, page titles).
 import type { Section } from "./chrome";
 
-const P: Record<Section | "external" | "menu" | "close" | "signout" | "plus", React.ReactNode> = {
+type Extra = "external" | "menu" | "close" | "signout" | "plus" | "absence" | "request" | "children" | "details" | "portal";
+const P: Record<Section | Extra, React.ReactNode> = {
   notice: (<><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M18.5 5.5a9 9 0 0 1 0 13" /></>),
   calendar: (<><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></>),
   documents: (<><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h6" /></>),
@@ -18,6 +19,11 @@ const P: Record<Section | "external" | "menu" | "close" | "signout" | "plus", Re
   close: (<path d="M6 6l12 12M18 6 6 18" />),
   signout: (<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5M21 12H9" /></>),
   plus: (<path d="M12 5v14M5 12h14" />),
+  absence: (<><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18M10 14l4 4M14 14l-4 4" /></>),
+  request: (<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />),
+  children: (<><circle cx="12" cy="8" r="4" /><path d="M6 21v-1a6 6 0 0 1 12 0v1" /></>),
+  details: (<><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="11" r="2" /><path d="M6 16a3 3 0 0 1 6 0M14 10h4M14 14h4" /></>),
+  portal: (<><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>),
 };
 
 export type IconName = keyof typeof P;

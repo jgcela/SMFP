@@ -26,7 +26,7 @@ export function SideNav({ menuIcon, closeIcon, children }: { menuIcon: React.Rea
         {open ? closeIcon : menuIcon}
         <span>{open ? "Close" : "Menu"}</span>
       </button>
-      <div id="sp-nav" className="sp-navwrap" data-open={open ? "true" : undefined}>
+      <div id="sp-nav" className="sp-navwrap" data-open={open ? "true" : undefined} onClick={(e) => { if ((e.target as HTMLElement).closest("a")) setOpen(false); }}>
         {children}
       </div>
     </>
