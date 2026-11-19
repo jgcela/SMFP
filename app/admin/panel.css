@@ -298,7 +298,7 @@
 .sp .my-sent{grid-template-columns:72px minmax(0,1fr);padding:14px 0}
 .sp .my-sent .sp-date .d{font-size:26px;line-height:32px}
 .sp .my-sent .sp-date .d--long{font-size:16px;line-height:22px;white-space:normal}
-.sp .my-sent.is-done{opacity:.7}
+/* Resolved items keep full contrast (WCAG AA); the "Resolved" badge marks them. */
 .sp .my-sent .msg{white-space:pre-line;overflow-wrap:anywhere;font-size:15px;line-height:22px}
 .sp .adm-radios{gap:10px}
 .sp .adm-radios .adm-check{min-height:44px;padding:0 16px;border:1px solid var(--p-line);border-radius:999px;font-weight:500;color:var(--p-text)}
