@@ -163,3 +163,12 @@ Migration: `db/migrations/2026-11-19-step6b-volunteer.sql` (`volunteer_opportuni
 - Staff: `/admin/volunteer` to create, edit, hide and delete (with confirmation); `/admin/volunteer/[id]` lists who signed up, with a CSV download.
 - Import: `scripts/seed-volunteer.mjs` (prebuild) reads the old page in `content/volunteer/` once per school: its 12 opportunities (with their own sign-up buttons, portal sign-up off, no spot limit), the title, lead and steps. It then sends the old address `volunteer-opportunities_202627.html` to `/volunteer` and moves menu links there. It never runs again for that school.
 - No emails or reminders yet.
+
+## Step 6c: Staff favorites
+
+Migration: `db/migrations/2026-11-19-step6c-staff-favorites.sql` (`staff_favorites`, and the page's teams, title, lead and notes on `schools`). There are no birthday or allergy columns on purpose.
+
+- `/staff-favorites` (`app/staff-favorites/route.ts`, `content/staff-favorites-template.html`, `renderStaffPage` in `lib/render.ts`): only families the school approved, and the school's staff, see the cards, with the old look, search by name or role and team filters (`public/staff-favorites.js`). Anyone else gets a sign-in notice that brings them back (to the same `#staff-surname` card) after signing in. Card anchors are the old ones.
+- Optional photo per card, in private storage (`staff/<school>/…`), served by `/staff-favorites/photo/[id]` only to someone who may see the page.
+- Staff: `/admin/staff-favorites` to create, edit (name, role, group, photo, favorites in order: the first 4 visible, the rest under "More favorites", wishlist link), hide, move up/down within a group, and delete (with confirmation).
+- Import: `scripts/seed-staff-favorites.mjs` (prebuild) reads the old page in `content/staff-favorites/` once per school, WITHOUT birthdays, the Allergies field and the health details in `content/staff-favorites/redactions.json` (the import stops if one of those is not found). It then sends the old address `staff-favorites_202627.html` to `/staff-favorites` and moves menu links there.
