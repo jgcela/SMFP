@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FamilyStatus } from "../../../lib/family";
 import { changeFamilyCode, setFamilyStatus, type FamilyResult } from "./actions";
+import { Head } from "../ui";
 
 export type FamilyRow = {
   id: number; name: string; email: string; status: FamilyStatus; createdAt: string; decidedAt: string | null; decidedBy: string;
@@ -74,13 +75,8 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
 
   return (
     <>
+      <Head title="Families" lead={<>Families create their account at <strong>/family/register</strong> with the school code. They can sign in only after you approve them.</>} />
       <div className="adm-card">
-        <div className="adm-head">
-          <div>
-            <h1>Families</h1>
-            <p className="lead">Families create their account at <strong>/family/register</strong> with the school code. They can sign in only after you approve them.</p>
-          </div>
-        </div>
         {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
         <div className="fam-tabs" role="tablist" aria-label="Families by status">
           {TABS.map((t) => (

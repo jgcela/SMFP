@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { categoryLabel, KIND_LABEL, STATUS_LABEL, type SubmissionKind, type SubmissionStatus } from "../../../lib/my-family";
 import { setSubmissionStatus, type StatusResult } from "./actions";
+import { Head } from "../ui";
 
 export type StaffRow = {
   id: number; kind: SubmissionKind; category: string; childName: string; dateFrom: string; dateTo: string; message: string;
@@ -39,13 +40,9 @@ export function RequestsList({ rows, filters, today, tomorrow, week }: { rows: S
 
   const open = rows.filter((r) => r.status !== "resolved").length;
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Absences &amp; requests</h1>
-          <p className="lead">What families send from “My family”. Change the status so the family knows where it stands.</p>
-        </div>
-      </div>
+    <>
+      <Head title={<>Absences &amp; requests</>} lead={<>What families send from “My family”. Change the status so the family knows where it stands.</>} />
+      <div className="adm-card">
 
       <form className="adm-f rq-filters" onSubmit={(e) => { e.preventDefault(); go(f); }} aria-label="Filters">
         <div className="my-quick" role="group" aria-label="Dates">
@@ -114,6 +111,7 @@ export function RequestsList({ rows, filters, today, tomorrow, week }: { rows: S
       ) : (
         <p className="adm-empty">{filters.from || filters.to || filters.status || filters.kind ? "Nothing matches these filters." : "Families have not sent anything yet."}</p>
       )}
-    </div>
+      </div>
+    </>
   );
 }

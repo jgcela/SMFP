@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FAVORITE_LABELS, MAX_FAVORITES, PHOTO_ACCEPT, PHOTO_MAX_BYTES, VISIBLE_FAVORITES, type Favorite, type StaffCard, type Team } from "../../../lib/staff-favorites";
 import { deleteStaffCard, moveStaffCard, saveStaffCard, setStaffHidden, startPhotoUpload, type SfResult } from "./actions";
+import { Badge, Head, Initials, PencilIcon, RowMenu } from "../ui";
 
 const photoUrl = (c: StaffCard) => `/staff-favorites/photo/${c.id}?v=${c.version}`;
 
@@ -120,47 +121,45 @@ export function StaffFavoritesManager({ cards, teams, storageReady }: { cards: S
   const shown = cards.filter((c) => words.every((w) => norm(`${c.name} ${c.role}`).includes(w)));
   const groups = [...teams, { key: "", label: "Other staff" }].map((t) => ({ ...t, cards: shown.filter((c) => (teams.some((x) => x.key === c.team) ? c.team === t.key : t.key === "")) })).filter((g) => g.cards.length);
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Staff favorites</h1>
-          <p className="lead">The cards on the portal’s <a href="/staff-favorites" target="_blank" rel="noopener">Staff favorites page</a>. Only families who signed in can see it.</p>
-        </div>
-        {editing === null && <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}>New staff member</button>}
-      </div>
+    <>
+      <Head title="Staff favorites" lead={<>The cards on the portal’s <a href="/staff-favorites" target="_blank" rel="noopener">Staff favorites page</a>. Only families who signed in can see it.</>} actions={<>{editing === null && <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}>New staff member</button>}</>} />
+      <div className="adm-card">
       {msg && (msg.error || msg.ok) && <p className={`adm-msg ${msg.error ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.error ?? msg.ok}</p>}
       {editing === "new" && <CardForm teams={teams} storageReady={storageReady} onDone={done} />}
       {current && <CardForm key={current.id} c={current} teams={teams} storageReady={storageReady} onDone={done} />}
       {editing === null && (cards.length ? (<>
-        <label className="adm-f sf-search">Find by name or role<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="For example: Russell" /></label>
+        <label className="adm-f sf-search">Find by name or role<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name or role" /></label>
         {groups.length ? groups.map((g) => (
           <section key={g.key || "-"} aria-label={g.label}>
             <h2 className="adm-h2">{g.label} <span className="note">{g.cards.length}</span></h2>
-            <ul className="adm-list">
+            <ul className="sp-rows">
               {g.cards.map((c, i) => (
-                <li key={c.id} className={`adm-doc${c.hidden ? " is-hidden" : ""}`}>
-                  <div className="what sf-what">
-                    {c.photo && <img src={photoUrl(c)} alt="" width={40} height={40} />}
+                <li key={c.id} className={`sp-row${c.hidden ? " is-hidden" : ""}`}>
+                  <div className="sp-person">
+                    {c.photo ? <img className="sp-ini" src={photoUrl(c)} alt="" width={48} height={48} /> : <Initials name={c.name} />}
                     <span>
-                      <strong>{c.name}{c.hidden && <span className="pill pill--muted">Hidden</span>}</strong>
+                      <strong>{c.name}</strong>
                       <span className="note">{c.role}{c.role && " · "}{c.favorites.length ? `${c.favorites.length} favorite${c.favorites.length === 1 ? "" : "s"}` : "No favorites yet"}</span>
                     </span>
                   </div>
-                  <div className="act">
+                  <div className="sp-act">
                     {confirm === c.id ? (
-                      <span className="confirm">
+                      <span className="sp-confirm">
                         <span>Delete the card of {c.name}? This cannot be undone.</span>
                         <button type="button" className="danger" autoFocus disabled={busy} onClick={() => run(deleteStaffCard(c.id))}>Delete</button>
                         <button type="button" onClick={() => setConfirm(null)}>Cancel</button>
                       </span>
                     ) : (<>
-                      {!q && <>
-                        <button type="button" aria-label={`Move ${c.name} up`} disabled={busy || i === 0} onClick={() => run(moveStaffCard(c.id, -1))}>↑</button>
-                        <button type="button" aria-label={`Move ${c.name} down`} disabled={busy || i === g.cards.length - 1} onClick={() => run(moveStaffCard(c.id, 1))}>↓</button>
-                      </>}
-                      <button type="button" onClick={() => { setMsg(null); setEditing(c.id); }}>Edit</button>
-                      <button type="button" disabled={busy} onClick={() => run(setStaffHidden(c.id, !c.hidden))}>{c.hidden ? "Show" : "Hide"}</button>
-                      <button type="button" onClick={() => { setMsg(null); setConfirm(c.id); }}>Delete</button>
+                      <Badge on={!c.hidden} />
+                      <button type="button" className="sp-edit" aria-label={`Edit ${c.name}`} onClick={() => { setMsg(null); setEditing(c.id); }}><PencilIcon />Edit</button>
+                      <RowMenu label={c.name} items={[
+                        ...(q ? [] : [
+                          { label: "Move up", disabled: busy || i === 0, onSelect: () => run(moveStaffCard(c.id, -1)) },
+                          { label: "Move down", disabled: busy || i === g.cards.length - 1, onSelect: () => run(moveStaffCard(c.id, 1)) },
+                        ]),
+                        { label: c.hidden ? "Show on the portal" : "Hide from the portal", disabled: busy, onSelect: () => run(setStaffHidden(c.id, !c.hidden)) },
+                        { label: "Delete", danger: true, onSelect: () => { setMsg(null); setConfirm(c.id); } },
+                      ]} />
                     </>)}
                   </div>
                 </li>
@@ -169,6 +168,7 @@ export function StaffFavoritesManager({ cards, teams, storageReady }: { cards: S
           </section>
         )) : <p className="adm-empty">Nobody matches “{q}”.</p>}
       </>) : <p className="adm-empty">No staff cards yet. Add the first one with “New staff member”.</p>)}
-    </div>
+      </div>
+    </>
   );
 }

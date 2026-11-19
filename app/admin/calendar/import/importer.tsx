@@ -5,6 +5,7 @@ import { startTransition, useActionState, useEffect, useState } from "react";
 import { CATEGORIES, type ImportRow } from "../../../../lib/events";
 import { importEvents, previewImport, type PreviewState } from "../actions";
 import { fmtDay, fmtTime } from "../manager";
+import { Head } from "../../ui";
 
 type Pick = ImportRow & { on: boolean };
 
@@ -33,13 +34,10 @@ export function Importer() {
   };
 
   return (
+    <>
+    <Head back={<Link href="/admin/calendar">← Calendar</Link>} title="Import events"
+      lead="Choose a calendar file (.ics, for example exported from Google Calendar) or a spreadsheet saved as .csv. Nothing is saved until you check the preview and press Import." />
     <div className="adm-card">
-      <p className="adm-back"><Link href="/admin/calendar">← Calendar</Link></p>
-      <h1>Import events</h1>
-      <p className="lead">
-        Choose a calendar file (.ics, for example exported from Google Calendar) or a spreadsheet saved as .csv.
-        Nothing is saved until you check the preview and press Import.
-      </p>
 
       {!rows && (
         <form
@@ -125,5 +123,6 @@ export function Importer() {
         </>
       )}
     </div>
+    </>
   );
 }

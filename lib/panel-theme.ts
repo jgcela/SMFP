@@ -14,7 +14,8 @@ export type PanelColors = {
   link: string; // links
 };
 
-export type PanelTheme = { shortName: string; markUrl: string; colors: PanelColors };
+export type Pill = { bg: string; fg: string };
+export type PanelTheme = { shortName: string; markUrl: string; colors: PanelColors; categories: Record<string, Pill> };
 
 const FALLBACK: PanelColors = {
   page: "#F3F4F6", surface: "#FFFFFF", ink: "#1F2937", text: "#1F2937", muted: "#4B5563",
@@ -53,7 +54,21 @@ export function readPanelTheme(raw: unknown, schoolName: string): PanelTheme {
   let markUrl = typeof t.markUrl === "string" ? t.markUrl.trim() : "";
   if (markUrl && !/^(https:)?\/\//.test(markUrl) && !markUrl.startsWith("/")) markUrl = `/${markUrl}`;
   if (/^(javascript|data):/i.test(markUrl)) markUrl = "";
-  return { shortName, markUrl, colors };
+  const categories: Record<string, Pill> = {};
+  const cats = (t.categories && typeof t.categories === "object" ? t.categories : {}) as Record<string, unknown>;
+  for (const [k, v] of Object.entries(cats)) if (typeof v === "string" && HEX.test(v)) categories[k] = pill(v);
+  return { shortName, markUrl, colors, categories };
+}
+
+const toHex = (c: number[]) => `#${c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("")}`;
+const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const mix = (a: string, b: string, t: number) => { const x = rgb(a), y = rgb(b); return toHex(x.map((v, i) => v * t + y[i] * (1 - t))); };
+// A category pill: a light tint of the colour, with text dark enough to read (4.5:1).
+export function pill(hex: string): Pill {
+  const bg = mix(hex, "#FFFFFF", 0.14);
+  let fg = hex;
+  for (let i = 0; i < 20 && contrast(fg, bg) < 4.5; i++) fg = mix(fg, "#000000", 0.85);
+  return { bg, fg };
 }
 
 // CSS custom properties set on <body> of the panels.

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { LINK_GROUPS, PORTAL_PAGES, PORTAL_SECTIONS, checkHref, opensInNewTabByDefault, type LinkGroup } from "../../../lib/links";
 import { deleteLink, moveLink, saveLink, setLinkHidden, type LinkState } from "./actions";
+import { Badge, Head, PencilIcon, RowMenu } from "../ui";
 
 export type AdminLink = {
   id: number; placement: LinkGroup; label: string; shortLabel: string; href: string; newTab: boolean; hidden: boolean;
@@ -111,7 +112,7 @@ function LinkRow({ l, first, last, onEdit, report }: { l: AdminLink; first: bool
         <strong>
           {l.label}
           {l.shortLabel && <span className="note"> · short: {l.shortLabel}</span>}
-          {l.hidden && <span className="pill pill--muted">Hidden</span>}
+          
         </strong>
         <span className="note adm-href">
           {l.href}
@@ -124,17 +125,18 @@ function LinkRow({ l, first, last, onEdit, report }: { l: AdminLink; first: bool
             onYes={async () => { const r = await deleteLink(l.id); setConfirming(false); report(r); }} />
         ) : (
           <>
-            <a href={openHref(l.href)} target="_blank" rel="noopener">Open</a>
-            {!fixed && (
-              <>
-                <button type="button" onClick={async () => report(await moveLink(l.id, "first"))} disabled={first} aria-label={`Move ${l.label} to the first place`}>First</button>
-                <button type="button" onClick={async () => report(await moveLink(l.id, -1))} disabled={first} aria-label={`Move ${l.label} up`}>↑</button>
-                <button type="button" onClick={async () => report(await moveLink(l.id, 1))} disabled={last} aria-label={`Move ${l.label} down`}>↓</button>
-              </>
-            )}
-            <button type="button" onClick={onEdit}>Edit</button>
-            <button type="button" onClick={async () => report(await setLinkHidden(l.id, !l.hidden))}>{l.hidden ? "Show" : "Hide"}</button>
-            {!fixed && <button type="button" onClick={() => setConfirming(true)}>Delete</button>}
+            <Badge on={!l.hidden} />
+            <a href={openHref(l.href)} target="_blank" rel="noopener">Open<span className="sr-only"> {l.label} (opens in a new tab)</span></a>
+            <button type="button" className="sp-edit" onClick={onEdit} aria-label={`Edit ${l.label}`}><PencilIcon />Edit</button>
+            <RowMenu label={l.label} items={[
+              ...(fixed ? [] : [
+                { label: "Move to the first place", disabled: first, onSelect: async () => report(await moveLink(l.id, "first")) },
+                { label: "Move up", disabled: first, onSelect: async () => report(await moveLink(l.id, -1)) },
+                { label: "Move down", disabled: last, onSelect: async () => report(await moveLink(l.id, 1)) },
+              ]),
+              { label: l.hidden ? "Show on the portal" : "Hide from the portal", onSelect: async () => report(await setLinkHidden(l.id, !l.hidden)) },
+              ...(fixed ? [] : [{ label: "Delete", danger: true, onSelect: () => setConfirming(true) }]),
+            ]} />
           </>
         )}
       </div>
@@ -158,13 +160,9 @@ export function LinksManager({ links, categories, pages }: { links: AdminLink[];
   const open = (e: Editing) => { setMsg(null); setEditing(e); };
 
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Links</h1>
-          <p className="lead">The shortcuts, the main menu and the FACTS button of the portal, in this order. Hidden links stay here but are not shown to families.</p>
-        </div>
-      </div>
+    <>
+      <Head title="Links" lead={<>The shortcuts, the main menu and the FACTS button of the portal, in this order. Hidden links stay here but are not shown to families.</>} />
+      <div className="adm-card">
       {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
       {editing && (
         <LinkForm key={`${editing.group}-${editing.link?.id ?? "new"}`} link={editing.link} group={editing.group} categories={categories} pages={pages} onDone={done} />
@@ -197,6 +195,7 @@ export function LinksManager({ links, categories, pages }: { links: AdminLink[];
           </section>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }

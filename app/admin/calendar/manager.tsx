@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORIES, CATEGORY_LABEL } from "../../../lib/events";
 import { deleteEvent, saveEvent, type EventState } from "./actions";
+import { Cat, Head, PencilIcon, RowMenu } from "../ui";
 
 export type AdminEvent = { id: number; date: string; endDate: string | null; time: string | null; category: string; title: string; note: string };
 
@@ -91,31 +92,53 @@ function Row({ e, past, onEdit, onDeleted }: { e: AdminEvent; past: boolean; onE
     onDeleted(r?.error ?? r?.ok ?? "", !!r?.error);
   };
   return (
-    <li className={`adm-ev${past ? " is-past" : ""}`}>
-      <div className="when">
-        <span className="d">{fmtDay(e.date)}{e.endDate ? ` – ${fmtDay(e.endDate)}` : ""}</span>
-        <span className="t">{fmtTime(e.time)}</span>
-      </div>
-      <div className="what">
-        <span className={`cat cat--${e.category}`}>{CATEGORY_LABEL[e.category] ?? e.category}</span>
+    <li className={`sp-ev${past ? " is-past" : ""}`}>
+      <DateBlock from={e.date} to={e.endDate} />
+      <div className="sp-ev-what">
         <strong>{e.title}</strong>
+        <span className="sp-ev-meta">
+          <Cat k={e.category} label={CATEGORY_LABEL[e.category] ?? e.category} />
+          <span>{fmtTime(e.time)}</span>
+        </span>
         {e.note && <span className="note">{e.note}</span>}
       </div>
-      <div className="act">
+      <div className="sp-act">
         {confirming ? (
-          <span className="confirm" role="group" aria-label="Confirm delete">
+          <span className="sp-confirm" role="group" aria-label="Confirm delete">
             <span>Delete this event?</span>
             <button type="button" className="danger" onClick={del} disabled={busy} autoFocus>{busy ? "Deleting…" : "Yes, delete"}</button>
             <button type="button" onClick={() => setConfirming(false)} disabled={busy}>Cancel</button>
           </span>
         ) : (
           <>
-            <button type="button" onClick={onEdit}>Edit</button>
-            <button type="button" onClick={() => setConfirming(true)}>Delete</button>
+            <button type="button" className="sp-edit" onClick={onEdit} aria-label={`Edit ${e.title}`}><PencilIcon />Edit</button>
+            <RowMenu label={e.title} items={[{ label: "Delete", danger: true, onSelect: () => setConfirming(true) }]} />
           </>
         )}
       </div>
     </li>
+  );
+}
+
+// The big date on the left of a row: "Nov / 19", or "Nov / 25–29" for several days.
+export function DateBlock({ from, to }: { from: string; to?: string | null }) {
+  const [y, m, d] = from.split("-").map(Number);
+  const thisYear = new Date().getFullYear();
+  let day = String(d);
+  let mon = MON[m - 1];
+  let label = fmtDay(from);
+  if (to && to !== from) {
+    const [y2, m2, d2] = to.split("-").map(Number);
+    label += ` to ${fmtDay(to)}`;
+    day = m2 === m && y2 === y ? `${d}–${d2}` : `${d}–${MON[m2 - 1]} ${d2}`;
+  }
+  if (y !== thisYear) mon += ` ${y}`;
+  return (
+    <div className="sp-date">
+      <span className="sr-only">{label}</span>
+      <span className="m" aria-hidden="true">{mon}</span>
+      <span className={`d${day.length > 5 ? " d--long" : ""}`} aria-hidden="true">{day}</span>
+    </div>
   );
 }
 
@@ -142,41 +165,42 @@ export function CalendarManager({ events, notice }: { events: AdminEvent[]; noti
   const done = (text: string) => { setEditing(null); if (text) { setMsg({ text }); router.refresh(); } };
 
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Calendar</h1>
-          <p className="lead">These events appear in “This week and next”, the month view and the no-school notice of the portal.</p>
-        </div>
-        <div className="adm-actions">
-          <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}>Add event</button>
-          <Link href="/admin/calendar/import" className="btn btn--outline">Import .ics / .csv</Link>
-        </div>
-      </div>
+    <>
+      <Head
+        title="Calendar"
+        lead="These events appear in “This week and next”, the month view and the no-school notice of the portal."
+        actions={<>
+          <Link href="/admin/calendar/import" className="btn btn--outline"><svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>Import .ics / .csv</Link>
+          <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}><svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>Add event</button>
+        </>}
+      />
       {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
-      {editing && <EventForm key={editing === "new" ? "new" : editing.id} event={editing === "new" ? null : editing} onDone={done} />}
-      <div className="adm-tools">
-        <label className="adm-search">
-          <span className="sr-only">Search events</span>
-          <input type="search" placeholder="Search by title, note, category or date" value={q} onChange={(e) => setQ(e.target.value)} />
-        </label>
-        <label className="adm-check">
-          <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
-          Show past events ({pastCount})
-        </label>
+      {editing && <div className="adm-card sp-formcard"><EventForm key={editing === "new" ? "new" : editing.id} event={editing === "new" ? null : editing} onDone={done} /></div>}
+      <div className="adm-card">
+        <div className="sp-tools">
+          <div className="sp-seg" role="group" aria-label="Which events">
+            <button type="button" aria-pressed={!showPast} onClick={() => setShowPast(false)}>Upcoming</button>
+            <button type="button" aria-pressed={showPast} onClick={() => setShowPast(true)}>Include past ({pastCount})</button>
+          </div>
+          <label className="sp-search">
+            <span className="sr-only">Search events</span>
+            <svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <input type="search" placeholder="Search by title, note, category or date" value={q} onChange={(e) => setQ(e.target.value)} />
+          </label>
+        </div>
+        <p className="adm-count" aria-live="polite">{list.length} event{list.length === 1 ? "" : "s"}{q ? ` matching “${q}”` : ""}</p>
+        <ul className="sp-list">
+          {list.map((e) => (
+            <Row key={e.id} e={e} past={(e.endDate ?? e.date) < t}
+              onEdit={() => { setMsg(null); setEditing(e); }}
+              onDeleted={(text, err) => {
+                setMsg({ text, err });
+                if (!err) { setGone((g) => new Set(g).add(e.id)); router.refresh(); }
+              }} />
+          ))}
+        </ul>
+        {!list.length && <p className="adm-empty">{q ? "No events match your search." : "No upcoming events."}</p>}
       </div>
-      <p className="adm-count" aria-live="polite">{list.length} event{list.length === 1 ? "" : "s"}{q ? ` matching “${q}”` : ""}</p>
-      <ul className="adm-list">
-        {list.map((e) => (
-          <Row key={e.id} e={e} past={(e.endDate ?? e.date) < t}
-            onEdit={() => { setMsg(null); setEditing(e); }}
-            onDeleted={(text, err) => {
-              setMsg({ text, err });
-              if (!err) { setGone((g) => new Set(g).add(e.id)); router.refresh(); }
-            }} />
-        ))}
-      </ul>
-      {!list.length && <p className="adm-empty">{q ? "No events match your search." : "No upcoming events."}</p>}
-    </div>
+    </>
   );
 }

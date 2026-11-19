@@ -117,3 +117,170 @@
   .sp .adm-actions .btn{width:100%}
 }
 @media (prefers-reduced-motion:reduce){.sp *{transition:none!important}}
+
+/* ---------- Phase 2: every staff screen ---------- */
+.sp-main-stack,.sp .adm-main>.adm-card+.adm-card,.sp .adm-main>.adm-msg+.adm-card,.sp .adm-main>.sp-formcard+.adm-card{margin-top:20px}
+.sp .adm-main>.adm-msg{margin:0 0 16px}
+.sp-back{margin:0 0 10px}
+.sp-back a,.sp .adm-back a{display:inline-flex;align-items:center;gap:6px;color:var(--p-link);font:600 15px/20px var(--font-brand);text-decoration:none}
+.sp-back a:hover,.sp .adm-back a:hover{text-decoration:underline}
+.sp .adm-h2,.sp .adm-cat-top h2,.sp .adm-panel h2{color:var(--p-ink);font:700 20px/26px var(--font-brand)}
+.sp .note{color:var(--p-muted)}
+.sp .adm-count{color:var(--p-muted)}
+.sp .adm-empty{color:var(--p-muted)}
+
+/* Toolbars: segmented switch and search with an icon */
+.sp-tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 12px}
+.sp-seg{display:inline-flex;padding:4px;border:1px solid var(--p-line);border-radius:999px;background:var(--p-surface);gap:2px;flex:none}
+.sp-seg button{min-height:38px;padding:0 16px;border:0;border-radius:999px;background:none;color:var(--p-text);font:600 14px/20px var(--font-brand);cursor:pointer;white-space:nowrap}
+.sp-seg button[aria-pressed=true]{background:var(--p-ink);color:var(--p-on-ink)}
+.sp-search{position:relative;flex:1 1 260px;display:block;min-width:0}
+.sp-search .sp-ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--p-muted);pointer-events:none}
+.sp-search input,.sp .sf-search input{width:100%;box-sizing:border-box;min-height:46px;padding:0 16px 0 44px;border:1px solid var(--p-line);border-radius:999px;background:var(--p-surface);font:400 16px/24px var(--font-text);color:var(--p-text)}
+.sp .sf-search input{padding-left:16px}
+.sp-search input:focus,.sp .sf-search input:focus{outline:3px solid color-mix(in srgb,var(--p-ink) 35%,transparent);outline-offset:0;border-color:var(--p-ink)}
+
+/* Rows with a big date on the left */
+.sp-list{list-style:none;margin:0;padding:0}
+.sp-ev{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:8px 20px;align-items:center;padding:18px 4px;border-top:1px solid var(--p-line)}
+.sp-ev:first-child{border-top:0}
+.sp-ev.is-past{opacity:.62}
+.sp-date{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;align-self:stretch;border-right:1px solid var(--p-line);padding-right:16px;color:var(--p-ink)}
+.sp-date .m{font:500 15px/20px var(--font-brand);color:var(--p-muted)}
+.sp-date .d{font:700 32px/38px var(--font-brand);white-space:nowrap}
+.sp-date .d--long{font-size:20px;line-height:28px}
+.sp-ev-what{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sp-ev-what strong{font:700 18px/24px var(--font-brand);color:var(--p-ink);overflow-wrap:anywhere}
+.sp-ev-meta{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;color:var(--p-muted);font-size:14px;line-height:20px}
+.sp-ev-what .note{font-size:14px;line-height:20px;overflow-wrap:anywhere}
+
+/* Pills: categories (school colours) and status */
+.sp-cat{display:inline-flex;align-items:center;min-height:26px;padding:0 12px;border-radius:999px;font:600 13px/18px var(--font-brand);background:var(--p-soft);color:var(--p-on-soft);white-space:nowrap}
+.sp-badge{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 12px;border-radius:999px;font:600 13px/18px var(--font-brand);background:var(--p-page);color:var(--p-muted);white-space:nowrap}
+.sp-badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.7}
+.sp-badge.is-on{background:#E3F4E8;color:#17643A}
+.sp .pill{border-radius:999px;background:var(--p-accent);color:var(--p-on-accent);font:700 12px/18px var(--font-brand);padding:1px 10px}
+.sp .pill--muted{background:var(--p-page);color:var(--p-muted)}
+.sp-ini{display:inline-flex;align-items:center;justify-content:center;flex:none;width:48px;height:48px;border-radius:14px;background:var(--p-soft);color:var(--p-on-soft);font:700 17px/1 var(--font-brand)}
+
+/* Row actions: Edit and the "…" menu on the right */
+.sp-act{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.sp-edit,.sp-more,.sp-act>button,.sp-confirm button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:44px;padding:0 16px;border-radius:999px;border:1px solid var(--p-line);background:var(--p-surface);color:var(--p-ink);font:600 14px/20px var(--font-brand);cursor:pointer;box-sizing:border-box;text-decoration:none}
+.sp-edit .sp-ic{width:16px;height:16px}
+.sp-more{padding:0;width:44px}
+.sp-more svg{width:20px;height:20px;fill:currentColor}
+.sp-edit:hover,.sp-more:hover,.sp-act>button:hover:not(:disabled),.sp-confirm button:hover:not(:disabled){background:var(--p-soft);color:var(--p-on-soft)}
+.sp-act>button:disabled{opacity:.4;cursor:default}
+.sp-menu{position:relative}
+.sp-menu-list{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:200px;padding:6px;background:var(--p-surface);border:1px solid var(--p-line);border-radius:14px;box-shadow:0 12px 32px rgba(20,24,60,.16);display:flex;flex-direction:column}
+.sp-menu-list button{display:flex;align-items:center;min-height:44px;padding:0 14px;border:0;border-radius:10px;background:none;color:var(--p-text);font:500 15px/20px var(--font-brand);text-align:left;cursor:pointer;white-space:nowrap}
+.sp-menu-list button:hover:not(:disabled),.sp-menu-list button:focus-visible{background:var(--p-soft);color:var(--p-on-soft);outline:none}
+.sp-menu-list button:focus-visible{box-shadow:inset 0 0 0 2px var(--p-ink)}
+.sp-menu-list button:disabled{opacity:.4;cursor:default}
+.sp-menu-list .is-danger{color:#A4231B}
+.sp-confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:600 14px/20px var(--font-brand);color:#8A1C12}
+.sp-confirm .danger,.sp .confirm .danger{background:#B3261E;border-color:#B3261E;color:#fff}
+.sp-confirm .danger:hover:not(:disabled),.sp .confirm .danger:hover:not(:disabled){background:#8A1C12;color:#fff}
+
+/* Generic rows (documents, links, people, families, wishlists…) */
+.sp .adm-list{border-top:0}
+.sp .adm-doc{border-bottom:0;border-top:1px solid var(--p-line);padding:14px 4px;gap:10px 16px}
+.sp .adm-list>.adm-doc:first-child{border-top:0}
+.sp .adm-doc .what strong{color:var(--p-ink);font:700 16px/22px var(--font-brand)}
+.sp .adm-doc .act,.sp .adm-cat-top .act{gap:8px}
+.sp .adm-doc .act>button,.sp .adm-doc .act>a,.sp .adm-cat-top .act button,.sp .adm-cat-top .confirm button,.sp .adm-doc .confirm button,.sp .adm-ev .act button,.sp .adm-ev .confirm button,.sp .fam-code .confirm button,.sp .pe-versions li button,.sp .sf-fav-act button{min-height:44px;min-width:44px;border-radius:999px;border:1px solid var(--p-line);background:var(--p-surface);color:var(--p-ink)}
+.sp .adm-doc .act>button:hover:not(:disabled),.sp .adm-doc .act>a:hover,.sp .adm-cat-top .act button:hover:not(:disabled),.sp .pe-versions li button:hover:not(:disabled),.sp .sf-fav-act button:hover:not(:disabled){background:var(--p-soft);color:var(--p-on-soft)}
+.sp .adm-doc .act .ok{background:var(--p-ink);border-color:var(--p-ink);color:var(--p-on-ink)}
+.sp .adm-doc .act .ok:hover:not(:disabled){background:color-mix(in srgb,var(--p-ink) 85%,#000);color:var(--p-on-ink)}
+.sp .adm-doc .confirm .danger,.sp .adm-cat-top .confirm .danger,.sp .fam-code .confirm .danger,.sp .pe-versions .confirm .danger{background:#B3261E;border-color:#B3261E;color:#fff}
+.sp .adm-cat{margin-top:28px}
+
+.sp .adm-cat-top{border-bottom:1px solid var(--p-line);padding-bottom:12px;margin-bottom:4px}
+.sp .adm-cat-top .count,.sp .adm-h2 .note{display:inline-block;font:600 13px/20px var(--font-brand);color:var(--p-on-soft);background:var(--p-soft);border-radius:999px;padding:0 10px;margin-left:6px;vertical-align:3px}
+.sp section+section>.adm-h2{margin-top:28px}
+.sp .adm-h2+.adm-list{margin-top:8px}
+
+/* Forms opened from a list ("New…", "Edit…") */
+.sp .adm-panel{border:0;background:var(--p-surface);border-radius:var(--sp-r);padding:0;margin:0}
+.sp .adm-card>.adm-panel{border:1px solid var(--p-line);background:var(--p-page);padding:22px;margin:0 0 20px;border-radius:18px}
+.sp .adm-panel input[type=file]{font:400 15px/22px var(--font-text)}
+.sp .adm-check input{accent-color:var(--p-ink)}
+.sp .adm-f input[type=date],.sp .adm-f input[type=time],.sp .adm-f select{min-height:46px}
+
+/* Tabs, quick filters, statuses */
+.sp .fam-tabs{border-bottom:0;gap:6px;padding:4px;border:1px solid var(--p-line);border-radius:999px;display:inline-flex;max-width:100%;box-sizing:border-box;margin:0 0 12px}
+.sp .fam-tabs button{border:0;border-radius:999px;min-height:40px;padding:0 16px;color:var(--p-text)}
+.sp .fam-tabs button[aria-selected=true]{background:var(--p-ink);color:var(--p-on-ink)}
+.sp .fam-tabs button[aria-selected=true] .n{background:var(--p-surface);color:var(--p-ink)}
+.sp .fam-tabs .n{background:var(--p-soft);color:var(--p-on-soft)}
+.sp .fam-tabs .n--hot{background:var(--p-accent);color:var(--p-on-accent)}
+.sp .fam-tabs button:focus-visible{outline:3px solid var(--p-ink);outline-offset:2px}
+.sp .fam-status{border-left:0;background:color-mix(in srgb,var(--p-accent) 18%,#fff);border-radius:16px}
+.sp .fam-code .code{background:var(--p-soft);color:var(--p-on-soft);border-radius:12px}
+.sp .my-quick button{min-height:40px;border-radius:999px;border:1px solid var(--p-line);background:var(--p-surface);color:var(--p-text)}
+.sp .my-quick button:hover{background:var(--p-soft);color:var(--p-on-soft)}
+.sp .my-quick button[aria-pressed=true]{background:var(--p-ink);border-color:var(--p-ink);color:var(--p-on-ink)}
+.sp .rq{border-bottom:0;border-top:1px solid var(--p-line);padding:16px 4px}
+.sp .rq:first-child{border-top:0}
+.sp .rq .what strong{color:var(--p-ink)}
+.sp .rq-st{border:1px solid var(--p-line);border-radius:999px}
+.sp .st-btn{border-left:1px solid var(--p-line);min-height:42px;padding:0 14px}
+.sp .st{border-radius:999px}
+.sp .my-dl dt{color:var(--p-ink)}
+.sp .my-jump a,.sp .my-dl a,.sp .adm-doc .what .note a,.sp .adm-href{color:var(--p-link)}
+
+/* Tables (calendar import, volunteer sign-ups) */
+.sp .adm-tablewrap{border:1px solid var(--p-line);border-radius:16px}
+.sp .adm-table th{background:var(--p-page);color:var(--p-ink)}
+.sp .adm-table td{border-top:1px solid var(--p-line)}
+.sp .adm-sticky{background:var(--p-surface)}
+
+/* Pages editor */
+.sp .pe-toolbar,.sp .pe-paper{border:1px solid var(--p-line);border-radius:16px}
+.sp .pe-btn{border-radius:10px}
+.sp .pe-btn[aria-pressed=true]{background:var(--p-soft);border-color:var(--p-ink);color:var(--p-on-soft)}
+.sp .pe-btn:hover:not(:disabled){background:var(--p-soft)}
+.sp .pe-linkbar{border:1px solid var(--p-line);background:var(--p-page);border-radius:16px}
+.sp .pe-status{border-radius:12px}
+.sp .pe-crumbs a{color:var(--p-link)}
+
+/* Wishlists and Staff favorites rows: initials or photo, name, class, status */
+.sp-person{display:flex;align-items:center;gap:14px;min-width:0}
+.sp-person>span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sp-person strong{font:700 17px/22px var(--font-brand);color:var(--p-ink)}
+.sp-person .note{font-size:14px;line-height:20px;overflow-wrap:anywhere}
+.sp-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;padding:12px 14px;border:1px solid var(--p-line);border-radius:18px;margin:0 0 10px;background:var(--p-surface)}
+.sp-row.is-hidden{background:var(--p-page)}
+.sp-row.is-hidden .sp-ini{filter:grayscale(1);opacity:.7}
+.sp-rows{list-style:none;margin:8px 0 0;padding:0}
+
+@media (max-width:959px){
+  .sp .adm-main>.adm-card,.sp .adm-main>.sp-formcard{border-radius:18px}
+}
+@media (max-width:640px){
+  .sp-ev{grid-template-columns:64px minmax(0,1fr);padding:14px 0}
+  .sp-date{padding-right:10px}
+  .sp-date .d{font-size:24px;line-height:30px}
+  .sp-date .d--long{font-size:15px;line-height:20px;white-space:normal}
+  .sp-date .m{font-size:13px}
+  .sp-ev .sp-act{grid-column:2;justify-content:flex-start}
+  .sp-tools{flex-direction:column;align-items:stretch}
+  .sp-seg{align-self:flex-start;max-width:100%}
+  .sp-row{grid-template-columns:1fr;padding:12px}
+  .sp-row .sp-act{justify-content:flex-start}
+  .sp .fam-tabs{display:flex;overflow-x:auto;border-radius:18px}
+  .sp-menu-list{right:auto;left:0}
+  .sp-act .sp-menu:last-child .sp-menu-list{left:auto;right:0}
+}
+/* The "…" menu inside older rows: undo the row-button look */
+.sp .act .sp-more,.sp .sp-act .sp-more{padding:0;width:44px;min-width:44px;border-radius:999px;border:1px solid var(--p-line);background:var(--p-surface)}
+.sp .act .sp-menu-list button,.sp .sp-act .sp-menu-list button{display:flex;justify-content:flex-start;width:100%;min-height:44px;padding:0 14px;border:0;border-radius:10px;background:none;color:var(--p-text);font:500 15px/20px var(--font-brand);text-align:left}
+.sp .act .sp-menu-list button:hover:not(:disabled),.sp .act .sp-menu-list button:focus-visible,.sp .sp-act .sp-menu-list button:hover:not(:disabled),.sp .sp-act .sp-menu-list button:focus-visible{background:var(--p-soft);color:var(--p-on-soft)}
+.sp .act .sp-menu-list .is-danger,.sp .sp-act .sp-menu-list .is-danger{color:#A4231B}
+.sp .act .sp-edit{padding:0 16px}
+.sp .adm-doc .act{align-items:center}
+.sp-head-a .btn--primary:not(:has(svg))::before{content:"+";font:400 24px/1 var(--font-brand);margin-top:-2px}
+.sp .adm-card--narrow h1{font:800 30px/36px var(--font-brand);margin:0 0 6px}
+.sp .rq-row>*,.sp .adm-row>*{min-width:0}
+.sp .adm-f input[type=date]{min-width:0}
+@media (max-width:640px){.sp-search{flex:none;width:100%}}

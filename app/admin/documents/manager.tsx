@@ -5,6 +5,7 @@ import { ACCEPT_ATTR, MAX_FILE_BYTES } from "../../../lib/files";
 import {
   deleteCategory, deleteDocument, moveCategory, moveDocument, saveCategory, saveDocument, startUpload, type DocState,
 } from "./actions";
+import { Head, PencilIcon, RowMenu } from "../ui";
 
 export type AdminCategory = { id: number; key: string; name: string; description: string };
 export type AdminDoc = {
@@ -172,11 +173,13 @@ function DocRow({ d, first, last, onEdit, report }: { d: AdminDoc; first: boolea
             onYes={async () => { const r = await deleteDocument(d.id); setConfirming(false); report(r); }} />
         ) : (
           <>
-            <a href={d.href.startsWith("http") ? d.href : `/${d.href}`} target="_blank" rel="noopener">Open</a>
-            <button type="button" onClick={() => move(-1)} disabled={first} aria-label={`Move ${d.title} up`}>↑</button>
-            <button type="button" onClick={() => move(1)} disabled={last} aria-label={`Move ${d.title} down`}>↓</button>
-            <button type="button" onClick={onEdit}>Edit</button>
-            <button type="button" onClick={() => setConfirming(true)}>Delete</button>
+            <a href={d.href.startsWith("http") ? d.href : `/${d.href}`} target="_blank" rel="noopener">Open<span className="sr-only"> {d.title} (opens in a new tab)</span></a>
+            <button type="button" className="sp-edit" onClick={onEdit} aria-label={`Edit ${d.title}`}><PencilIcon />Edit</button>
+            <RowMenu label={d.title} items={[
+              { label: "Move up", disabled: first, onSelect: () => move(-1) },
+              { label: "Move down", disabled: last, onSelect: () => move(1) },
+              { label: "Delete", danger: true, onSelect: () => setConfirming(true) },
+            ]} />
           </>
         )}
       </div>
@@ -205,17 +208,12 @@ export function DocumentsManager({ categories, docs, storageReady }: { categorie
   const open = (e: Editing) => { setMsg(null); setEditing(e); };
 
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Documents</h1>
-          <p className="lead">The “Family documents” section of the portal, in this order.</p>
-        </div>
-        <div className="adm-actions">
-          <button type="button" className="btn btn--primary" onClick={() => open({ type: "doc", doc: null })}>Add document</button>
-          <button type="button" className="btn btn--outline" onClick={() => open({ type: "cat", cat: null })}>Add category</button>
-        </div>
-      </div>
+    <>
+      <Head title="Documents" lead={<>The “Family documents” section of the portal, in this order.</>} actions={<>
+        <button type="button" className="btn btn--outline" onClick={() => open({ type: "cat", cat: null })}>Add category</button>
+        <button type="button" className="btn btn--primary" onClick={() => open({ type: "doc", doc: null })}>Add document</button>
+      </>} />
+      <div className="adm-card">
       {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
       {editing?.type === "doc" && (
         <DocumentForm key={editing.doc?.id ?? "new"} doc={editing.doc} categories={categories} defaultCategory={editing.category}
@@ -260,6 +258,7 @@ export function DocumentsManager({ categories, docs, storageReady }: { categorie
           </section>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }

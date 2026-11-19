@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createPage, deletePage } from "./actions";
+import { Head } from "../ui";
 
 export type PageRow = {
   id: number; slug: string; title: string; legacy: string; publishedAt: string | null; updatedAt: string; unpublishedChanges: boolean;
@@ -26,16 +27,9 @@ export function PagesList({ pages }: { pages: PageRow[] }) {
   };
 
   return (
-    <div className="adm-card">
-      <div className="adm-head">
-        <div>
-          <h1>Pages</h1>
-          <p className="lead">The portal’s text pages. Edit a draft, then press “Publish”: families only see what is published.</p>
-        </div>
-        <div className="adm-actions">
-          <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setAdding(true); }}>New page</button>
-        </div>
-      </div>
+    <>
+      <Head title="Pages" lead={<>The portal’s text pages. Edit a draft, then press “Publish”: families only see what is published.</>} actions={<button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setAdding(true); }}>New page</button>} />
+      <div className="adm-card">
       {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
       {adding && (
         <form className="adm-f adm-panel" onSubmit={create}>
@@ -86,6 +80,7 @@ export function PagesList({ pages }: { pages: PageRow[] }) {
       ) : (
         <p className="adm-empty">No pages yet.</p>
       )}
-    </div>
+      </div>
+    </>
   );
 }
