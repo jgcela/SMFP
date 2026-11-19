@@ -1,11 +1,12 @@
-// Header of the staff area: school, sections and sign out.
+// Header of the staff area (and of the family sign-in pages): school, sections and sign out.
 import Link from "next/link";
+import { familySignOut } from "../family/actions";
 import { signOut } from "./actions";
 import { loadSchoolHeader } from "./school";
 
-export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages";
+export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages" | "families";
 
-export async function AdminTop({ signedIn, section }: { signedIn: boolean; section?: Section }) {
+export async function AdminTop({ signedIn, section, area = "staff" }: { signedIn: boolean; section?: Section; area?: "staff" | "family" }) {
   const school = await loadSchoolHeader();
   return (
     <header className="adm-top">
@@ -13,10 +14,10 @@ export async function AdminTop({ signedIn, section }: { signedIn: boolean; secti
         {school.logoUrl && <img src={school.logoUrl} alt="" />}
         <div className="t">
           {school.name}
-          <small>Staff</small>
+          <small>{area === "family" ? "Families" : "Staff"}</small>
         </div>
         {signedIn && (
-          <form action={signOut}>
+          <form action={area === "family" ? familySignOut : signOut}>
             <button type="submit">Sign out</button>
           </form>
         )}
@@ -30,6 +31,7 @@ export async function AdminTop({ signedIn, section }: { signedIn: boolean; secti
             <Link href="/admin/links" aria-current={section === "links" ? "page" : undefined}>Links</Link>
             <Link href="/admin/contact" aria-current={section === "contact" ? "page" : undefined}>Contact</Link>
             <Link href="/admin/pages" aria-current={section === "pages" ? "page" : undefined}>Pages</Link>
+            <Link href="/admin/families" aria-current={section === "families" ? "page" : undefined}>Families</Link>
           </div>
         </nav>
       )}
