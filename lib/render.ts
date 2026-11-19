@@ -4,6 +4,7 @@ import { opensInNewTabByDefault } from "./links";
 import { mapsHref } from "./contact";
 import { absolutePaths } from "./page-html";
 import type { ContactPerson, Link, School } from "./portal";
+import { anchorOf, VISIBLE_FAVORITES, type StaffCard, type Team } from "./staff-favorites";
 import { KINDS, spotsLabel, spotsLeft, whenLabel, type Opportunity, type VLink } from "./volunteer";
 
 // The page markup, with {{...}} where each school's content goes.
@@ -12,6 +13,8 @@ const template = readFileSync(path.join(process.cwd(), "content/portal-template.
 const pageTemplate = readFileSync(path.join(process.cwd(), "content/page-template.html"), "utf8");
 // Step 6b: the Volunteer page, built from volunteer_opportunities.
 const volunteerTemplate = readFileSync(path.join(process.cwd(), "content/volunteer-template.html"), "utf8");
+// Step 6c: Staff favorites, built from staff_favorites (families who signed in only).
+const staffTemplate = readFileSync(path.join(process.cwd(), "content/staff-favorites-template.html"), "utf8");
 
 export const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
@@ -244,4 +247,102 @@ export function renderVolunteerPage(school: School, links: Link[], people: Conta
   values["volunteer.count"] = opps.length ? `Showing ${opps.length} of ${opps.length} opportunities` : "No opportunities right now. Check back soon.";
   values["volunteer.cards"] = opps.map((o) => card(o, st)).join("");
   return absolutePaths(fill(volunteerTemplate, values));
+}
+
+// ---------- Staff favorites (step 6c) ----------
+export type StaffPage = { title: string; lead: string; intro: string; teams: Team[] };
+/** Who is looking: a family or staff member of this school, or why they cannot see the page. */
+export type StaffViewer = "allowed" | "nobody" | "pending" | "other";
+
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+function staffCard(c: StaffCard, id: string) {
+  const fav = (f: { label: string; value: string }) => `<div><dt>${ve(f.label)}</dt><dd>${ve(f.value)}</dd></div>`;
+  const top = c.favorites.slice(0, VISIBLE_FAVORITES), rest = c.favorites.slice(VISIBLE_FAVORITES);
+  const photo = c.photo ? `<img class="staff-photo" src="/staff-favorites/photo/${c.id}?v=${c.version}" alt="" width="56" height="56" loading="lazy">` : "";
+  return `          <article class="card staff anchor"${id ? ` id="${id}"` : ""} aria-labelledby="sn-${c.id}" data-team="${esc(c.team)}" data-text="${esc(norm(`${c.name} ${c.role}`))}">
+      <div class="staff-top${photo ? " staff-top--photo" : ""}">
+        ${photo}<div><h3 id="sn-${c.id}">${ve(c.name)}</h3><p class="small">${ve(c.role)}</p></div>
+      </div>
+      <dl class="favs">${top.map(fav).join("")}</dl>${rest.length ? `<details class="more"><summary>More favorites (${rest.length})</summary><dl class="favs favs--more body">${rest.map(fav).join("")}</dl></details>` : ""}
+      ${c.wishlistHref ? `<p class="card-actions"><a class="btn btn--outline" href="${esc(c.wishlistHref)}">Classroom wishlist</a></p>` : ""}
+    </article>
+`;
+}
+
+function staffBody(page: StaffPage, cards: StaffCard[]) {
+  const ids = new Set<string>();
+  const idOf = (c: StaffCard) => { const id = anchorOf(c.name); if (ids.has(id)) return ""; ids.add(id); return id; };
+  const teams: Team[] = [...page.teams];
+  if (cards.some((c) => !teams.some((t) => t.key === c.team))) teams.push({ key: "", label: "Other staff" });
+  const known = (c: StaffCard) => teams.some((t) => t.key === c.team);
+  const shared = cards.filter((c) => c.favorites.length);
+  const groups = teams.map((t) => {
+    const g = shared.filter((c) => (known(c) ? c.team === t.key : t.key === ""));
+    if (!g.length) return "";
+    return `      <section class="stack staff-group" style="gap:16px" aria-label="${esc(t.label)}" data-team="${esc(t.key)}"><h3 class="h3">${esc(t.label)} <span class="caption">${g.length}</span></h3><div class="grid grid--staff">
+${g.map((c) => staffCard(c, idOf(c))).join("")}      </div></section>
+`;
+  }).join("");
+  const pending = cards.filter((c) => !c.favorites.length);
+  const chips = [{ key: "all", label: "All" }, ...teams.filter((t) => cards.some((c) => (known(c) ? c.team === t.key : t.key === "")))]
+    .map((t) => `<button type="button" class="fchip" data-f="${esc(t.key || "-")}" aria-pressed="${t.key === "all"}">${esc(t.label)}</button>`).join("");
+  return `  <section class="section" aria-labelledby="staff-title">
+    <div class="wrap stack">
+      ${page.intro}
+      <div class="toolbar">
+        <div class="sec-head">
+          <h2 class="h2" id="staff-title">Find a staff member</h2>
+          <div class="rule"></div>
+        </div>
+        <div class="field">
+          <label for="s-search">Search by name or role</label>
+          <input id="s-search" type="search" placeholder="e.g. a last name or a grade">
+        </div>
+      </div>
+      <div class="filters" role="group" aria-label="Filter by team" id="filters">${chips}</div>
+      <p class="count" id="count" aria-live="polite">${shared.length ? `Showing ${shared.length} of ${shared.length} staff members` : "No staff favorites yet."}</p>
+      <div id="groups" class="stack">
+${groups}      </div>
+      <div class="empty" id="empty" hidden><p><strong>No staff members match your search.</strong> Try a last name or a grade.</p></div>
+      <p class="small" id="pending">${pending.length ? `Still to share their favorites: <span>${pending.map((c) => `<span data-team="${esc(known(c) ? c.team : "")}" data-text="${esc(norm(`${c.name} ${c.role}`))}">${ve(c.name)}</span>`).join("<span class=\"sep\">, </span>")}</span>.` : ""}</p>
+    </div>
+  </section>
+`;
+}
+
+function staffLocked(viewer: Exclude<StaffViewer, "allowed">) {
+  const text = {
+    nobody: ["Sign in to see staff favorites", "This page is only for families of the school. Sign in with your family account to see it."],
+    pending: ["Your family account is not approved yet", "You can see this page once the school approves your family account. If it is taking long, contact the school office."],
+    other: ["This page is for families of the school", "The account you signed in with cannot see this page. Sign out and sign in with your family account."],
+  }[viewer];
+  const button = viewer === "nobody"
+    ? `<p class="card-actions"><a class="btn btn--primary" id="sf-signin" href="/family?next=${encodeURIComponent("/staff-favorites")}">Sign in</a></p>
+          <script>(function(){var a=document.getElementById("sf-signin");if(location.hash)a.href="/family?next="+encodeURIComponent("/staff-favorites"+location.hash);})();</script>`
+    : viewer === "other" ? `<p class="card-actions"><a class="btn btn--outline" href="/family">Go to family sign-in</a></p>` : "";
+  return `  <section class="section" aria-labelledby="lock-title">
+    <div class="wrap stack">
+      <div class="note sf-lock" role="status">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+        <div class="stack" style="gap:8px">
+          <h2 class="h3" id="lock-title">${esc(text[0])}</h2>
+          <p>${esc(text[1])}</p>
+          ${button}
+        </div>
+      </div>
+    </div>
+  </section>
+`;
+}
+
+export function renderStaffPage(school: School, links: Link[], people: ContactPerson[], page: StaffPage, cards: StaffCard[], viewer: StaffViewer) {
+  const values = innerPageValues(school, links, people, "staff-favorites");
+  const title = page.title || "Staff favorite things";
+  values["page.title"] = esc(title);
+  values["page.crumb"] = esc(title);
+  values["page.summary"] = esc(`Favorite drinks, snacks and treats of ${school.name} staff, for gift ideas. ${school.school_year}.`);
+  values["page.lead"] = page.lead ? `      <p class="lead" id="page-lead">${esc(page.lead)}</p>\n` : "";
+  values["staff.body"] = viewer === "allowed" ? staffBody(page, cards) : staffLocked(viewer);
+  return absolutePaths(fill(staffTemplate, values));
 }

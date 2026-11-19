@@ -303,3 +303,8 @@ a.ctile .v{text-decoration:underline}
 .vol-note{border-radius:var(--r-md);padding:12px 16px;font:500 15px/22px var(--font-text);background:#e6f4ea;color:#14532d}
 .vol-note--err{background:#fdecea;color:#8a1c12}
 .vol-contact a{color:var(--cerulean)}
+/* Step 6c: Staff favorites — optional photo, and the sign-in notice */
+.staff-top--photo{justify-content:flex-start}
+.staff-photo{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none;background:var(--tint)}
+.sf-lock{max-width:720px}
+.sf-lock .h3{margin:0}

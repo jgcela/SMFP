@@ -16,7 +16,8 @@ export function signUpload(p: Payload) {
   return `${body}.${mac(body)}`;
 }
 
-export function readUpload(token: string, schoolId: number): { key: string; name: string } | null {
+/** `area` is the storage folder the upload must be in: documents (step 4b) or staff photos (step 6c). */
+export function readUpload(token: string, schoolId: number, area: "documents" | "staff" = "documents"): { key: string; name: string } | null {
   const [body, sig] = token.split(".");
   if (!body || !sig) return null;
   const want = Buffer.from(mac(body));
@@ -25,7 +26,7 @@ export function readUpload(token: string, schoolId: number): { key: string; name
   try {
     const p = JSON.parse(Buffer.from(body, "base64url").toString()) as Payload;
     if (p.s !== schoolId || p.e < Date.now() / 1000) return null;
-    if (!p.k.startsWith(`documents/${schoolId}/`)) return null;
+    if (!p.k.startsWith(`${area}/${schoolId}/`)) return null;
     return { key: p.k, name: p.n };
   } catch {
     return null;
