@@ -4,7 +4,8 @@ import { opensInNewTabByDefault } from "./links";
 import { mapsHref } from "./contact";
 import { absolutePaths } from "./page-html";
 import type { ContactPerson, Link, School } from "./portal";
-import { anchorOf, VISIBLE_FAVORITES, type StaffCard, type Team } from "./staff-favorites";
+import { staffAnchors, VISIBLE_FAVORITES, type StaffCard, type Team } from "./staff-favorites";
+import { storeLabel, type Group, type Wishlist } from "./wishlists";
 import { KINDS, spotsLabel, spotsLeft, whenLabel, type Opportunity, type VLink } from "./volunteer";
 
 // The page markup, with {{...}} where each school's content goes.
@@ -15,6 +16,8 @@ const pageTemplate = readFileSync(path.join(process.cwd(), "content/page-templat
 const volunteerTemplate = readFileSync(path.join(process.cwd(), "content/volunteer-template.html"), "utf8");
 // Step 6c: Staff favorites, built from staff_favorites (families who signed in only).
 const staffTemplate = readFileSync(path.join(process.cwd(), "content/staff-favorites-template.html"), "utf8");
+// Step 6d: Teacher wishlists, built from wishlists (families who signed in only).
+const wishlistTemplate = readFileSync(path.join(process.cwd(), "content/wishlists-template.html"), "utf8");
 
 export const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
@@ -271,8 +274,8 @@ function staffCard(c: StaffCard, id: string) {
 }
 
 function staffBody(page: StaffPage, cards: StaffCard[]) {
-  const ids = new Set<string>();
-  const idOf = (c: StaffCard) => { const id = anchorOf(c.name); if (ids.has(id)) return ""; ids.add(id); return id; };
+  const anchors = staffAnchors(cards, page.teams);
+  const idOf = (c: StaffCard) => anchors.get(c.id) ?? "";
   const teams: Team[] = [...page.teams];
   if (cards.some((c) => !teams.some((t) => t.key === c.team))) teams.push({ key: "", label: "Other staff" });
   const known = (c: StaffCard) => teams.some((t) => t.key === c.team);
@@ -311,15 +314,16 @@ ${groups}      </div>
 `;
 }
 
-function staffLocked(viewer: Exclude<StaffViewer, "allowed">) {
+// The notice for someone who may not see a families-only page (Staff favorites, Wishlists).
+function familiesOnly(viewer: Exclude<StaffViewer, "allowed">, what: string, pagePath: string) {
   const text = {
-    nobody: ["Sign in to see staff favorites", "This page is only for families of the school. Sign in with your family account to see it."],
+    nobody: [`Sign in to see ${what}`, "This page is only for families of the school. Sign in with your family account to see it."],
     pending: ["Your family account is not approved yet", "You can see this page once the school approves your family account. If it is taking long, contact the school office."],
     other: ["This page is for families of the school", "The account you signed in with cannot see this page. Sign out and sign in with your family account."],
   }[viewer];
   const button = viewer === "nobody"
-    ? `<p class="card-actions"><a class="btn btn--primary" id="sf-signin" href="/family?next=${encodeURIComponent("/staff-favorites")}">Sign in</a></p>
-          <script>(function(){var a=document.getElementById("sf-signin");if(location.hash)a.href="/family?next="+encodeURIComponent("/staff-favorites"+location.hash);})();</script>`
+    ? `<p class="card-actions"><a class="btn btn--primary" id="sf-signin" href="/family?next=${encodeURIComponent(pagePath)}">Sign in</a></p>
+          <script>(function(){var a=document.getElementById("sf-signin");if(location.hash)a.href="/family?next="+encodeURIComponent("${pagePath}"+location.hash);})();</script>`
     : viewer === "other" ? `<p class="card-actions"><a class="btn btn--outline" href="/family">Go to family sign-in</a></p>` : "";
   return `  <section class="section" aria-labelledby="lock-title">
     <div class="wrap stack">
@@ -343,6 +347,79 @@ export function renderStaffPage(school: School, links: Link[], people: ContactPe
   values["page.crumb"] = esc(title);
   values["page.summary"] = esc(`Favorite drinks, snacks and treats of ${school.name} staff, for gift ideas. ${school.school_year}.`);
   values["page.lead"] = page.lead ? `      <p class="lead" id="page-lead">${esc(page.lead)}</p>\n` : "";
-  values["staff.body"] = viewer === "allowed" ? staffBody(page, cards) : staffLocked(viewer);
+  values["staff.body"] = viewer === "allowed" ? staffBody(page, cards) : familiesOnly(viewer, "staff favorites", "/staff-favorites");
   return absolutePaths(fill(staffTemplate, values));
+}
+
+// ---------- Teacher wishlists (step 6d) ----------
+export type WishlistPage = { title: string; lead: string; intro: string; groups: Group[] };
+
+function wishCard(w: Wishlist, groupLabel: string, favAnchor: string) {
+  const items = w.items.length
+    ? `<ul class="wl-items">${w.items.map((i) => {
+        const label = i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">${ve(i.name)}<span class="sr-only"> (opens in a new tab)</span></a>` : ve(i.name);
+        const qty = i.quantity > 1 ? ` <span class="wl-qty">× ${i.quantity}</span>` : "";
+        return i.done
+          ? `<li class="is-done"><s>${label}${qty}</s> <span class="wl-got">${icon("check")}Got it<span class="sr-only">: no longer needed</span></span></li>`
+          : `<li>${label}${qty}</li>`;
+      }).join("")}</ul>`
+    : "";
+  const store = w.storeUrl
+    ? `<a class="btn btn--primary" href="${esc(w.storeUrl)}" target="_blank" rel="noopener">${esc(storeLabel(w.storeUrl))}${icon("ext")}<span class="sr-only">(opens in a new tab)</span></a>`
+    : "";
+  const fav = favAnchor ? `<a class="btn btn--outline" href="/staff-favorites#${esc(favAnchor)}">Favorite things</a>` : "";
+  return `          <article class="card wl" id="wl-${w.id}" aria-label="${esc(w.name)}" data-group="${esc(w.grp)}" data-text="${esc(norm(`${w.name} ${w.classText} ${groupLabel}`))}">
+      <div><h3>${ve(w.name)}</h3>${w.classText ? `<p class="small">${ve(w.classText)}</p>` : ""}</div>
+      ${items}
+      ${store || fav ? `<p class="card-actions">${store}${fav}</p>` : ""}
+    </article>
+`;
+}
+
+function wishBody(page: WishlistPage, lists: Wishlist[], anchors: Map<number, string>) {
+  const groups: Group[] = [...page.groups];
+  const known = (w: Wishlist) => groups.some((g) => g.key === w.grp);
+  if (lists.some((w) => !known(w))) groups.push({ key: "", label: "Other" });
+  const inGroup = (w: Wishlist, k: string) => (known(w) ? w.grp === k : k === "");
+  const sections = groups.map((g) => {
+    const ls = lists.filter((w) => inGroup(w, g.key));
+    if (!ls.length) return "";
+    return `      <section aria-label="${esc(g.label)}" class="stack wl-group" style="gap:16px" data-group="${esc(g.key)}"><h3 class="h3">${esc(g.label)} <span class="caption" data-one="list" data-many="lists">${ls.length} list${ls.length > 1 ? "s" : ""}</span></h3><div class="grid grid--tight">
+${ls.map((w) => wishCard(w, g.label, w.staffId ? anchors.get(w.staffId) ?? "" : "")).join("")}      </div></section>
+`;
+  }).join("");
+  const chips = [{ key: "all", label: "All" }, ...groups.filter((g) => lists.some((w) => inGroup(w, g.key)))]
+    .map((g) => `<button type="button" class="fchip" data-f="${esc(g.key || "-")}" aria-pressed="${g.key === "all"}">${esc(g.label)}</button>`).join("");
+  return `  <section class="section" aria-labelledby="lists-title">
+    <div class="wrap stack">
+      ${page.intro}
+      <div class="toolbar">
+        <div class="sec-head">
+          <h2 class="h2" id="lists-title">Find a teacher</h2>
+          <div class="rule"></div>
+        </div>
+        <div class="field">
+          <label for="t-search">Search by teacher or grade</label>
+          <input id="t-search" type="search" placeholder="e.g. a last name, 3rd grade, Art">
+        </div>
+      </div>
+      <div class="filters" role="group" aria-label="Filter by group" id="filters">${chips}</div>
+      <p class="count" id="count" aria-live="polite">${lists.length ? `Showing ${lists.length} of ${lists.length} wishlists` : "No wishlists yet."}</p>
+      <div id="groups" class="stack">
+${sections}      </div>
+      <div class="empty" id="empty" hidden><p><strong>No wishlists match your search.</strong> Not every teacher has a list. You can also check <a href="/staff-favorites">Staff favorite things</a> for gift ideas.</p></div>
+    </div>
+  </section>
+`;
+}
+
+export function renderWishlistPage(school: School, links: Link[], people: ContactPerson[], page: WishlistPage, lists: Wishlist[], viewer: StaffViewer, anchors: Map<number, string>) {
+  const values = innerPageValues(school, links, people, "wishlists");
+  const title = page.title || "Teacher wishlists";
+  values["page.title"] = esc(title);
+  values["page.crumb"] = esc(title);
+  values["page.summary"] = esc(`Classroom wishlists of ${school.name} teachers, ${school.school_year}.`);
+  values["page.lead"] = page.lead ? `      <p class="lead" id="page-lead">${esc(page.lead)}</p>\n` : "";
+  values["staff.body"] = viewer === "allowed" ? wishBody(page, lists, anchors) : familiesOnly(viewer, "the teacher wishlists", "/wishlists");
+  return absolutePaths(fill(wishlistTemplate, values));
 }

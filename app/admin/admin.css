@@ -287,3 +287,11 @@
 @media (max-width:640px){.sf-fav{grid-template-columns:1fr}.sf-fav-act{justify-content:flex-end}}
 .adm-panel fieldset{min-width:0}
 .adm-panel input[type=file]{max-width:100%;box-sizing:border-box}
+/* Step 6d: Wishlists */
+.wl-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.4fr) 90px auto auto;gap:10px;align-items:end;padding-bottom:10px;border-bottom:1px dashed var(--gray)}
+.wl-got-box{min-height:44px;align-items:center}
+.wl-admin-items{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.wl-admin-items li{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;line-height:20px}
+.wl-admin-items .is-done{color:#5b6470}
+.wl-admin-items button{min-height:36px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--cerulean);background:var(--white);color:var(--navy);font:600 13px/18px var(--font-brand);cursor:pointer;flex:none}
+@media (max-width:760px){.wl-row{grid-template-columns:1fr 1fr}.wl-row>label:nth-of-type(-n+3){grid-column:1/-1}.wl-row .sf-fav-act{justify-content:flex-end}}

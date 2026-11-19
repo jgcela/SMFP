@@ -1,0 +1,5 @@
+{
+  "_about": "Step 6d: how the old wishlists are joined to Staff favorites cards when imported (approved by the school on 2026-11-19). A list is joined to the card with the same surname. When a surname has more than one card, `pick` says which one, by a word in the card's role.",
+  "pick": { "guzman": "7th Grade" },
+  "strip_query_from": ["amazon.com"]
+}
