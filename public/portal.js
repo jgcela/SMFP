@@ -126,7 +126,7 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   const isNew = (it) => it.added && (today - parse(it.added)) / DAY_MS <= 30;
   const icon = (it) => it.type === 'ext' ? 'i-ext' : it.type === 'web' ? 'i-arrow' : 'i-dl';
   const docTotal = DOCS.reduce((n, c) => n + c.items.length, 0);
-  $('#docs-intro').textContent = `${docTotal} forms, handbooks and flyers for 2026–27, grouped by what you need to do.`;
+  $('#docs-intro').textContent = `${docTotal} forms, handbooks and flyers for ${CONFIG.year}, grouped by what you need to do.`;
   $('#most').innerHTML = MOST_USED.map(([c, i]) => { const it = DOCS.find(x => x.id === c).items[i];
     return `<li><a href="${esc(it.h)}"><svg class="icon" style="color:var(--navy);width:24px;height:24px" aria-hidden="true"><use href="#i-doc"/></svg><span class="t">${esc(it.t)}${it.d ? `<span class="desc">${esc(it.d)}</span>` : ''}</span><span class="meta">${esc(it.m)}</span></a></li>`; }).join('');
   const renderDocs = (q = '') => {
@@ -169,7 +169,18 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
     list.forEach(e => { const k = monthKey(e.d); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
     return [...groups.values()].map(g => `<div class="month"><h3 class="h3">${MON_FULL[g[0].d.getMonth()]} ${g[0].d.getFullYear()}</h3><ul class="rows">${g.map(e => rowHTML(e, past)).join('')}</ul></div>`).join('');
   };
+  // A new year starts with an empty calendar: show one plain line until the school adds events.
+  const noEvents = events.length === 0;
+  if (noEvents) {
+    $('#filters').hidden = true;
+    $$('#calendar .seg, #calendar .js-sub-ics, #calendar .cal-status').forEach(x => { x.hidden = true; x.style.display = 'none'; });
+  }
   const renderList = () => {
+    if (noEvents) {
+      $('#upcoming-months').innerHTML = `<p class="empty-note">The ${esc(CONFIG.year)} calendar will be posted here soon.${$('#calendar .pdf-link') ? ' Until then, see the full calendar (PDF) above.' : ''}</p>`;
+      $('#toggle-past').hidden = true; $('#show-more').hidden = true; $('#cal-status-text').textContent = '';
+      return;
+    }
     const past = events.filter(e => e.d < today && passes(e));
     const up = events.filter(e => e.d >= today && passes(e));
     const months = [...new Set(up.map(e => monthKey(e.d)))];
@@ -207,7 +218,7 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#ev-"]'); if (!a) return; e.preventDefault(); reveal(a.getAttribute('href').slice(1)); });
 
   // Month view
-  const first = events[0].d, last = events[events.length - 1].d;
+  const first = noEvents ? today : events[0].d, last = noEvents ? today : events[events.length - 1].d;
   const minM = monthKey(first), maxM = monthKey(last);
   let curM = Math.min(Math.max(monthKey(today), minM), maxM);
   let selDay = null;

@@ -52,14 +52,14 @@ export function AddYearForm({ label, startsOn, endsOn, fromLabel }: { label: str
           <input type="radio" name="start" value="copy" defaultChecked />
           <span>
             <strong>Copy from {fromLabel}</strong>
-            <span className="hint">Copies pages, modules, links, staff favorites, contact details, family documents and the look. Never copies the calendar, notices, wishlists or volunteering.</span>
+            <span className="hint">Copies pages, modules, links, staff favorites, contact details, family documents and the look. Copied documents are marked so you check they are up to date. Never copies the calendar, notices, wishlists or volunteering.</span>
           </span>
         </label>
         <label className="yr-choice">
           <input type="radio" name="start" value="scratch" />
           <span>
             <strong>Start from scratch</strong>
-            <span className="hint">An empty year with the basic modules, without logo or colours.</span>
+            <span className="hint">Keeps the basics: logo, colours, modules and the office contact details. Pages, links, documents and staff cards start empty.</span>
           </span>
         </label>
       </fieldset>
@@ -111,7 +111,7 @@ export function SwitchOnForm({ id, label, activeLabel }: { id: number; label: st
     <form onSubmit={onSubmit} className="adm-f yr-confirm" noValidate>
       <Message state={state} id="on-err" />
       <input type="hidden" name="id" value={id} />
-      <p><strong>From now on families will see {label}.</strong> {activeLabel} will be archived: the school can still look at it, families cannot. Grades saved in &ldquo;Move children up a grade&rdquo; become the children&rsquo;s grades.</p>
+      <p><strong>From now on families will see {label}.</strong> {activeLabel} will be archived: the school can still look at it, families cannot. Every child moves up one grade (children in the last grade leave the school). Changes you saved in &ldquo;Move children up a grade&rdquo; are used instead.</p>
       <label>
         Type {label} to confirm
         <input type="text" name="confirm" autoComplete="off" required {...bad(state, "confirm", "on-err")} />
@@ -179,7 +179,7 @@ export function MoveUpForm({ yearId, rows, grades, leaves, applyNow }: { yearId:
           </tbody>
         </table>
       </div>
-      <p className="note">{applyNow ? "This year is already active: the new grades apply as soon as you save." : "The new grades apply when you switch the year on. Until then families keep seeing the current ones."} Children who leave the school stay on record, but are no longer listed.</p>
+      <p className="note">{applyNow ? "This year is already active: the new grades apply as soon as you save." : "You only need to save if you change something: when you switch the year on, every child moves up one grade anyway. Until then families keep seeing the current grades."} Children who leave the school stay on record, but are no longer listed.</p>
       <div className="adm-actions">
         <button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Saving…" : "Save new grades"}</button>
       </div>

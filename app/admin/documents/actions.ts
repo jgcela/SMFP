@@ -119,7 +119,7 @@ export async function saveDocument(_prev: DocState, fd: FormData): Promise<DocSt
         docId = row.id;
       } else {
         await tx`
-          update documents set title = ${title}, description = ${description}, category_id = ${categoryId},
+          update documents set title = ${title}, description = ${description}, category_id = ${categoryId}, review_from = null,
             most_used_rank = ${mostRank}, sort_order = ${moved ? next : tx`sort_order`}
           where id = ${docId} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       }
@@ -140,6 +140,22 @@ export async function saveDocument(_prev: DocState, fd: FormData): Promise<DocSt
     return fail(err, "Could not save. Try again.");
   } finally {
     if (newKey) await removeFile(newKey); // uploaded but refused or not saved
+  }
+}
+
+/** A document copied from last year that is still right: remove the "check it" mark. */
+export async function markUpToDate(id: number | "all"): Promise<DocState> {
+  try {
+    const staff = await requireYearStaff();
+    const rows = await db()`
+      update documents set review_from = null
+      where school_id = ${staff.schoolId} and year_id = ${staff.yearId} and review_from is not null
+        ${id === "all" ? db()`` : db()`and id = ${Number(id)}`}
+      returning id`;
+    refresh();
+    return { ok: rows.length === 1 ? "Marked as up to date." : `${rows.length} documents marked as up to date.` };
+  } catch (err) {
+    return fail(err, "Could not save. Try again.");
   }
 }
 

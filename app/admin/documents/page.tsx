@@ -17,7 +17,7 @@ export default async function DocumentsPage() {
       select id, key, name, description from document_categories where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by sort_order, id`,
     db()<AdminDoc[]>`
       select id, category_id as "categoryId", title, description, href, meta, kind, most_used_rank is not null as "mostUsed",
-        file_key is not null as "uploaded", file_name as "fileName"
+        file_key is not null as "uploaded", file_name as "fileName", review_from as "reviewFrom"
       from documents where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by sort_order, id`,
     storageConfigured() ? getStorage().ping() : Promise.resolve(false),
   ]);

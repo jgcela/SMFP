@@ -3,7 +3,6 @@
 // failure leaves nothing half done.
 import type { TransactionSql } from "postgres";
 import { db } from "./db";
-import { DEFAULT_MODULES } from "./plans";
 
 type Tx = TransactionSql<Record<string, never>>;
 
@@ -13,7 +12,9 @@ export type NewYear = { label: string; startsOn: string; endsOn: string; copy: b
  * Creates a year being prepared. With copy, it takes from the active year the
  * pages, modules, links, staff cards, contact details and people, family
  * documents and the look. Calendar, notices, wishlists and volunteering are
- * never copied. Files in storage are shared, not duplicated.
+ * never copied. Files in storage are shared, not duplicated. From scratch keeps
+ * only the basics (logo, colours, modules and the office contact details), with
+ * no content.
  */
 export async function createYear(schoolId: number, y: NewYear): Promise<number> {
   return db().begin(async (sql) => {
@@ -32,10 +33,15 @@ export async function createYear(schoolId: number, y: NewYear): Promise<number> 
         from school_years where id = ${from.id}
         returning id`;
       await copyContent(tx, from.id, id);
+      // Copied documents are last year's: mark them so the school checks each one.
+      await tx`update documents set review_from = (select label from school_years where id = ${from.id}) where year_id = ${id}`;
     } else {
       [{ id }] = await tx<{ id: number }[]>`
-        insert into school_years (school_id, label, starts_on, ends_on, status, created_by, modules)
-        values (${schoolId}, ${y.label}, ${y.startsOn}, ${y.endsOn}, 'preparing', ${y.by}, ${DEFAULT_MODULES as string[]})
+        insert into school_years (school_id, label, starts_on, ends_on, status, created_by,
+          logo_url, logo_key, panel_theme, modules, phone_display, phone_href, email, office_hours, address, notice_auto_days)
+        select school_id, ${y.label}, ${y.startsOn}, ${y.endsOn}, 'preparing', ${y.by},
+          logo_url, logo_key, panel_theme, modules, phone_display, phone_href, email, office_hours, address, notice_auto_days
+        from school_years where id = ${from.id}
         returning id`;
     }
     return id;
@@ -131,6 +137,19 @@ export async function activateYear(schoolId: number, yearId: number) {
         select id, ${cur.id}, grade, teacher, false from children where school_id = ${schoolId} and not left_school
         on conflict (child_id, year_id) do update set grade = excluded.grade, teacher = excluded.teacher`;
       await tx`update school_years set status = 'archived', archived_at = now() where id = ${cur.id}`;
+    }
+    // Children nobody reviewed move up one grade on their own (after the last grade they
+    // leave the school); a grade that is not in the school's list stays as it is.
+    const [{ grades }] = await tx<{ grades: string[] }[]>`select grades from schools where id = ${schoolId}`;
+    const unplanned = await tx<{ id: number; grade: string }[]>`
+      select c.id, c.grade from children c
+      where c.school_id = ${schoolId} and not c.left_school
+        and not exists (select 1 from child_years cy where cy.child_id = c.id and cy.year_id = ${yearId})`;
+    for (const c of unplanned) {
+      const n = nextGrade(grades ?? [], c.grade);
+      await tx`
+        insert into child_years (child_id, year_id, grade, teacher, leaves)
+        values (${c.id}, ${yearId}, ${n === null ? c.grade : n === LEAVES ? c.grade : n}, '', ${n === LEAVES})`;
     }
     // Planned grades (from "Move children up a grade") become the children's grades.
     await tx`

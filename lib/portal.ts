@@ -39,7 +39,7 @@ export type Link = { placement: string; label: string; short_label: string; href
 
 // The data the page script (public/portal.js) works with, in the shapes it expects.
 export type PortalData = {
-  config: { googleCalendarId: string; officeEmail: string; alertDays: number };
+  config: { googleCalendarId: string; officeEmail: string; alertDays: number; year: string };
   // Active notices; the page shows the newest one whose dates include today
   // (checked in the browser, like every other date on the page).
   notices: { message: string; linkLabel: string; linkHref: string; from: string; until: string }[];
@@ -101,7 +101,7 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
     .map((x) => [x.key, x.i] as [string, number]);
 
   const data: PortalData = {
-    config: { googleCalendarId: school.google_calendar_id, officeEmail: school.email, alertDays: school.notice_auto_days },
+    config: { googleCalendarId: school.google_calendar_id, officeEmail: school.email, alertDays: school.notice_auto_days, year: school.school_year },
     notices: notices.map((n) => ({ message: n.message, linkLabel: n.link_label, linkHref: n.link_href, from: iso(n.show_from), until: iso(n.show_until) })),
     docs: docGroups.map(({ cat, items }) => ({
       id: cat.key, name: cat.name, desc: cat.description,

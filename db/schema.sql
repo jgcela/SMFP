@@ -680,3 +680,6 @@ create unique index if not exists pages_year_legacy on pages(year_id, legacy_pat
 insert into child_years (child_id, year_id, grade, teacher)
 select c.id, y.id, c.grade, c.teacher from children c join school_years y on y.school_id = c.school_id and y.status = 'active'
 on conflict do nothing;
+
+-- Step 11a follow-up: copied documents waiting to be checked.
+alter table documents add column if not exists review_from text;
