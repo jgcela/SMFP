@@ -191,3 +191,13 @@ The staff area (/admin) and "My family" (/family) share one look: a sidebar (a "
 - Colours, short name and emblem come from `schools.panel_theme` (jsonb), per school. `content/panel/theme.json` fills in missing keys once at build time (`scripts/seed-panel-theme.mjs`); what the school already has is never changed. `categories` gives one colour per calendar category; the pill text is darkened until it reads at 4.5:1.
 - Code: `lib/panel-theme.ts`, `app/admin/panel.css`, `app/admin/chrome.tsx`, `app/admin/ui.tsx`, `app/admin/icons.tsx` (one icon per section).
 - No functions, data or addresses changed. The public portal is untouched.
+
+## Step 9: emails, forgotten password, Family sign-in button
+
+- Emails go through Resend (`lib/mail.ts`). Vercel variables: `RESEND_API_KEY` (only in Vercel, never in the code) and `MAIL_FROM` (an address on a domain verified in Resend). The sender name is the school's name and replies go to the school's email. Without a key nothing is sent; on a local copy `MAIL_OUTBOX_DIR` saves each email as a .json file.
+- The emails (`lib/emails.ts`) are in English and take the school's name, logo and colours from the database: account received, account approved (with the sign-in link), account rejected, and a notice to the school when a new family is waiting. The school sets that address in Panel → Settings (`schools.notify_email`; empty sends nothing).
+- Forgotten password, for staff (/admin/forgot-password) and families (/family/forgot-password): the email gets a link that works once, for 1 hour (`lib/email-links.ts`, table `email_links`, which keeps only a hash of the token). The screen says the same whether or not the account exists. Setting a new password signs the account out everywhere.
+- Changing the account's email: Settings (/admin/settings, /family/settings). It needs the current password and is confirmed with a link sent to the new address; until then the old email stays.
+- At most 8 emails per address and per computer every 15 minutes.
+- A "Family sign-in" button sits in the public header on every page, on computers and phones, and leads to /family.
+- Migration: `db/migrations/2026-11-20-step9-email.sql`.

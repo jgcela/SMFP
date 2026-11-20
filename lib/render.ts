@@ -53,6 +53,10 @@ function factsButton(facts: Link | undefined) {
 `;
 }
 
+// Step 9: the way in for families, next to FACTS on every public page.
+const FAMILY_BUTTON = `        <a class="btn btn-family" href="/family" aria-label="Family sign-in"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Family<span class="lbl-fam-long">&nbsp;sign-in</span></span></a>
+`;
+
 export function schoolTitle(school: School) {
   return `Parent Portal — ${school.name}`;
 }
@@ -96,6 +100,7 @@ function schoolValues(school: School, links: Link[], people: ContactPerson[]) {
     "school.email": esc(school.email),
     "school.office_hours": esc(school.office_hours),
     "school.footer": esc([school.name, place, `Parent Portal, school year ${school.school_year}`].filter(Boolean).join(" · ")),
+    "family.button": FAMILY_BUTTON,
     "facts.button": factsButton(links.find((l) => l.placement === "facts")),
     ...contactParts(school, people),
   } as Record<string, string>;

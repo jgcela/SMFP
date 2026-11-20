@@ -4,6 +4,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "../../lib/auth";
+import { mailSchool, sendSchoolMail } from "../../lib/emails";
 import { db } from "../../lib/db";
 import { familyOfUser, normalizeCode, STATUS_MESSAGE } from "../../lib/family";
 import { schoolSlug } from "../../lib/portal";
@@ -57,6 +58,10 @@ export async function registerFamily(_prev: FamilyFormState, fd: FormData): Prom
     if (userId) await db()`delete from auth_user where id = ${userId}`.catch(() => {});
     return { error: "The account could not be created. Try again in a moment." };
   }
+  // Step 9: tell the family we received it, and the school that someone is waiting.
+  await sendSchoolMail(school.id, "familyReceived", email, name);
+  const notify = (await mailSchool(school.id))?.notifyEmail;
+  if (notify) await sendSchoolMail(school.id, "schoolNewFamily", notify, name, email);
   return { done: "pending", message: STATUS_MESSAGE.pending };
 }
 

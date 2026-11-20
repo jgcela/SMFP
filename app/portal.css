@@ -238,3 +238,14 @@ a.ctile .v{text-decoration:underline}
 .contact-people .k{text-transform:uppercase}
 .contact-people a{color:var(--white);font-size:15px;line-height:22px;overflow-wrap:anywhere;min-height:44px;display:inline-flex;align-items:center}
 .legal{padding-top:24px;border-top:1px solid var(--cerulean);font-size:14px;line-height:20px;color:var(--azure)}
+
+/* Family sign-in button (step 9) */
+.btn-family{background:transparent;color:var(--white);border-color:var(--sky)}
+.btn-family:hover{background:#22477a;color:var(--white)}
+.btn-family .icon{width:16px;height:16px;flex:none}
+.logo{flex:none}
+.bar-actions .btn{white-space:nowrap}
+@media (max-width:640px){.bar .wrap{gap:12px}.bar-actions .btn{padding:0 12px;gap:6px}.btn-facts .lbl-long{display:none}}
+@media (max-width:480px){.logo img{height:36px}.bar-actions{gap:6px}.bar-actions .btn{padding:0 10px}.bar-actions .btn .icon{display:none}}
+@media (max-width:379px){.btn-family .lbl-fam-long{display:none}}
+@media (max-width:350px){.logo img{height:30px}.bar-actions .btn{padding:0 8px}}

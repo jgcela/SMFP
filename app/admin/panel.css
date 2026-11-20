@@ -311,3 +311,4 @@
   .my-grid{display:flex;flex-direction:column}
 }
 @media (max-width:640px){.sp .my-sent{grid-template-columns:60px minmax(0,1fr)}}
+.sp .adm-card>.adm-h2:first-child{margin:0 0 12px}

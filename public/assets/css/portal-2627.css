@@ -308,3 +308,14 @@ a.ctile .v{text-decoration:underline}
 .staff-photo{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none;background:var(--tint)}
 .sf-lock{max-width:720px}
 .sf-lock .h3{margin:0}
+
+/* Family sign-in button (step 9) */
+.btn-family{background:transparent;color:var(--white);border-color:var(--sky)}
+.btn-family:hover{background:#22477a;color:var(--white)}
+.btn-family .icon{width:16px;height:16px;flex:none}
+.logo{flex:none}
+.bar-actions .btn{white-space:nowrap}
+@media (max-width:640px){.bar .wrap{gap:12px}.bar-actions .btn{padding:0 12px;gap:6px}.btn-facts .lbl-long{display:none}}
+@media (max-width:480px){.logo img{height:36px}.bar-actions{gap:6px}.bar-actions .btn{padding:0 10px}.bar-actions .btn .icon{display:none}}
+@media (max-width:379px){.btn-family .lbl-fam-long{display:none}}
+@media (max-width:350px){.logo img{height:30px}.bar-actions .btn{padding:0 8px}}
