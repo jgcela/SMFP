@@ -1,4 +1,5 @@
 "use client";
+import { PasswordFields } from "../admin/password-fields";
 import { startTransition, useActionState } from "react";
 import { familySignIn, registerFamily, type FamilyFormState } from "./actions";
 import { SLink } from "../admin/ui";
@@ -71,15 +72,7 @@ export function RegisterForm() {
         Email
         <input type="email" name="email" autoComplete="email" maxLength={200} required {...invalid(state, "email")} />
       </label>
-      <label>
-        Password
-        <span className="hint">At least 10 characters. A short sentence is easy to remember.</span>
-        <input type="password" name="password" autoComplete="new-password" minLength={10} maxLength={128} required {...invalid(state, "password")} />
-      </label>
-      <label>
-        Repeat the password
-        <input type="password" name="confirm" autoComplete="new-password" minLength={10} maxLength={128} required {...invalid(state, "confirm")} />
-      </label>
+      <PasswordFields min={10} hint="A short sentence is easy to remember." invalidPassword={invalid(state, "password")} invalidConfirm={invalid(state, "confirm")} />
       <label>
         School code
         <span className="hint">The school office gives this code to families.</span>

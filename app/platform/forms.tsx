@@ -6,6 +6,7 @@ import {
   confirmTwoStep, createFirstAdmin, createSchool, newBackupCodesAction, platformSignIn, platformVerify, resendInvite,
   setPlanAndModules, setSchoolStatus, type PfState,
 } from "./actions";
+import { PasswordFields } from "../admin/password-fields";
 
 type Fn = (prev: PfState, fd: FormData) => Promise<PfState>;
 function useForm(fn: Fn) {
@@ -115,9 +116,7 @@ export function FirstAdminForm() {
         <input type="password" name="setup_code" autoComplete="off" required {...invalid(state, "setup_code")} /></label>
       <label>Your name<input type="text" name="name" autoComplete="name" maxLength={100} required {...invalid(state, "name")} /></label>
       <label>Your email<input type="email" name="email" autoComplete="username" required {...invalid(state, "email")} /></label>
-      <label>Password<span className="hint">At least 12 characters.</span>
-        <input type="password" name="password" autoComplete="new-password" minLength={12} maxLength={128} required {...invalid(state, "password")} /></label>
-      <label>Password again<input type="password" name="confirm" autoComplete="new-password" required {...invalid(state, "confirm")} /></label>
+      <PasswordFields min={12} confirmLabel="Password again" invalidPassword={invalid(state, "password")} invalidConfirm={invalid(state, "confirm")} />
       <div className="adm-actions"><button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Creating…" : "Create Super Admin"}</button></div>
     </form>
   );

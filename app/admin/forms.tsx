@@ -1,4 +1,5 @@
 "use client";
+import { PasswordFields } from "./password-fields";
 import { startTransition, useActionState, useState } from "react";
 import { saveNotice, setPassword, signIn, type FormState } from "./actions";
 
@@ -57,15 +58,7 @@ export function SetPasswordForm({ token }: { token: string }) {
     <form onSubmit={onSubmit} className="adm-f">
       <Message state={state} />
       <input type="hidden" name="token" value={token} />
-      <label>
-        New password
-        <span className="hint">At least 10 characters. A short sentence is easy to remember.</span>
-        <input type="password" name="password" autoComplete="new-password" minLength={10} maxLength={128} required autoFocus />
-      </label>
-      <label>
-        Repeat the password
-        <input type="password" name="confirm" autoComplete="new-password" minLength={10} maxLength={128} required />
-      </label>
+      <PasswordFields min={10} label="New password" hint="A short sentence is easy to remember." autoFocus />
       <div className="adm-actions">
         <Submit pending={pending} busy="Saving…">Save password</Submit>
       </div>

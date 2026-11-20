@@ -287,3 +287,9 @@
 @media (max-width:640px){.sf-fav{grid-template-columns:1fr}.sf-fav-act{justify-content:flex-end}}
 .adm-panel fieldset{min-width:0}
 .adm-panel input[type=file]{max-width:100%;box-sizing:border-box}
+.pw-rules{list-style:none;margin:-8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font:600 14px/20px var(--font-text)}
+.pw-rules li{display:flex;align-items:center;gap:8px}
+.pw-rules li>span[aria-hidden]{display:inline-flex;width:18px;justify-content:center;font-size:15px}
+.pw-no{color:#b42318}
+.pw-ok{color:#15803d}
+.pw-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
