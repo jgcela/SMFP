@@ -3,16 +3,17 @@ import { currentStaff } from "../../../lib/staff";
 import { loadOpportunities } from "../../../lib/volunteer-db";
 import { AdminTop } from "../chrome";
 import { VolunteerManager } from "./manager";
-import { requireModule, schoolPath } from "../../../lib/portal";
+import { schoolPath } from "../../../lib/portal";
+import { requirePanelModule } from "../../../lib/years";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Volunteer" };
 
 export default async function VolunteerAdmin() {
-  await requireModule("volunteer");
+  await requirePanelModule("volunteer");
   const { staff } = await currentStaff();
   if (!staff) redirect(await schoolPath("/admin"));
-  const opps = await loadOpportunities(staff.schoolId, { includeHidden: true });
+  const opps = await loadOpportunities(staff.yearId, { includeHidden: true });
   return (
     <>
       <AdminTop signedIn section="volunteer" />

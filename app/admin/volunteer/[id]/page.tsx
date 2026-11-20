@@ -7,20 +7,21 @@ import { OPP_COLUMNS, spotsLabel, whenLabel, type Opportunity } from "../../../.
 import { AdminTop } from "../../chrome";
 import { loadSignups } from "./signups";
 import { Head, SLink } from "../../ui";
-import { requireModule, schoolPath } from "../../../../lib/portal";
+import { schoolPath } from "../../../../lib/portal";
+import { requirePanelModule } from "../../../../lib/years";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Volunteer sign-ups" };
 
 export default async function SignupsPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireModule("volunteer");
+  await requirePanelModule("volunteer");
   const { staff } = await currentStaff();
   if (!staff) redirect(await schoolPath("/admin"));
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) notFound();
   const sql = db();
   const [[o], [s]] = await Promise.all([
-    sql<Opportunity[]>`select ${sql.unsafe(OPP_COLUMNS)} from volunteer_opportunities o where o.id = ${id} and o.school_id = ${staff.schoolId}`,
+    sql<Opportunity[]>`select ${sql.unsafe(OPP_COLUMNS)} from volunteer_opportunities o where o.id = ${id} and o.school_id = ${staff.schoolId} and o.year_id = ${staff.yearId}`,
     sql<{ timezone: string }[]>`select timezone from schools where id = ${staff.schoolId}`,
   ]);
   if (!o) notFound();

@@ -31,6 +31,8 @@ export type School = {
   id: number; slug: string; name: string; city: string; region: string; school_year: string;
   logo_url: string; phone_display: string; phone_href: string; email: string; office_hours: string; address: string;
   google_calendar_id: string; notice_auto_days: number; panel_theme: unknown; status: string; modules: string[]; calendar_pdf_url: string; calendar_pdf_label: string;
+  // Step 11a: the active school year, whose content and settings are shown.
+  year_id: number;
 };
 export type ContactPerson = { name: string; role: string; email: string };
 export type Link = { placement: string; label: string; short_label: string; href: string; new_tab: boolean };
@@ -62,24 +64,30 @@ const iso = (d: Date | string | null) => {
 // cache(): the title and the page share one set of queries per request.
 export const loadPortal = cache(async function loadPortal(slug: string) {
   const sql = db();
-  const [school] = await sql<School[]>`select * from schools where slug = ${slug}`;
+  // The school, with the settings of its active year (step 11a).
+  const [school] = await sql<School[]>`
+    select s.id, s.slug, s.name, s.city, s.region, s.status, y.id as year_id, y.label as school_year,
+      y.logo_url, y.phone_display, y.phone_href, y.email, y.office_hours, y.address, y.google_calendar_id,
+      y.notice_auto_days, y.panel_theme, y.modules, y.calendar_pdf_url, y.calendar_pdf_label
+    from schools s join school_years y on y.school_id = s.id and y.status = 'active'
+    where s.slug = ${slug}`;
   if (!school) notFound();
 
   // Dates come back as text so no time zone can move them by a day.
   const [notices, events, cats, docs, links, contacts] = await Promise.all([
     sql<{ message: string; link_label: string; link_href: string; show_from: string | null; show_until: string | null }[]>`
       select message, link_label, link_href, show_from::text, show_until::text from notices
-      where school_id = ${school.id} and is_active order by created_at desc, id desc`,
+      where year_id = ${school.year_id} and is_active order by created_at desc, id desc`,
     sql<{ event_date: string; end_date: string | null; start_time: string | null; category: string; title: string; details: string; badges: string[]; link_url: string }[]>`
       select event_date::text, end_date::text, start_time::text, category, title, details, badges, link_url
-      from events where school_id = ${school.id} order by event_date, sort_order, id`,
+      from events where year_id = ${school.year_id} order by event_date, sort_order, id`,
     sql<{ id: number; key: string; name: string; description: string }[]>`
-      select id, key, name, description from document_categories where school_id = ${school.id} order by sort_order, id`,
+      select id, key, name, description from document_categories where year_id = ${school.year_id} order by sort_order, id`,
     sql<{ category_id: number; title: string; href: string; meta: string; description: string; kind: string; keywords: string; added_on: string | null; most_used_rank: number | null }[]>`
       select category_id, title, href, meta, description, kind, keywords, added_on::text, most_used_rank
-      from documents where school_id = ${school.id} order by sort_order, id`,
-    sql<Link[]>`select placement, label, short_label, href, new_tab from links where school_id = ${school.id} and not hidden order by sort_order, id`,
-    sql<ContactPerson[]>`select name, role, email from contact_people where school_id = ${school.id} order by sort_order, id`,
+      from documents where year_id = ${school.year_id} order by sort_order, id`,
+    sql<Link[]>`select placement, label, short_label, href, new_tab from links where year_id = ${school.year_id} and not hidden order by sort_order, id`,
+    sql<ContactPerson[]>`select name, role, email from contact_people where year_id = ${school.year_id} order by sort_order, id`,
   ]);
 
   const docGroups = cats.map((c) => {
@@ -120,8 +128,10 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
 // ---- Step 10: the modules a school has turned on (lib/plans.ts) ----
 export const currentSchoolRow = cache(async () => {
   const slug = await schoolSlug();
-  const [s] = await db()<{ id: number; modules: string[]; status: string; timezone: string }[]>`
-    select id, modules, status, timezone from schools where slug = ${slug}`;
+  // Modules of the active year: what families and the public may use.
+  const [s] = await db()<{ id: number; modules: string[]; status: string; timezone: string; year_id: number }[]>`
+    select s.id, y.modules, s.status, s.timezone, y.id as year_id
+    from schools s join school_years y on y.school_id = s.id and y.status = 'active' where s.slug = ${slug}`;
   if (!s) notFound();
   return s;
 });

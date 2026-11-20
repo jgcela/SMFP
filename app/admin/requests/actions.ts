@@ -3,17 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { db } from "../../../lib/db";
 import { STATUS_LABEL, type SubmissionStatus } from "../../../lib/my-family";
-import { requireStaff } from "../../../lib/staff";
+import { requireYearStaff } from "../../../lib/staff";
 
 export type StatusResult = { ok?: string; error?: string };
 
 export async function setSubmissionStatus(id: number, status: SubmissionStatus): Promise<StatusResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     if (!Number.isInteger(id) || !(status in STATUS_LABEL)) return { error: "That change is not possible." };
     const [r] = await db()<{ id: number }[]>`
       update family_submissions set status = ${status}, status_at = now(), status_by = ${staff.name || staff.email}
-      where id = ${id} and school_id = ${staff.schoolId}
+      where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}
       returning id`;
     if (!r) return { error: "This item is no longer in the list. Reload the page." };
     revalidatePath("/admin/requests");

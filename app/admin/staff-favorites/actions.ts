@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { db } from "../../../lib/db";
 import { detectFileKind, storageSafeName } from "../../../lib/files";
-import { requireStaff } from "../../../lib/staff";
+import { requireYearStaff } from "../../../lib/staff";
 import { PHOTO_ACCEPT, PHOTO_MAX_BYTES, readStaffCard } from "../../../lib/staff-favorites";
 import { loadStaffPage } from "../../../lib/staff-favorites-db";
 import { getStorage } from "../../../lib/storage";
@@ -17,13 +17,16 @@ const GONE = "This card is no longer in the list. Reload the page.";
 
 async function removeFile(key: string | null | undefined) {
   if (!key) return;
+  // A copied school year shares its photos with the year it came from (step 11a).
+  const [used] = await db()`select 1 from staff_favorites where photo_key = ${key} limit 1`;
+  if (used) return;
   try { await getStorage().delete(key); } catch { /* an orphan photo is harmless */ }
 }
 
 /** The browser sends the photo straight to private storage. */
 export async function startPhotoUpload(fileName: string, size: number): Promise<{ token: string; putUrl: string } | { error: string }> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const ext = (/\.([a-z0-9]{1,5})$/i.exec(fileName)?.[1] ?? "").toLowerCase();
     if (!PHOTO_ACCEPT.split(",").includes(`.${ext}`)) return { error: "Choose a photo in PNG, JPG, GIF or WebP." };
     if (!(size > 0)) return { error: "The photo is empty." };
@@ -37,14 +40,14 @@ export async function startPhotoUpload(fileName: string, size: number): Promise<
 export async function saveStaffCard(fd: FormData): Promise<SfResult> {
   let newKey: string | null = null;
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const id = Number(fd.get("id") || 0);
-    const { teams } = await loadStaffPage(staff.schoolId);
+    const { teams } = await loadStaffPage(staff.yearId);
     const r = readStaffCard(fd, teams);
     if (!r.value) return { error: r.error, field: r.field };
     const v = r.value;
     const sql = db();
-    const [cur] = id ? await sql<{ photo_key: string | null }[]>`select photo_key from staff_favorites where id = ${id} and school_id = ${staff.schoolId}` : [];
+    const [cur] = id ? await sql<{ photo_key: string | null }[]>`select photo_key from staff_favorites where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}` : [];
     if (id && !cur) return { error: GONE };
 
     let photo: string | null | undefined; // undefined = keep the current one
@@ -66,11 +69,11 @@ export async function saveStaffCard(fd: FormData): Promise<SfResult> {
       updated_by: staff.name || staff.email, ...(photo !== undefined ? { photo_key: photo } : {}),
     };
     if (id) {
-      const u = await sql`update staff_favorites set ${sql(cols)}, updated_at = now() where id = ${id} and school_id = ${staff.schoolId}`;
+      const u = await sql`update staff_favorites set ${sql(cols)}, updated_at = now() where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       if (!u.count) return { error: GONE };
     } else {
-      const [n] = await sql<{ id: number }[]>`insert into staff_favorites ${sql({ ...cols, school_id: staff.schoolId })} returning id`;
-      await sql`update staff_favorites set sort_order = (select coalesce(max(sort_order), 0) + 1 from staff_favorites where school_id = ${staff.schoolId})
+      const [n] = await sql<{ id: number }[]>`insert into staff_favorites ${sql({ ...cols, school_id: staff.schoolId, year_id: staff.yearId })} returning id`;
+      await sql`update staff_favorites set sort_order = (select coalesce(max(sort_order), 0) + 1 from staff_favorites where school_id = ${staff.schoolId} and year_id = ${staff.yearId})
         where id = ${n.id}`;
     }
     newKey = null; // saved: keep it
@@ -87,10 +90,10 @@ export async function saveStaffCard(fd: FormData): Promise<SfResult> {
 
 export async function setStaffHidden(id: number, hidden: boolean): Promise<SfResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const [c] = await db()<{ name: string }[]>`
       update staff_favorites set hidden = ${hidden}, updated_at = now(), updated_by = ${staff.name || staff.email}
-      where id = ${id} and school_id = ${staff.schoolId} returning name`;
+      where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId} returning name`;
     if (!c) return { error: GONE };
     refresh();
     return { ok: hidden ? `${c.name} is hidden. Families no longer see this card.` : `${c.name} is visible again.` };
@@ -100,19 +103,19 @@ export async function setStaffHidden(id: number, hidden: boolean): Promise<SfRes
 /** Moves a card up or down among the cards of its own group. */
 export async function moveStaffCard(id: number, dir: -1 | 1): Promise<SfResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     let moved = false;
     await db().begin(async (tx) => {
-      await tx`select 1 from staff_favorites where school_id = ${staff.schoolId} for update`;
+      await tx`select 1 from staff_favorites where school_id = ${staff.schoolId} and year_id = ${staff.yearId} for update`;
       // Number them 1, 2, 3… first, so two cards never share a place.
       await tx`update staff_favorites f set sort_order = n.rn from (
-        select id, row_number() over (order by sort_order, id) as rn from staff_favorites where school_id = ${staff.schoolId}) n
+        select id, row_number() over (order by sort_order, id) as rn from staff_favorites where school_id = ${staff.schoolId} and year_id = ${staff.yearId}) n
         where f.id = n.id`;
-      const [c] = await tx<{ team: string; sort_order: number }[]>`select team, sort_order from staff_favorites where id = ${id} and school_id = ${staff.schoolId}`;
+      const [c] = await tx<{ team: string; sort_order: number }[]>`select team, sort_order from staff_favorites where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       if (!c) return;
       const [other] = dir < 0
-        ? await tx<{ id: number; sort_order: number }[]>`select id, sort_order from staff_favorites where school_id = ${staff.schoolId} and team = ${c.team} and sort_order < ${c.sort_order} order by sort_order desc limit 1`
-        : await tx<{ id: number; sort_order: number }[]>`select id, sort_order from staff_favorites where school_id = ${staff.schoolId} and team = ${c.team} and sort_order > ${c.sort_order} order by sort_order limit 1`;
+        ? await tx<{ id: number; sort_order: number }[]>`select id, sort_order from staff_favorites where school_id = ${staff.schoolId} and year_id = ${staff.yearId} and team = ${c.team} and sort_order < ${c.sort_order} order by sort_order desc limit 1`
+        : await tx<{ id: number; sort_order: number }[]>`select id, sort_order from staff_favorites where school_id = ${staff.schoolId} and year_id = ${staff.yearId} and team = ${c.team} and sort_order > ${c.sort_order} order by sort_order limit 1`;
       if (!other) return;
       await tx`update staff_favorites set sort_order = ${other.sort_order} where id = ${id}`;
       await tx`update staff_favorites set sort_order = ${c.sort_order} where id = ${other.id}`;
@@ -125,9 +128,9 @@ export async function moveStaffCard(id: number, dir: -1 | 1): Promise<SfResult> 
 
 export async function deleteStaffCard(id: number): Promise<SfResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const [c] = await db()<{ name: string; photo_key: string | null }[]>`
-      delete from staff_favorites where id = ${id} and school_id = ${staff.schoolId} returning name, photo_key`;
+      delete from staff_favorites where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId} returning name, photo_key`;
     if (!c) return { error: GONE };
     await removeFile(c.photo_key);
     refresh();

@@ -18,6 +18,7 @@ export async function pageResponse(copy: PageCopy, preview?: string) {
 export async function findPublished(slug: string) {
   const [p] = await db()<PageCopy[]>`
     select p.title, p.summary, p.html from pages p join schools s on s.id = p.school_id
+      join school_years y on y.id = p.year_id and y.status = 'active'
     where s.slug = ${await schoolSlug()} and p.slug = ${slug} and p.published_at is not null`;
   return p ?? null;
 }

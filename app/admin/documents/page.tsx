@@ -14,11 +14,11 @@ export default async function DocumentsPage() {
   if (!staff) redirect(await schoolPath("/admin"));
   const [cats, docs, storageReady] = await Promise.all([
     db()<AdminCategory[]>`
-      select id, key, name, description from document_categories where school_id = ${staff.schoolId} order by sort_order, id`,
+      select id, key, name, description from document_categories where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by sort_order, id`,
     db()<AdminDoc[]>`
       select id, category_id as "categoryId", title, description, href, meta, kind, most_used_rank is not null as "mostUsed",
         file_key is not null as "uploaded", file_name as "fileName"
-      from documents where school_id = ${staff.schoolId} order by sort_order, id`,
+      from documents where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by sort_order, id`,
     storageConfigured() ? getStorage().ping() : Promise.resolve(false),
   ]);
   return (

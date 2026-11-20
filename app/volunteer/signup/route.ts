@@ -22,7 +22,10 @@ export async function POST(req: Request) {
   const family = await currentFamily();
   if (!family) return back(req, "signin", id || undefined);
   if (!Number.isInteger(id) || id <= 0) return back(req, "gone");
-  const [s] = await db()<{ timezone: string }[]>`select timezone from schools where id = ${family.schoolId}`;
-  const r = await changeSignup(family.schoolId, family.id, id, join, todayIn(s?.timezone || "UTC"));
+  const [s] = await db()<{ timezone: string; year_id: number }[]>`
+    select s.timezone, y.id as year_id from schools s join school_years y on y.school_id = s.id and y.status = 'active'
+    where s.id = ${family.schoolId}`;
+  if (!s) return back(req, "gone");
+  const r = await changeSignup(family.schoolId, s.year_id, family.id, id, join, todayIn(s?.timezone || "UTC"));
   return back(req, r, id);
 }

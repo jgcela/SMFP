@@ -3,17 +3,12 @@
 // server and only touches rows of that school.
 import { revalidatePath } from "next/cache";
 import { db } from "../../../lib/db";
-import { currentStaff } from "../../../lib/staff";
+import { requireYearStaff } from "../../../lib/staff";
 import { ALL_CATEGORY_KEYS, CATEGORIES, parseCsv, parseIcs, validateEvent, type EventInput, type ImportRow } from "../../../lib/events";
 
 export type EventState = { error?: string; ok?: string; savedId?: number } | undefined;
 
-async function requireStaff() {
-  const { user, staff } = await currentStaff();
-  if (!user) throw new Error("Your session has ended. Sign in again.");
-  if (!staff) throw new Error("This account cannot edit this school’s portal.");
-  return staff;
-}
+const requireStaff = requireYearStaff;
 
 function refresh() {
   revalidatePath("/"); // the families' portal: list, month view and notice
@@ -43,7 +38,7 @@ export async function saveEvent(_prev: EventState, fd: FormData): Promise<EventS
     if (id) {
       // An older event may keep the category it already has (e.g. Health).
       const [cur] = await db()<{ category: string; event_date: string; end_date: string | null }[]>`
-        select category, event_date::text, end_date::text from events where id = ${id} and school_id = ${staff.schoolId}`;
+        select category, event_date::text, end_date::text from events where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       if (!cur) return { error: "This event no longer exists. Reload the page." };
       if (ALL_CATEGORY_KEYS.includes(cur.category)) allowed = [...new Set([...allowed, cur.category])];
       // Keep a multi-day break's length when only other fields change.
@@ -56,14 +51,14 @@ export async function saveEvent(_prev: EventState, fd: FormData): Promise<EventS
       await db()`
         update events set title = ${e.title}, event_date = ${e.date}, end_date = ${e.endDate},
           start_time = ${e.time}, category = ${e.category}, details = ${e.note}
-        where id = ${id} and school_id = ${staff.schoolId}`;
+        where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       refresh();
       return { ok: "Event saved.", savedId: id };
     }
     const [row] = await db()<{ id: number }[]>`
-      insert into events (school_id, event_date, start_time, category, title, details, sort_order)
-      values (${staff.schoolId}, ${e.date}, ${e.time}, ${e.category}, ${e.title}, ${e.note},
-        (select coalesce(max(sort_order), 0) + 1 from events where school_id = ${staff.schoolId}))
+      insert into events (school_id, year_id, event_date, start_time, category, title, details, sort_order)
+      values (${staff.schoolId}, ${staff.yearId}, ${e.date}, ${e.time}, ${e.category}, ${e.title}, ${e.note},
+        (select coalesce(max(sort_order), 0) + 1 from events where school_id = ${staff.schoolId} and year_id = ${staff.yearId}))
       returning id`;
     refresh();
     return { ok: "Event added.", savedId: row.id };
@@ -75,7 +70,7 @@ export async function saveEvent(_prev: EventState, fd: FormData): Promise<EventS
 export async function deleteEvent(id: number): Promise<EventState> {
   try {
     const staff = await requireStaff();
-    const res = await db()`delete from events where id = ${Number(id)} and school_id = ${staff.schoolId}`;
+    const res = await db()`delete from events where id = ${Number(id)} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
     if (!res.count) return { error: "This event no longer exists." };
     refresh();
     return { ok: "Event deleted." };
@@ -89,12 +84,12 @@ export type PreviewState = { error?: string; rows?: ImportRow[]; fileName?: stri
 
 const MAX_BYTES = 1024 * 1024;
 
-async function markDuplicates(schoolId: number, rows: ImportRow[]) {
+async function markDuplicates(yearId: number, rows: ImportRow[]) {
   const dates = [...new Set(rows.filter((r) => r.date).map((r) => r.date))];
   if (!dates.length) return;
   const existing = await db()<{ d: string; title: string }[]>`
     select event_date::text as d, lower(trim(title)) as title from events
-    where school_id = ${schoolId} and event_date = any(${dates}::date[])`;
+    where year_id = ${yearId} and event_date = any(${dates}::date[])`;
   const key = new Set(existing.map((x) => `${x.d}|${x.title}`));
   const seen = new Set<string>();
   for (const r of rows) {
@@ -121,7 +116,7 @@ export async function previewImport(_prev: PreviewState, fd: FormData): Promise<
     } else if (name.endsWith(".csv") || name.endsWith(".txt")) parsed = parseCsv(text, fallback);
     else return { error: "Only .ics and .csv files can be imported." };
     if (parsed.error) return { error: parsed.error };
-    await markDuplicates(staff.schoolId, parsed.rows);
+    await markDuplicates(staff.yearId, parsed.rows);
     parsed.rows.sort((a, b) => (a.date || "9").localeCompare(b.date || "9") || (a.time ?? "").localeCompare(b.time ?? ""));
     return { rows: parsed.rows, fileName: file.name };
   } catch (err) {
@@ -146,17 +141,17 @@ export async function importEvents(rows: EventInput[]): Promise<{ error?: string
     }
     // Skip events already in the calendar (same date and title).
     const asRows = clean.map((e, i) => ({ ...e, line: i }) as ImportRow);
-    await markDuplicates(staff.schoolId, asRows);
+    await markDuplicates(staff.yearId, asRows);
     const toAdd = asRows.filter((r) => !r.duplicate);
     await db().begin(async (sql) => {
       const [{ base }] = await sql<{ base: number }[]>`
-        select coalesce(max(sort_order), 0) as base from events where school_id = ${staff.schoolId}`;
+        select coalesce(max(sort_order), 0) as base from events where school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       let n = 0;
       for (const e of toAdd) {
         n++;
         await sql`
-          insert into events (school_id, event_date, end_date, start_time, category, title, details, sort_order)
-          values (${staff.schoolId}, ${e.date}, ${e.endDate}, ${e.time}, ${e.category}, ${e.title}, ${e.note}, ${base + n})`;
+          insert into events (school_id, year_id, event_date, end_date, start_time, category, title, details, sort_order)
+          values (${staff.schoolId}, ${staff.yearId}, ${e.date}, ${e.endDate}, ${e.time}, ${e.category}, ${e.title}, ${e.note}, ${base + n})`;
       }
     });
     refresh();

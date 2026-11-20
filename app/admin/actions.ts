@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "../../lib/auth";
 import { db } from "../../lib/db";
-import { clearFailures, currentStaff, recordFailure, tooManyFailures } from "../../lib/staff";
+import { ARCHIVED_ERROR, clearFailures, currentStaff, recordFailure, tooManyFailures } from "../../lib/staff";
 import { schoolPath } from "../../lib/portal";
 
 export type FormState = { error?: string; ok?: string } | undefined;
@@ -52,6 +52,7 @@ export async function saveNotice(_prev: FormState, fd: FormData): Promise<FormSt
   const { user, staff } = await currentStaff();
   if (!user) return { error: "Your session has ended. Sign in again." };
   if (!staff) return { error: "This account cannot edit this school’s portal." };
+  if (staff.yearStatus === "archived") return { error: ARCHIVED_ERROR };
 
   const message = String(fd.get("message") ?? "").trim();
   const linkLabel = String(fd.get("link_label") ?? "").trim();
@@ -68,20 +69,20 @@ export async function saveNotice(_prev: FormState, fd: FormData): Promise<FormSt
 
   await db().begin(async (sql) => {
     const [current] = await sql<{ id: number }[]>`
-      select id from notices where school_id = ${staff.schoolId} order by created_at desc, id desc limit 1 for update`;
+      select id from notices where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by created_at desc, id desc limit 1 for update`;
     let id = current?.id;
     if (id) {
       await sql`
         update notices set message = ${message}, link_label = ${linkLabel}, link_href = ${linkHref},
           is_active = ${show}, show_from = null, show_until = null
-        where id = ${id} and school_id = ${staff.schoolId}`;
+        where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
     } else {
       [{ id }] = await sql<{ id: number }[]>`
-        insert into notices (school_id, message, link_label, link_href, is_active)
-        values (${staff.schoolId}, ${message}, ${linkLabel}, ${linkHref}, ${show}) returning id`;
+        insert into notices (school_id, year_id, message, link_label, link_href, is_active)
+        values (${staff.schoolId}, ${staff.yearId}, ${message}, ${linkLabel}, ${linkHref}, ${show}) returning id`;
     }
     // Only one notice per school: the one edited here.
-    await sql`update notices set is_active = false where school_id = ${staff.schoolId} and id <> ${id!}`;
+    await sql`update notices set is_active = false where school_id = ${staff.schoolId} and year_id = ${staff.yearId} and id <> ${id!}`;
   });
   revalidatePath("/");
   return { ok: show ? "Saved. The portal now shows this notice." : "Saved. The notice is hidden from the portal." };

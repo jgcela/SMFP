@@ -12,6 +12,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ legacy: string 
   if (!/\.html?$/i.test(legacy)) return notFound();
   const [p] = await db()<{ slug: string }[]>`
     select p.slug from pages p join schools s on s.id = p.school_id
+      join school_years y on y.id = p.year_id and y.status = 'active'
     where s.slug = ${await schoolSlug()} and p.legacy_path = ${legacy} and p.published_at is not null`;
   const url = new URL(req.url);
   if (p) return go(`/pages/${encodeURIComponent(p.slug)}${url.search}`);

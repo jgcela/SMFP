@@ -9,8 +9,14 @@ import { auth } from "./auth";
 import { db } from "./db";
 import { audit, supportVisit } from "./platform";
 import { schoolSlug } from "./portal";
+import { panelYear, type YearStatus } from "./years";
 
-export type Staff = { userId: string; email: string; name: string; schoolId: number; schoolName: string; support?: boolean };
+// yearId: the school year the panel is working on (lib/years.ts). Content of a
+// year is read and written only with this year's id.
+export type Staff = {
+  userId: string; email: string; name: string; schoolId: number; schoolName: string; support?: boolean;
+  yearId: number; yearLabel: string; yearStatus: YearStatus;
+};
 
 export async function currentUser() {
   const s = await auth().api.getSession({ headers: await headers() });
@@ -26,10 +32,14 @@ export async function currentStaff(): Promise<{ user: Awaited<ReturnType<typeof 
     where ss.user_id = ${user.id} and s.slug = ${await schoolSlug()} and s.status <> 'suspended'`;
   if (!rows.length) {
     const v = await supportVisit();
-    if (v && v.userId === user.id) return { user, staff: { userId: user.id, email: user.email, name: user.name, schoolId: v.schoolId, schoolName: v.schoolName, support: true } };
+    if (v && v.userId === user.id) {
+      const y = await panelYear(v.schoolId);
+      return { user, staff: { userId: user.id, email: user.email, name: user.name, schoolId: v.schoolId, schoolName: v.schoolName, support: true, yearId: y.id, yearLabel: y.label, yearStatus: y.status } };
+    }
     return { user, staff: null };
   }
-  return { user, staff: { userId: user.id, email: user.email, name: user.name, schoolId: rows[0].school_id, schoolName: rows[0].name } };
+  const y = await panelYear(rows[0].school_id);
+  return { user, staff: { userId: user.id, email: user.email, name: user.name, schoolId: rows[0].school_id, schoolName: rows[0].name, yearId: y.id, yearLabel: y.label, yearStatus: y.status } };
 }
 
 // ---- Failed sign-in counter: 8 failures per email per 15 minutes ----
@@ -67,5 +77,14 @@ export async function requireStaff(): Promise<Staff> {
     } catch {}
     await audit({ userId: staff.userId, email: staff.email }, "support.change", staff.schoolId, `Change in the staff panel${page ? ` (${page})` : ""}`);
   }
+  return staff;
+}
+
+export const ARCHIVED_ERROR = "This school year is archived. You can look at it, but not change it.";
+
+/** For server actions that change a year's content: refused in an archived year. */
+export async function requireYearStaff(): Promise<Staff> {
+  const staff = await requireStaff();
+  if (staff.yearStatus === "archived") throw new Error(ARCHIVED_ERROR);
   return staff;
 }

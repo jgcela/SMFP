@@ -5,7 +5,8 @@ import { currentStaff } from "../../../../lib/staff";
 import { AdminTop } from "../../chrome";
 import { ChildrenFixer, type KidRow } from "./fixer";
 import { Head, SLink } from "../../ui";
-import { requireModule, schoolPath } from "../../../../lib/portal";
+import { schoolPath } from "../../../../lib/portal";
+import { requirePanelModule } from "../../../../lib/years";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Family" };
@@ -13,7 +14,7 @@ export const metadata = { title: "Family" };
 type Fam = { id: number; name: string; email: string; status: string; parentNames: string; phone: string; c2Name: string; c2Phone: string; c2Rel: string };
 
 export default async function FamilyDetail({ params }: { params: Promise<{ id: string }> }) {
-  await requireModule("families");
+  await requirePanelModule("families");
   const { staff } = await currentStaff();
   if (!staff) redirect(await schoolPath("/admin"));
   const id = Number((await params).id);
@@ -24,7 +25,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
         f.contact2_name as "c2Name", f.contact2_phone as "c2Phone", f.contact2_relation as "c2Rel"
       from families f join auth_user u on u.id = f.user_id
       where f.id = ${id} and f.school_id = ${staff.schoolId}`,
-    db()<KidRow[]>`select id, name, grade, teacher from children where family_id = ${id} and school_id = ${staff.schoolId} order by id`,
+    db()<KidRow[]>`select id, name, grade, teacher from children where family_id = ${id} and school_id = ${staff.schoolId} and not left_school order by id`,
     db()<{ open: number }[]>`select count(*)::int as open from family_submissions where family_id = ${id} and school_id = ${staff.schoolId} and status <> 'resolved'`,
   ]);
   if (!f) notFound();

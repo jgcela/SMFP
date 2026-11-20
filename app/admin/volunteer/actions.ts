@@ -2,7 +2,7 @@
 // Staff manage the school's volunteer opportunities (step 6b). Only rows of this school.
 import { revalidatePath } from "next/cache";
 import { db } from "../../../lib/db";
-import { requireStaff } from "../../../lib/staff";
+import { requireYearStaff } from "../../../lib/staff";
 import { readOpportunity } from "../../../lib/volunteer";
 
 export type VolResult = { ok?: string; error?: string; field?: string };
@@ -11,7 +11,7 @@ const refresh = () => { revalidatePath("/admin/volunteer"); };
 
 export async function saveOpportunity(fd: FormData): Promise<VolResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const id = Number(fd.get("id") || 0);
     const r = readOpportunity(fd);
     if (!r.value) return { error: r.error, field: r.field };
@@ -29,11 +29,11 @@ export async function saveOpportunity(fd: FormData): Promise<VolResult> {
         const [{ n }] = await sql<{ n: number }[]>`select count(*)::int as n from volunteer_signups where opportunity_id = ${id} and school_id = ${staff.schoolId}`;
         if (n > v.spots) return { error: `${n} families are already signed up. Spots cannot be fewer than ${n}.`, field: "spots" };
       }
-      const u = await sql`update volunteer_opportunities set ${sql(cols)}, updated_at = now() where id = ${id} and school_id = ${staff.schoolId}`;
+      const u = await sql`update volunteer_opportunities set ${sql(cols)}, updated_at = now() where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       if (!u.count) return { error: "This opportunity is no longer in the list. Reload the page." };
     } else {
-      const [n] = await sql<{ id: number }[]>`insert into volunteer_opportunities ${sql({ ...cols, school_id: staff.schoolId })} returning id`;
-      await sql`update volunteer_opportunities set sort_order = (select coalesce(max(sort_order), 0) + 1 from volunteer_opportunities where school_id = ${staff.schoolId})
+      const [n] = await sql<{ id: number }[]>`insert into volunteer_opportunities ${sql({ ...cols, school_id: staff.schoolId, year_id: staff.yearId })} returning id`;
+      await sql`update volunteer_opportunities set sort_order = (select coalesce(max(sort_order), 0) + 1 from volunteer_opportunities where school_id = ${staff.schoolId} and year_id = ${staff.yearId})
         where id = ${n.id}`;
     }
     refresh();
@@ -43,10 +43,10 @@ export async function saveOpportunity(fd: FormData): Promise<VolResult> {
 
 export async function setOpportunityHidden(id: number, hidden: boolean): Promise<VolResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const [o] = await db()<{ title: string }[]>`
       update volunteer_opportunities set hidden = ${hidden}, updated_at = now(), updated_by = ${staff.name || staff.email}
-      where id = ${id} and school_id = ${staff.schoolId} returning title`;
+      where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId} returning title`;
     if (!o) return { error: "This opportunity is no longer in the list. Reload the page." };
     refresh();
     return { ok: hidden ? `“${o.title}” is hidden. Families no longer see it; its sign-ups are kept.` : `“${o.title}” is visible on the Volunteer page again.` };
@@ -55,8 +55,8 @@ export async function setOpportunityHidden(id: number, hidden: boolean): Promise
 
 export async function deleteOpportunity(id: number): Promise<VolResult> {
   try {
-    const staff = await requireStaff();
-    const [o] = await db()<{ title: string }[]>`delete from volunteer_opportunities where id = ${id} and school_id = ${staff.schoolId} returning title`;
+    const staff = await requireYearStaff();
+    const [o] = await db()<{ title: string }[]>`delete from volunteer_opportunities where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId} returning title`;
     if (!o) return { error: "This opportunity is no longer in the list. Reload the page." };
     refresh();
     return { ok: `“${o.title}” deleted, with its sign-ups.` };

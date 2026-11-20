@@ -15,8 +15,9 @@ export async function GET(req: Request) {
   const { school, links, contacts } = await loadPortal(await schoolSlug());
   const [[extra], opps, { user, staff }] = await Promise.all([
     db()<{ title: string; lead: string; intro: string; timezone: string }[]>`
-      select volunteer_title as title, volunteer_lead as lead, volunteer_intro_html as intro, timezone from schools where id = ${school.id}`,
-    loadOpportunities(school.id),
+      select y.volunteer_title as title, y.volunteer_lead as lead, y.volunteer_intro_html as intro, s.timezone
+      from school_years y join schools s on s.id = y.school_id where y.id = ${school.year_id}`,
+    loadOpportunities(school.year_id),
     currentStaff(),
   ]);
   const family = user ? await familyOfUser(user.id) : null;

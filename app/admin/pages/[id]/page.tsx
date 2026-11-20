@@ -17,7 +17,7 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
     select id, slug, legacy_path as legacy, draft_title as title, draft_summary as summary, draft_html as html,
       published_at::text as "publishedAt",
       (published_at is not null and (draft_title <> title or draft_summary <> summary or draft_html <> html)) as "unpublishedChanges"
-    from pages where id = ${id} and school_id = ${staff.schoolId}`;
+    from pages where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
   if (!page) notFound();
   const versions = await db()<Version[]>`
     select id, kind, title, author, created_at::text as "createdAt" from page_versions where page_id = ${id} order by created_at desc, id desc limit 50`;

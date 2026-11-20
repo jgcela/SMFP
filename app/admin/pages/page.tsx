@@ -14,7 +14,7 @@ export default async function PagesPage() {
   const pages = await db()<PageRow[]>`
     select id, slug, draft_title as title, legacy_path as legacy, published_at::text as "publishedAt", updated_at::text as "updatedAt",
       (published_at is not null and (draft_title <> title or draft_summary <> summary or draft_html <> html)) as "unpublishedChanges"
-    from pages where school_id = ${staff.schoolId} order by draft_title`;
+    from pages where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by draft_title`;
   return (
     <>
       <AdminTop signedIn section="pages" />

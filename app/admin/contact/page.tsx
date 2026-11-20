@@ -13,8 +13,8 @@ export default async function ContactPage() {
   if (!staff) redirect(await schoolPath("/admin"));
   const [[school], people] = await Promise.all([
     db()<ContactDetails[]>`
-      select phone_display as phone, email, address, office_hours as "officeHours" from schools where id = ${staff.schoolId}`,
-    db()<Person[]>`select id, name, role, email from contact_people where school_id = ${staff.schoolId} order by sort_order, id`,
+      select phone_display as phone, email, address, office_hours as "officeHours" from school_years where id = ${staff.yearId}`,
+    db()<Person[]>`select id, name, role, email from contact_people where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by sort_order, id`,
   ]);
   return (
     <>

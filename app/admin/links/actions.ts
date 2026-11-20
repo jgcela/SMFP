@@ -4,7 +4,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "../../../lib/db";
 import { checkHref, type LinkGroup } from "../../../lib/links";
-import { requireStaff } from "../../../lib/staff";
+import { requireYearStaff } from "../../../lib/staff";
 
 export type LinkState = { error?: string; ok?: string } | undefined;
 
@@ -17,18 +17,18 @@ function refresh() {
 }
 const fail = (err: unknown, fallback: string) => ({ error: err instanceof Error ? err.message : fallback });
 
-async function categoryKeys(schoolId: number) {
-  const rows = await db()<{ key: string }[]>`select key from document_categories where school_id = ${schoolId}`;
+async function categoryKeys(yearId: number) {
+  const rows = await db()<{ key: string }[]>`select key from document_categories where year_id = ${yearId}`;
   return rows.map((r) => r.key);
 }
-async function pagePaths(schoolId: number) {
-  const rows = await db()<{ slug: string; legacy_path: string }[]>`select slug, legacy_path from pages where school_id = ${schoolId}`;
+async function pagePaths(yearId: number) {
+  const rows = await db()<{ slug: string; legacy_path: string }[]>`select slug, legacy_path from pages where year_id = ${yearId}`;
   return rows.flatMap((r) => [`pages/${r.slug}`, r.legacy_path].filter(Boolean));
 }
 
 export async function saveLink(_prev: LinkState, fd: FormData): Promise<LinkState> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const sql = db();
     const id = Number(fd.get("id") ?? 0) || null;
     const label = String(fd.get("label") ?? "").trim();
@@ -39,25 +39,25 @@ export async function saveLink(_prev: LinkState, fd: FormData): Promise<LinkStat
     if (label.length > 60) return { error: "The text is too long (60 characters at most)." };
     if (shortLabel.length > 30) return { error: "The shorter text is too long (30 characters at most)." };
     if (href.length > 1000) return { error: "The address is too long." };
-    const bad = checkHref(href, await categoryKeys(staff.schoolId), await pagePaths(staff.schoolId));
+    const bad = checkHref(href, await categoryKeys(staff.yearId), await pagePaths(staff.yearId));
     if (bad) return { error: bad };
 
     if (id) {
       const [row] = await sql<{ placement: LinkGroup }[]>`
-        select placement from links where id = ${id} and school_id = ${staff.schoolId}`;
+        select placement from links where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       if (!row || !EDITABLE.includes(row.placement)) return { error: "This link no longer exists." };
       const short = row.placement === "popular" ? "" : shortLabel;
       await sql`update links set label = ${label}, short_label = ${short}, href = ${href}, new_tab = ${newTab}
-        where id = ${id} and school_id = ${staff.schoolId}`;
+        where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
       refresh();
       return { ok: "Link saved." };
     }
     const placement = String(fd.get("placement") ?? "") as LinkGroup;
     if (!CAN_ADD.includes(placement)) return { error: "Links can only be added to “Popular” or the main menu." };
     const short = placement === "popular" ? "" : shortLabel;
-    await sql`insert into links (school_id, placement, label, short_label, href, new_tab, sort_order)
-      values (${staff.schoolId}, ${placement}, ${label}, ${short}, ${href}, ${newTab},
-        (select coalesce(max(sort_order), -1) + 1 from links where school_id = ${staff.schoolId} and placement = ${placement}))`;
+    await sql`insert into links (school_id, year_id, placement, label, short_label, href, new_tab, sort_order)
+      values (${staff.schoolId}, ${staff.yearId}, ${placement}, ${label}, ${short}, ${href}, ${newTab},
+        (select coalesce(max(sort_order), -1) + 1 from links where school_id = ${staff.schoolId} and year_id = ${staff.yearId} and placement = ${placement}))`;
     refresh();
     return { ok: "Link added at the end of the list." };
   } catch (err) {
@@ -67,8 +67,8 @@ export async function saveLink(_prev: LinkState, fd: FormData): Promise<LinkStat
 
 export async function deleteLink(id: number): Promise<LinkState> {
   try {
-    const staff = await requireStaff();
-    const r = await db()`delete from links where id = ${Number(id)} and school_id = ${staff.schoolId}
+    const staff = await requireYearStaff();
+    const r = await db()`delete from links where id = ${Number(id)} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}
       and placement in ('popular', 'top')`;
     if (!r.count) return { error: "This link cannot be deleted, or no longer exists." };
     refresh();
@@ -80,8 +80,8 @@ export async function deleteLink(id: number): Promise<LinkState> {
 
 export async function setLinkHidden(id: number, hidden: boolean): Promise<LinkState> {
   try {
-    const staff = await requireStaff();
-    const r = await db()`update links set hidden = ${!!hidden} where id = ${Number(id)} and school_id = ${staff.schoolId}
+    const staff = await requireYearStaff();
+    const r = await db()`update links set hidden = ${!!hidden} where id = ${Number(id)} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}
       and placement in ('popular', 'top', 'facts')`;
     if (!r.count) return { error: "This link no longer exists." };
     refresh();
@@ -94,13 +94,13 @@ export async function setLinkHidden(id: number, hidden: boolean): Promise<LinkSt
 // to: -1 up, 1 down, "first" to the top of its list.
 export async function moveLink(id: number, to: -1 | 1 | "first"): Promise<LinkState> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     await db().begin(async (tx) => {
       const [row] = await tx<{ placement: string }[]>`
-        select placement from links where id = ${Number(id)} and school_id = ${staff.schoolId} and placement in ('popular', 'top')`;
+        select placement from links where id = ${Number(id)} and school_id = ${staff.schoolId} and year_id = ${staff.yearId} and placement in ('popular', 'top')`;
       if (!row) throw new Error("This link no longer exists.");
       const list = await tx<{ id: number }[]>`
-        select id from links where school_id = ${staff.schoolId} and placement = ${row.placement} order by sort_order, id for update`;
+        select id from links where school_id = ${staff.schoolId} and year_id = ${staff.yearId} and placement = ${row.placement} order by sort_order, id for update`;
       const ids = list.map((x) => x.id);
       const i = ids.indexOf(Number(id));
       if (to === "first") {

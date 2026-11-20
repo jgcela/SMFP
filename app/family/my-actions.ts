@@ -51,15 +51,15 @@ export async function reportAbsence(fd: FormData): Promise<MyResult> {
     const to = String(fd.get("date_to") || from);
     const reason = String(fd.get("reason") ?? "");
     const note = text(fd, "note", 1000);
-    const [child] = await db()<{ name: string }[]>`select name from children where id = ${childId} and family_id = ${f.id}`;
+    const [child] = await db()<{ name: string }[]>`select name from children where id = ${childId} and family_id = ${f.id} and not left_school`;
     if (!child) return { error: "Choose which child will be absent.", field: "child_id" };
     const e = checkRange(from, to);
     if (e) return { error: e, field: "date_from" };
     if (!(reason in ABSENCE_REASONS)) return { error: "Choose the reason.", field: "reason" };
     if (reason === "other" && !note) return { error: "Add a short note to explain the reason.", field: "note" };
     await db()`
-      insert into family_submissions (school_id, family_id, child_id, child_name, kind, category, date_from, date_to, message)
-      values (${f.schoolId}, ${f.id}, ${childId}, ${child.name}, 'absence', ${reason}, ${from}, ${to}, ${note})`;
+      insert into family_submissions (school_id, year_id, family_id, child_id, child_name, kind, category, date_from, date_to, message)
+      values (${f.schoolId}, (select id from school_years where school_id = ${f.schoolId} and status = 'active'), ${f.id}, ${childId}, ${child.name}, 'absence', ${reason}, ${from}, ${to}, ${note})`;
     revalidatePath("/family");
     return { ok: `Absence sent for ${child.name}. The school will see it in its list.` };
   } catch (e) { return fail(e); }
@@ -78,13 +78,13 @@ export async function makeRequest(fd: FormData): Promise<MyResult> {
     if (!message) return { error: "Write the message for the school.", field: "message" };
     let childName = "";
     if (childId) {
-      const [c] = await db()<{ name: string }[]>`select name from children where id = ${childId} and family_id = ${f.id}`;
+      const [c] = await db()<{ name: string }[]>`select name from children where id = ${childId} and family_id = ${f.id} and not left_school`;
       if (!c) return { error: "Choose a child from your list, or “Whole family”.", field: "child_id" };
       childName = c.name;
     }
     await db()`
-      insert into family_submissions (school_id, family_id, child_id, child_name, kind, category, date_from, date_to, message)
-      values (${f.schoolId}, ${f.id}, ${childId || null}, ${childName}, 'request', ${type}, ${date}, ${date}, ${message})`;
+      insert into family_submissions (school_id, year_id, family_id, child_id, child_name, kind, category, date_from, date_to, message)
+      values (${f.schoolId}, (select id from school_years where school_id = ${f.schoolId} and status = 'active'), ${f.id}, ${childId || null}, ${childName}, 'request', ${type}, ${date}, ${date}, ${message})`;
     revalidatePath("/family");
     return { ok: "Request sent. You can follow its status below." };
   } catch (e) { return fail(e); }

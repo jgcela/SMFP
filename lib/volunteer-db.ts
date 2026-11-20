@@ -2,11 +2,11 @@
 import { db } from "./db";
 import { OPP_COLUMNS, type Opportunity } from "./volunteer";
 
-export async function loadOpportunities(schoolId: number, opts: { includeHidden?: boolean } = {}) {
+export async function loadOpportunities(yearId: number, opts: { includeHidden?: boolean } = {}) {
   const sql = db();
   return sql<Opportunity[]>`
     select ${sql.unsafe(OPP_COLUMNS)} from volunteer_opportunities o
-    where o.school_id = ${schoolId} ${opts.includeHidden ? sql`` : sql`and not o.hidden`}
+    where o.year_id = ${yearId} ${opts.includeHidden ? sql`` : sql`and not o.hidden`}
     order by o.sort_order, o.id`;
 }
 
@@ -14,11 +14,11 @@ export type SignupResult = "joined" | "left" | "full" | "already" | "closed" | "
 
 /** Signs a family up (or out). The spot check and the insert happen together, so two
  *  families can never take the last spot at the same time. */
-export async function changeSignup(schoolId: number, familyId: number, oppId: number, join: boolean, today: string): Promise<SignupResult> {
+export async function changeSignup(schoolId: number, yearId: number, familyId: number, oppId: number, join: boolean, today: string): Promise<SignupResult> {
   return db().begin(async (tx) => {
     const [o] = await tx<{ spots: number | null; portal_signup: boolean; hidden: boolean; event_date: string | null }[]>`
       select spots, portal_signup, hidden, event_date::text from volunteer_opportunities
-      where id = ${oppId} and school_id = ${schoolId} for update`;
+      where id = ${oppId} and school_id = ${schoolId} and year_id = ${yearId} for update`;
     if (!o || o.hidden || !o.portal_signup) return "gone";
     if (!join) {
       const r = await tx`delete from volunteer_signups where opportunity_id = ${oppId} and family_id = ${familyId}`;

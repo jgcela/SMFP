@@ -14,10 +14,10 @@ export async function GET() {
   const viewer = await staffViewer();
   const allowed = viewer === "allowed";
   const [page, lists, cards, staffPage] = await Promise.all([
-    loadWishlistPage(school.id),
-    allowed ? loadWishlists(school.id) : Promise.resolve([]),
-    allowed ? loadStaffCards(school.id) : Promise.resolve([]),
-    loadStaffPage(school.id),
+    loadWishlistPage(school.year_id),
+    allowed ? loadWishlists(school.year_id) : Promise.resolve([]),
+    allowed ? loadStaffCards(school.year_id) : Promise.resolve([]),
+    loadStaffPage(school.year_id),
   ]);
   // "Favorite things" goes to the teacher's card, when it is on the Staff favorites page.
   const anchors = staffAnchors([...cards], staffPage.teams);

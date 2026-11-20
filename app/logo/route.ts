@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 const TYPES: Record<string, string> = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp" };
 
 export async function GET() {
-  const [s] = await db()<{ logo_key: string }[]>`select logo_key from schools where slug = ${await schoolSlug()}`;
+  const [s] = await db()<{ logo_key: string }[]>`
+    select y.logo_key from schools s join school_years y on y.school_id = s.id and y.status = 'active' where s.slug = ${await schoolSlug()}`;
   const key = s?.logo_key ?? "";
   const ext = (/\.([a-z0-9]+)$/i.exec(key)?.[1] ?? "").toLowerCase();
   if (!key || !TYPES[ext]) return new Response("Not found", { status: 404 });

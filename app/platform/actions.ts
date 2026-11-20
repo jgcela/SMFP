@@ -279,14 +279,23 @@ export async function createSchool(_prev: PfState, fd: FormData): Promise<PfStat
     insert into schools (slug, name, school_year, timezone, plan, status, modules, panel_theme, family_code, logo_url)
     values (${slug}, ${name}, ${schoolYear()}, ${timezone}, ${plan}, ${status}, ${modules}, ${db().json(theme)}, ${newFamilyCode()}, ${logoBytes ? "logo" : ""})
     returning id`;
+  // Step 11a: the school's first year, active, with its look and modules.
+  const label = schoolYear();
+  const first = Number(/^\d{4}/.exec(label)?.[0] ?? new Date().getFullYear());
+  const [year] = await db()<{ id: number }[]>`
+    insert into school_years (school_id, label, starts_on, ends_on, status, activated_at, logo_url, panel_theme, modules, created_by)
+    values (${s.id}, ${label}, ${`${first}-07-01`}, ${`${first + 1}-06-30`}, 'active', now(), ${logoBytes ? "logo" : ""}, ${db().json(theme)}, ${modules}, ${admin.email})
+    returning id`;
   if (logoBytes) {
     const key = `logos/${s.id}/logo-${randomBytes(4).toString("hex")}.${logoExt}`;
     try {
       await getStorage().put(key, logoBytes, logo instanceof File ? logo.type : "image/png");
       await db()`update schools set logo_key = ${key} where id = ${s.id}`;
+      await db()`update school_years set logo_key = ${key} where id = ${year.id}`;
     } catch (e) {
       console.error(`[platform] logo upload: ${e instanceof Error ? e.message : e}`);
       await db()`update schools set logo_url = '', panel_theme = panel_theme || '{"markUrl": ""}'::jsonb where id = ${s.id}`;
+      await db()`update school_years set logo_url = '', panel_theme = panel_theme || '{"markUrl": ""}'::jsonb where id = ${year.id}`;
     }
   }
   forgetSchoolState();
@@ -298,7 +307,8 @@ export async function createSchool(_prev: PfState, fd: FormData): Promise<PfStat
 
 async function schoolById(id: number) {
   const [s] = await db()<{ id: number; slug: string; name: string; plan: string; status: SchoolStatus; modules: string[] }[]>`
-    select id, slug, name, plan, status, modules from schools where id = ${id}`;
+    select s.id, s.slug, s.name, s.plan, s.status, y.modules
+    from schools s join school_years y on y.school_id = s.id and y.status = 'active' where s.id = ${id}`;
   return s ?? null;
 }
 
@@ -311,6 +321,9 @@ export async function setPlanAndModules(_prev: PfState, fd: FormData): Promise<P
   const wanted = fd.getAll("modules").map(String);
   const modules = allowedModules(plan, wanted);
   await db()`update schools set plan = ${plan}, modules = ${modules} where id = ${s.id}`;
+  // Step 11a: modules belong to each year; the change applies to the active
+  // year and to the one being prepared. Archived years stay as they were.
+  await db()`update school_years set modules = ${modules} where school_id = ${s.id} and status <> 'archived'`;
   const parts: string[] = [];
   if (plan !== s.plan) parts.push(`plan ${planOf(s.plan).name} → ${planOf(plan).name}`);
   const on = modules.filter((m) => !s.modules.includes(m));
