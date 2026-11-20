@@ -1,5 +1,4 @@
 // Who signed up for one volunteer opportunity, with a CSV download.
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { db } from "../../../../lib/db";
 import { when } from "../../../../lib/my-family";
@@ -7,14 +6,16 @@ import { currentStaff } from "../../../../lib/staff";
 import { OPP_COLUMNS, spotsLabel, whenLabel, type Opportunity } from "../../../../lib/volunteer";
 import { AdminTop } from "../../chrome";
 import { loadSignups } from "./signups";
-import { Head } from "../../ui";
+import { Head, SLink } from "../../ui";
+import { requireModule, schoolPath } from "../../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Volunteer sign-ups" };
 
 export default async function SignupsPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireModule("volunteer");
   const { staff } = await currentStaff();
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) notFound();
   const sql = db();
@@ -29,7 +30,7 @@ export default async function SignupsPage({ params }: { params: Promise<{ id: st
     <>
       <AdminTop signedIn section="volunteer" />
       <main id="main" className="adm-main">
-        <Head back={<Link href="/admin/volunteer">← All opportunities</Link>} title={o.title}
+        <Head back={<SLink href="/admin/volunteer">← All opportunities</SLink>} title={o.title}
           lead={<>{[whenLabel(o), o.location, spotsLabel(o)].filter(Boolean).join(" · ")}{o.hidden && " · hidden"}</>}
           actions={rows.length > 0 ? <a className="btn btn--outline" href={`/admin/volunteer/${o.id}/csv`} download>Download CSV</a> : undefined} />
         <div className="adm-card">
@@ -41,7 +42,7 @@ export default async function SignupsPage({ params }: { params: Promise<{ id: st
                 <tbody>
                   {rows.map((r) => (
                     <tr key={r.familyId}>
-                      <td><Link href={`/admin/families/${r.familyId}`}>{r.family}</Link></td>
+                      <td><SLink href={`/admin/families/${r.familyId}`}>{r.family}</SLink></td>
                       <td>{r.parents}</td>
                       <td>{r.phone && <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`}>{r.phone}</a>}</td>
                       <td><a href={`mailto:${r.email}`}>{r.email}</a></td>

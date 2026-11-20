@@ -34,7 +34,9 @@
 
   var btns = document.querySelectorAll('.btn-family');
   if (!btns.length || !window.fetch) return;
-  fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' })
+  // Each school lives under /s/<code>/: ask that school who is signed in.
+  var school = location.pathname.match(/^\/s\/[^\/]+/);
+  fetch((school ? school[0] : '') + '/api/me', { credentials: 'same-origin', cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (me) {
       if (!me || !me.family) return;

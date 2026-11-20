@@ -3,7 +3,7 @@
 import { db } from "../../lib/db";
 import { familyOfUser } from "../../lib/family";
 import { todayIn } from "../../lib/my-family";
-import { loadPortal, schoolSlug } from "../../lib/portal";
+import { loadPortal, schoolSlug, moduleOn } from "../../lib/portal";
 import { renderVolunteerPage } from "../../lib/render";
 import { currentStaff } from "../../lib/staff";
 import { loadOpportunities, SIGNUP_MESSAGE } from "../../lib/volunteer-db";
@@ -11,7 +11,8 @@ import { loadOpportunities, SIGNUP_MESSAGE } from "../../lib/volunteer-db";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  const { school, links, contacts } = await loadPortal(schoolSlug());
+  if (!(await moduleOn("volunteer"))) return new Response("Not found", { status: 404 });
+  const { school, links, contacts } = await loadPortal(await schoolSlug());
   const [[extra], opps, { user, staff }] = await Promise.all([
     db()<{ title: string; lead: string; intro: string; timezone: string }[]>`
       select volunteer_title as title, volunteer_lead as lead, volunteer_intro_html as intro, timezone from schools where id = ${school.id}`,

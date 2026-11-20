@@ -1,11 +1,11 @@
 // One family, as the school sees it: contact details, and its children (kept by the school).
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { db } from "../../../../lib/db";
 import { currentStaff } from "../../../../lib/staff";
 import { AdminTop } from "../../chrome";
 import { ChildrenFixer, type KidRow } from "./fixer";
-import { Head } from "../../ui";
+import { Head, SLink } from "../../ui";
+import { requireModule, schoolPath } from "../../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Family" };
@@ -13,8 +13,9 @@ export const metadata = { title: "Family" };
 type Fam = { id: number; name: string; email: string; status: string; parentNames: string; phone: string; c2Name: string; c2Phone: string; c2Rel: string };
 
 export default async function FamilyDetail({ params }: { params: Promise<{ id: string }> }) {
+  await requireModule("families");
   const { staff } = await currentStaff();
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) notFound();
   const [[f], kids, [counts]] = await Promise.all([
@@ -32,7 +33,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
     <>
       <AdminTop signedIn section="families" />
       <main id="main" className="adm-main">
-        <Head back={<Link href="/admin/families">← All families</Link>} title={f.name} lead={<>{f.email}{f.status === "disabled" && " · turned off"}</>} />
+        <Head back={<SLink href="/admin/families">← All families</SLink>} title={f.name} lead={<>{f.email}{f.status === "disabled" && " · turned off"}</>} />
         <div className="adm-card">
           <h2 className="sp-card-h">Contact details</h2>
           <dl className="my-dl">
@@ -41,7 +42,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
             <dt>Second adult</dt>
             <dd>{f.c2Name ? <>{f.c2Name}{f.c2Rel && ` (${f.c2Rel})`}{f.c2Phone && <> · <a href={`tel:${f.c2Phone.replace(/[^\d+]/g, "")}`}>{f.c2Phone}</a></>}</> : dash("")}</dd>
           </dl>
-          <p className="note">The family keeps these details up to date from “My family”.{counts.open ? <> They have {counts.open} absence{counts.open === 1 ? "" : "s"} or request{counts.open === 1 ? "" : "s"} not resolved: see <Link href="/admin/requests?status=open">Absences &amp; requests</Link>.</> : null}</p>
+          <p className="note">The family keeps these details up to date from “My family”.{counts.open ? <> They have {counts.open} absence{counts.open === 1 ? "" : "s"} or request{counts.open === 1 ? "" : "s"} not resolved: see <SLink href="/admin/requests?status=open">Absences &amp; requests</SLink>.</> : null}</p>
         </div>
         <div className="adm-card">
           <h2 className="adm-h2">Children</h2>

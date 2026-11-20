@@ -2,7 +2,7 @@
 // Signing in only says WHO the person is (Better Auth, lib/auth.ts). Whether
 // they are a family of THIS school, and whether the school approved them, is
 // in the families table. The school always comes from this deployment
-// (PORTAL_SCHOOL), never from the browser. Today families sign in with email and
+// (its /s/<code> address, see proxy.ts), never from anything else the browser sends. Today families sign in with email and
 // password; FACTS sign-in (SSO) can be added later as another way to reach the
 // same families row (columns sso_provider / sso_subject), without changing the
 // approval flow or anything that reads currentFamily().
@@ -19,7 +19,7 @@ export async function familyOfUser(userId: string): Promise<Family | null> {
   const [f] = await db()<Family[]>`
     select f.id, f.user_id as "userId", f.name, u.email, f.school_id as "schoolId", f.status
     from families f join schools s on s.id = f.school_id join auth_user u on u.id = f.user_id
-    where f.user_id = ${userId} and s.slug = ${schoolSlug()}`;
+    where f.user_id = ${userId} and s.slug = ${await schoolSlug()} and s.status <> 'suspended'`;
   return f ?? null;
 }
 

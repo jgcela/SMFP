@@ -1,12 +1,11 @@
 "use client";
 // Staff: the school's volunteer opportunities. Create, edit, hide, delete (with a
 // confirmation), and see who signed up.
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { KINDS, spotsLabel, whenLabel, type Opportunity } from "../../../lib/volunteer";
 import { deleteOpportunity, saveOpportunity, setOpportunityHidden, type VolResult } from "./actions";
-import { Badge, Head, PencilIcon, RowMenu } from "../ui";
+import { Badge, Head, PencilIcon, RowMenu, SLink } from "../ui";
 
 const LINK_ROWS = 4;
 
@@ -131,7 +130,7 @@ export function VolunteerManager({ opps }: { opps: Opportunity[] }) {
                 <span className="note">{KINDS[o.kind]} · {whenLabel(o) || "No date"}{o.location && <> · {o.location}</>}</span>
                 <span className="note">
                   {o.portalSignup
-                    ? <>{spotsLabel(o)} · <Link href={`/admin/volunteer/${o.id}`}>See who signed up ({o.taken})</Link></>
+                    ? <>{spotsLabel(o)} · <SLink href={`/admin/volunteer/${o.id}`}>See who signed up ({o.taken})</SLink></>
                     : "Sign-up outside the portal (its own button)"}
                 </span>
               </div>

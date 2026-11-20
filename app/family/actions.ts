@@ -7,7 +7,7 @@ import { auth } from "../../lib/auth";
 import { mailSchool, sendSchoolMail } from "../../lib/emails";
 import { db } from "../../lib/db";
 import { familyOfUser, normalizeCode, STATUS_MESSAGE } from "../../lib/family";
-import { schoolSlug } from "../../lib/portal";
+import { schoolBase, schoolPath, schoolSlug } from "../../lib/portal";
 import { clearFailures, recordFailure, tooManyFailures } from "../../lib/staff";
 
 export type FamilyFormState = { error?: string; field?: string; done?: "pending" | "status"; message?: string } | undefined;
@@ -38,7 +38,7 @@ export async function registerFamily(_prev: FamilyFormState, fd: FormData): Prom
   if (await tooManyFailures(ipKey)) return { error: "Too many attempts. Wait 15 minutes and try again." };
 
   const [school] = await db()<{ id: number; family_code: string | null }[]>`
-    select id, family_code from schools where slug = ${schoolSlug()}`;
+    select id, family_code from schools where slug = ${await schoolSlug()}`;
   if (!school?.family_code || normalizeCode(school.family_code) !== code) {
     await recordFailure(ipKey);
     return { error: "That school code is not right. Check it with the school office.", field: "code" };
@@ -93,7 +93,9 @@ export async function familySignIn(_prev: FamilyFormState, fd: FormData): Promis
   }
   // Back to the page that asked them to sign in (e.g. the Volunteer page), if it is on this site.
   const next = String(fd.get("next") ?? "");
-  redirect(/^\/(?!\/)[\w\-./#?=&%]*$/.test(next) && !next.includes("\\") ? next : "/family");
+  const safe = /^\/(?!\/)[\w\-./#?=&%]*$/.test(next) && !next.includes("\\");
+  const base = await schoolBase();
+  redirect(safe ? (next.startsWith(`${base}/`) ? next : `${base}${next}`) : `${base}/family`);
 }
 
 export async function familySignOut() {
@@ -102,5 +104,5 @@ export async function familySignOut() {
   } catch {
     // already signed out
   }
-  redirect("/family");
+  redirect(await schoolPath("/family"));
 }

@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // proxy.ts decides about trailing slashes: a school's home page is /s/<code>/.
+  skipTrailingSlashRedirect: true,
+  // A school's logo is sent with the "New school" form (FAMITENLY panel, step 10).
+  experimental: { serverActions: { bodySizeLimit: "3mb" } },
   async rewrites() {
     // The other pages link back to the home page by its original file name.
     return [{ source: "/portal_202627.html", destination: "/" }];

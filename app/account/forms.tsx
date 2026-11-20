@@ -3,6 +3,7 @@
 // the staff area and "My family".
 import { startTransition, useActionState } from "react";
 import { confirmEmailChange, requestEmailChange, requestPasswordReset, resetPassword, type AccountState } from "./actions";
+import { PasswordFields } from "../admin/password-fields";
 
 function useForm(fn: (prev: AccountState, fd: FormData) => Promise<AccountState>) {
   const [state, action, pending] = useActionState(fn, undefined);
@@ -53,15 +54,8 @@ export function NewPasswordForm({ token }: { token: string }) {
     <form onSubmit={onSubmit} className="adm-f">
       <Message state={state} />
       <input type="hidden" name="token" value={token} />
-      <label>
-        New password
-        <span className="hint">At least 10 characters. A short sentence is easy to remember.</span>
-        <input type="password" name="password" autoComplete="new-password" minLength={10} maxLength={128} required autoFocus {...invalid(state, "password")} />
-      </label>
-      <label>
-        Repeat the password
-        <input type="password" name="confirm" autoComplete="new-password" minLength={10} maxLength={128} required {...invalid(state, "confirm")} />
-      </label>
+      <PasswordFields min={10} label="New password" hint="A short sentence is easy to remember." autoFocus
+        invalidPassword={invalid(state, "password")} invalidConfirm={invalid(state, "confirm")} />
       <div className="adm-actions">
         <button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Saving…" : "Save new password"}</button>
       </div>

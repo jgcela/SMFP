@@ -11,7 +11,7 @@ import { claimLink, createLink } from "../../lib/email-links";
 import { portalOrigin, sendSchoolMail } from "../../lib/emails";
 import { currentFamily } from "../../lib/family";
 import { isEmail } from "../../lib/mail";
-import { schoolSlug } from "../../lib/portal";
+import { schoolSlug, schoolPath } from "../../lib/portal";
 import { currentStaff, recordFailure, tooManyFailures } from "../../lib/staff";
 
 export type AccountState = { ok?: string; error?: string; field?: string } | undefined;
@@ -27,7 +27,7 @@ async function accountOf(userId: string): Promise<{ kind: "staff" | "family"; sc
     select s.id as school_id,
       exists (select 1 from school_staff ss where ss.user_id = ${userId} and ss.school_id = s.id) as staff,
       exists (select 1 from families f where f.user_id = ${userId} and f.school_id = s.id) as family
-    from schools s where s.slug = ${schoolSlug()}`;
+    from schools s where s.slug = ${await schoolSlug()}`;
   if (!r) return null;
   if (r.staff) return { kind: "staff", schoolId: r.school_id };
   if (r.family) return { kind: "family", schoolId: r.school_id };
@@ -58,7 +58,7 @@ export async function requestPasswordReset(_prev: AccountState, fd: FormData): P
   const acc = user ? await accountOf(user.id) : null;
   if (user && acc) {
     const token = await createLink(user.id, acc.schoolId, "reset_password");
-    const link = `${await portalOrigin()}/${area(acc.kind)}/reset-password?token=${token}`;
+    const link = `${await portalOrigin()}${await schoolPath(`/${area(acc.kind)}/reset-password`)}?token=${token}`;
     await sendSchoolMail(acc.schoolId, "resetPassword", email, link);
   }
   return { ok: RESET_SENT };
@@ -74,7 +74,7 @@ export async function resetPassword(_prev: AccountState, fd: FormData): Promise<
   const ipKey = `ip:${await clientIp()}`;
   if (await tooManyFailures(ipKey)) return { error: "Too many attempts. Wait 15 minutes and try again." };
 
-  const [school] = await db()<{ id: number }[]>`select id from schools where slug = ${schoolSlug()}`;
+  const [school] = await db()<{ id: number }[]>`select id from schools where slug = ${await schoolSlug()}`;
   const link = school ? await claimLink(token, "reset_password", school.id) : null;
   if (!link) {
     await recordFailure(ipKey);
@@ -90,7 +90,7 @@ export async function resetPassword(_prev: AccountState, fd: FormData): Promise<
   else await ctx.internalAdapter.createAccount({ userId: link.user_id, providerId: "credential", accountId: link.user_id, password: hashed });
   await ctx.internalAdapter.deleteUserSessions(link.user_id); // signed out everywhere
   await db()`update email_links set used_at = now() where user_id = ${link.user_id} and purpose = 'reset_password' and used_at is null`;
-  redirect(`/${area(acc.kind)}?password=reset`);
+  redirect(await schoolPath(`/${area(acc.kind)}?password=reset`));
 }
 
 // ---- Changing the account's email ----
@@ -127,7 +127,7 @@ export async function requestEmailChange(_prev: AccountState, fd: FormData): Pro
   const [taken] = await db()<{ id: string }[]>`select id from auth_user where lower(email) = ${email}`;
   if (taken) return sent;
   const token = await createLink(me.userId, me.schoolId, "change_email", email);
-  const link = `${await portalOrigin()}/${area(me.kind)}/confirm-email?token=${token}`;
+  const link = `${await portalOrigin()}${await schoolPath(`/${area(me.kind)}/confirm-email`)}?token=${token}`;
   await sendSchoolMail(me.schoolId, "confirmEmail", email, link);
   return sent;
 }
@@ -136,7 +136,7 @@ export async function confirmEmailChange(_prev: AccountState, fd: FormData): Pro
   const token = String(fd.get("token") ?? "");
   const ipKey = `ip:${await clientIp()}`;
   if (await tooManyFailures(ipKey)) return { error: "Too many attempts. Wait 15 minutes and try again." };
-  const [school] = await db()<{ id: number }[]>`select id from schools where slug = ${schoolSlug()}`;
+  const [school] = await db()<{ id: number }[]>`select id from schools where slug = ${await schoolSlug()}`;
   const link = school ? await claimLink(token, "change_email", school.id) : null;
   if (!link?.new_email) {
     await recordFailure(ipKey);

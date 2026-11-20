@@ -3,13 +3,14 @@ import { db } from "../../../../lib/db";
 import { currentStaff } from "../../../../lib/staff";
 import { AdminTop } from "../../chrome";
 import { PageEditor, type EditorPage, type Version } from "./editor";
+import { schoolPath } from "../../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Edit page" };
 
 export default async function EditPage({ params }: { params: Promise<{ id: string }> }) {
   const { staff } = await currentStaff();
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) notFound();
   const [page] = await db()<EditorPage[]>`

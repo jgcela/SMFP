@@ -3,13 +3,15 @@ import { db } from "../../../lib/db";
 import { currentStaff } from "../../../lib/staff";
 import { AdminTop } from "../chrome";
 import { FamiliesManager, type FamilyRow } from "./manager";
+import { requireModule, schoolPath } from "../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Families" };
 
 export default async function FamiliesPage() {
+  await requireModule("families");
   const { staff } = await currentStaff();
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const [families, [school]] = await Promise.all([
     db()<FamilyRow[]>`
       select f.id, f.name, u.email, f.status, f.created_at::text as "createdAt", f.decided_at::text as "decidedAt", f.decided_by as "decidedBy"

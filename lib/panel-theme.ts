@@ -15,7 +15,9 @@ export type PanelColors = {
 };
 
 export type Pill = { bg: string; fg: string };
-export type PanelTheme = { shortName: string; markUrl: string; colors: PanelColors; categories: Record<string, Pill> };
+// portal: the two colours chosen when FAMITENLY created the school (step 10). They
+// repaint the public pages; a school without them keeps the bundled look.
+export type PanelTheme = { shortName: string; markUrl: string; colors: PanelColors; categories: Record<string, Pill>; portal: { primary: string; accent: string } | null };
 
 const FALLBACK: PanelColors = {
   page: "#F3F4F6", surface: "#FFFFFF", ink: "#1F2937", text: "#1F2937", muted: "#4B5563",
@@ -57,12 +59,15 @@ export function readPanelTheme(raw: unknown, schoolName: string): PanelTheme {
   const categories: Record<string, Pill> = {};
   const cats = (t.categories && typeof t.categories === "object" ? t.categories : {}) as Record<string, unknown>;
   for (const [k, v] of Object.entries(cats)) if (typeof v === "string" && HEX.test(v)) categories[k] = pill(v);
-  return { shortName, markUrl, colors, categories };
+  const pt = (t.portal && typeof t.portal === "object" ? t.portal : {}) as Record<string, unknown>;
+  const portal = typeof pt.primary === "string" && HEX.test(pt.primary) && typeof pt.accent === "string" && HEX.test(pt.accent)
+    ? { primary: pt.primary, accent: pt.accent } : null;
+  return { shortName, markUrl, colors, categories, portal };
 }
 
 const toHex = (c: number[]) => `#${c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("")}`;
 const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-const mix = (a: string, b: string, t: number) => { const x = rgb(a), y = rgb(b); return toHex(x.map((v, i) => v * t + y[i] * (1 - t))); };
+export const mix = (a: string, b: string, t: number) => { const x = rgb(a), y = rgb(b); return toHex(x.map((v, i) => v * t + y[i] * (1 - t))); };
 // A category pill: a light tint of the colour, with text dark enough to read (4.5:1).
 export function pill(hex: string): Pill {
   const bg = mix(hex, "#FFFFFF", 0.14);
@@ -79,4 +84,17 @@ export function panelVars(t: PanelTheme): React.CSSProperties {
     "--p-line": c.line, "--p-soft": c.soft, "--p-on-soft": textOn(c.soft, c.ink), "--p-accent": c.accent,
     "--p-on-accent": textOn(c.accent, c.ink), "--p-link": c.link, "--p-on-ink": textOn(c.ink, c.surface),
   } as React.CSSProperties;
+}
+
+// The public pages' colours for a school created with its own two colours:
+// the bundled stylesheet's variables, rebuilt from them.
+export function portalColorsCss(p: { primary: string; accent: string }) {
+  let link = p.primary;
+  for (let i = 0; i < 20 && contrast(link, "#FFFFFF") < 4.5; i++) link = mix(link, "#000000", 0.85);
+  const v: Record<string, string> = {
+    "--navy": p.primary, "--navy-deep": mix(p.primary, "#000000", 0.75), "--navy-raised": mix(p.primary, "#FFFFFF", 0.85),
+    "--navy-hover": mix(p.primary, "#FFFFFF", 0.9), "--cerulean": link, "--gold": p.accent, "--gold-deep": mix(p.accent, "#000000", 0.9),
+    "--azure": mix(p.primary, "#FFFFFF", 0.1), "--light-blue": mix(p.primary, "#FFFFFF", 0.22), "--sky": mix(p.primary, "#FFFFFF", 0.45),
+  };
+  return `:root{${Object.entries(v).map(([k, x]) => `${k}:${x}`).join(";")}}`;
 }

@@ -1,7 +1,8 @@
 "use client";
-import Link from "next/link";
+import { PasswordFields } from "../admin/password-fields";
 import { startTransition, useActionState } from "react";
 import { familySignIn, registerFamily, type FamilyFormState } from "./actions";
+import { SLink } from "../admin/ui";
 
 function useForm(fn: (prev: FamilyFormState, fd: FormData) => Promise<FamilyFormState>) {
   const [state, action, pending] = useActionState(fn, undefined);
@@ -42,8 +43,8 @@ export function FamilySignInForm({ next = "", notice }: { next?: string; notice?
       </label>
       <div className="adm-actions">
         <button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</button>
-        <Link href="/family/register">New family? Create an account</Link>
-        <Link href="/family/forgot-password">Forgot your password?</Link>
+        <SLink href="/family/register">New family? Create an account</SLink>
+        <SLink href="/family/forgot-password">Forgot your password?</SLink>
       </div>
     </form>
   );
@@ -55,7 +56,7 @@ export function RegisterForm() {
     return (
       <>
         <Status title="Account created: waiting for approval" text={state.message ?? ""} />
-        <p className="adm-actions"><Link href="/family">Go to family sign-in</Link><a href="/">Back to the Parent Portal</a></p>
+        <p className="adm-actions"><SLink href="/family">Go to family sign-in</SLink><a href="/">Back to the Parent Portal</a></p>
       </>
     );
   }
@@ -71,15 +72,7 @@ export function RegisterForm() {
         Email
         <input type="email" name="email" autoComplete="email" maxLength={200} required {...invalid(state, "email")} />
       </label>
-      <label>
-        Password
-        <span className="hint">At least 10 characters. A short sentence is easy to remember.</span>
-        <input type="password" name="password" autoComplete="new-password" minLength={10} maxLength={128} required {...invalid(state, "password")} />
-      </label>
-      <label>
-        Repeat the password
-        <input type="password" name="confirm" autoComplete="new-password" minLength={10} maxLength={128} required {...invalid(state, "confirm")} />
-      </label>
+      <PasswordFields min={10} hint="A short sentence is easy to remember." invalidPassword={invalid(state, "password")} invalidConfirm={invalid(state, "confirm")} />
       <label>
         School code
         <span className="hint">The school office gives this code to families.</span>
@@ -87,7 +80,7 @@ export function RegisterForm() {
       </label>
       <div className="adm-actions">
         <button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Creating the account…" : "Create account"}</button>
-        <Link href="/family">I already have an account</Link>
+        <SLink href="/family">I already have an account</SLink>
       </div>
     </form>
   );

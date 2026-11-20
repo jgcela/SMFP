@@ -1,9 +1,8 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createPage, deletePage } from "./actions";
-import { Head } from "../ui";
+import { Head, SLink, useSchool } from "../ui";
 
 export type PageRow = {
   id: number; slug: string; title: string; legacy: string; publishedAt: string | null; updatedAt: string; unpublishedChanges: boolean;
@@ -16,6 +15,7 @@ export function PagesList({ pages }: { pages: PageRow[] }) {
   const [msg, setMsg] = useState<{ text: string; err?: boolean } | null>(null);
   const [confirm, setConfirm] = useState<number | null>(null);
   const router = useRouter();
+  const { base } = useSchool();
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +23,7 @@ export function PagesList({ pages }: { pages: PageRow[] }) {
     const r = await createPage(title);
     setBusy(false);
     if (r.error || !r.id) { setMsg({ text: r.error ?? "Could not create the page.", err: true }); return; }
-    router.push(`/admin/pages/${r.id}`);
+    router.push(`${base}/admin/pages/${r.id}`);
   };
 
   return (
@@ -69,7 +69,7 @@ export function PagesList({ pages }: { pages: PageRow[] }) {
                 ) : (
                   <>
                     {p.publishedAt && <a href={`/pages/${p.slug}`} target="_blank" rel="noopener">View</a>}
-                    <Link href={`/admin/pages/${p.id}`}>Edit</Link>
+                    <SLink href={`/admin/pages/${p.id}`}>Edit</SLink>
                     {!p.legacy && <button type="button" onClick={() => setConfirm(p.id)}>Delete</button>}
                   </>
                 )}

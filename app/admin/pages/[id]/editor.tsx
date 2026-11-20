@@ -4,11 +4,11 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { checkHref } from "../../../../lib/links";
 import { publishPage, restoreVersion, saveDraft, startImageUpload, type PageCopy, type PageResult } from "../actions";
+import { SLink } from "../../ui";
 
 export type EditorPage = {
   id: number; slug: string; legacy: string; title: string; summary: string; html: string;
@@ -209,7 +209,7 @@ export function PageEditor({ page, versions }: { page: EditorPage; versions: Ver
   return (
     <div className="pe">
       <div className="pe-main adm-card">
-        <p className="pe-crumbs"><Link href="/admin/pages">← All pages</Link></p>
+        <p className="pe-crumbs"><SLink href="/admin/pages">← All pages</SLink></p>
         <div className="adm-f">
           <label>
             Page title

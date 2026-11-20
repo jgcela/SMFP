@@ -1,10 +1,9 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FamilyStatus } from "../../../lib/family";
 import { changeFamilyCode, setFamilyStatus, type FamilyResult } from "./actions";
-import { Head } from "../ui";
+import { Head, SLink } from "../ui";
 
 export type FamilyRow = {
   id: number; name: string; email: string; status: FamilyStatus; createdAt: string; decidedAt: string | null; decidedBy: string;
@@ -63,11 +62,11 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
       <button type="button" onClick={() => setConfirm({ id: f.id, status: "rejected", question: `Reject ${f.name}?` })} disabled={busy}>Reject</button>
     </>);
     if (f.status === "approved") return (<>
-      <Link href={`/admin/families/${f.id}`}>Children &amp; details</Link>
+      <SLink href={`/admin/families/${f.id}`}>Children &amp; details</SLink>
       <button type="button" onClick={() => setConfirm({ id: f.id, status: "disabled", question: `Turn off ${f.name}? They will be signed out.` })} disabled={busy}>Turn off</button>
     </>);
     if (f.status === "disabled") return (<>
-      <Link href={`/admin/families/${f.id}`}>Children &amp; details</Link>
+      <SLink href={`/admin/families/${f.id}`}>Children &amp; details</SLink>
       <button type="button" onClick={() => change(f.id, "approved")} disabled={busy}>Turn back on</button>
     </>);
     return <button type="button" onClick={() => change(f.id, "approved")} disabled={busy}>Approve</button>;

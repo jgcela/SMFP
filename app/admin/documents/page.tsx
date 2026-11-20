@@ -4,13 +4,14 @@ import { currentStaff } from "../../../lib/staff";
 import { getStorage, storageConfigured } from "../../../lib/storage";
 import { AdminTop } from "../chrome";
 import { DocumentsManager, type AdminCategory, type AdminDoc } from "./manager";
+import { schoolPath } from "../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Documents" };
 
 export default async function DocumentsPage() {
   const { staff } = await currentStaff();
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const [cats, docs, storageReady] = await Promise.all([
     db()<AdminCategory[]>`
       select id, key, name, description from document_categories where school_id = ${staff.schoolId} order by sort_order, id`,

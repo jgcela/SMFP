@@ -3,13 +3,14 @@ import { db } from "../../../lib/db";
 import { currentStaff } from "../../../lib/staff";
 import { AdminTop } from "../chrome";
 import { LinksManager, type AdminLink } from "./manager";
+import { schoolPath } from "../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Links" };
 
 export default async function LinksPage() {
   const { staff } = await currentStaff();
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const [links, cats, pages] = await Promise.all([
     db()<AdminLink[]>`
       select id, placement, label, short_label as "shortLabel", href, new_tab as "newTab", hidden
