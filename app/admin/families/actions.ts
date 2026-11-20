@@ -4,6 +4,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "../../../lib/auth";
 import { db } from "../../../lib/db";
+import { sendSchoolMail } from "../../../lib/emails";
 import { newFamilyCode, type FamilyStatus } from "../../../lib/family";
 import { requireStaff } from "../../../lib/staff";
 
@@ -20,11 +21,16 @@ export async function setFamilyStatus(id: number, status: FamilyStatus): Promise
   try {
     const staff = await requireStaff();
     if (!Number.isInteger(id) || !["approved", "rejected", "disabled"].includes(status)) return { error: "That change is not possible." };
-    const [f] = await db()<{ user_id: string; name: string }[]>`
-      update families set status = ${status}, decided_at = now(), decided_by = ${staff.name || staff.email}
-      where id = ${id} and school_id = ${staff.schoolId}
-      returning user_id, name`;
+    const [f] = await db()<{ user_id: string; name: string; before: FamilyStatus; email: string }[]>`
+      with old as (select id, status from families where id = ${id} and school_id = ${staff.schoolId})
+      update families f set status = ${status}, decided_at = now(), decided_by = ${staff.name || staff.email}
+      from old, auth_user u
+      where f.id = old.id and u.id = f.user_id
+      returning f.user_id, f.name, old.status as before, u.email`;
     if (!f) return { error: "This family is no longer in the list. Reload the page." };
+    // Step 9: the family gets an email when it is approved or rejected (not when it was already).
+    if (f.before !== status && status === "approved") await sendSchoolMail(staff.schoolId, "familyApproved", f.email, f.name);
+    if (f.before !== status && status === "rejected") await sendSchoolMail(staff.schoolId, "familyRejected", f.email, f.name);
     // Anyone who is not approved loses any session they had.
     if (status !== "approved") await (await auth().$context).internalAdapter.deleteUserSessions(f.user_id);
     revalidatePath("/admin/families");

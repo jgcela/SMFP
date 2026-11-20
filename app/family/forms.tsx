@@ -24,10 +24,11 @@ function Status({ text, title }: { text: string; title: string }) {
   );
 }
 
-export function FamilySignInForm({ next = "" }: { next?: string }) {
+export function FamilySignInForm({ next = "", notice }: { next?: string; notice?: string }) {
   const { state, onSubmit, pending } = useForm(familySignIn);
   return (
     <form onSubmit={onSubmit} className="adm-f">
+      {notice && !state && <p className="adm-msg adm-msg--ok" role="status">{notice}</p>}
       {state?.error && <p className="adm-msg adm-msg--err" role="alert" id="form-error">{state.error}</p>}
       {state?.done === "status" && <Status title="You cannot sign in yet" text={state.message ?? ""} />}
       {next && <input type="hidden" name="next" value={next} />}
@@ -42,6 +43,7 @@ export function FamilySignInForm({ next = "" }: { next?: string }) {
       <div className="adm-actions">
         <button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</button>
         <Link href="/family/register">New family? Create an account</Link>
+        <Link href="/family/forgot-password">Forgot your password?</Link>
       </div>
     </form>
   );

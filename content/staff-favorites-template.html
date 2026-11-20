@@ -31,14 +31,14 @@
 </svg>
 
 <header class="site-header on-navy">
-  <div class="bar">
+{{links.util}}  <div class="bar">
     <div class="wrap">
       <a class="logo" href="/"><img src="{{school.logo_url}}" alt="{{school.logo_alt}}" width="140" height="52"></a>
       <nav class="main-nav" aria-label="Parent Portal">
         <a href="/">Home</a>
 {{links.nav}}      </nav>
       <div class="bar-actions">
-{{facts.button}}        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg><span class="sr-only">Menu</span></button>
+{{family.button}}{{facts.button}}        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg><span class="sr-only">Menu</span></button>
       </div>
     </div>
   </div>
@@ -76,5 +76,6 @@
 <script src="/page.js"></script>
 <script src="/staff-favorites.js"></script>
 <script src="/new-tab.js"></script>
+<script src="/header.js"></script>
 </body>
 </html>

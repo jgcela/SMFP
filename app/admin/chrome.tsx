@@ -8,7 +8,7 @@ import { Icon } from "./icons";
 import { loadSchoolHeader } from "./school";
 import { SideNav } from "./side-nav";
 
-export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages" | "families" | "requests" | "volunteer" | "staff-favorites" | "wishlists";
+export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages" | "families" | "requests" | "volunteer" | "staff-favorites" | "wishlists" | "settings";
 
 const GROUPS: { label: string; items: { id: Section; href: string; label: string }[] }[] = [
   {
@@ -32,6 +32,10 @@ const GROUPS: { label: string; items: { id: Section; href: string; label: string
       { id: "requests", href: "/admin/requests", label: "Absences & requests" },
     ],
   },
+  {
+    label: "Account",
+    items: [{ id: "settings", href: "/admin/settings", label: "Settings" }],
+  },
 ];
 
 function Brand({ name, markUrl, sub }: { name: string; markUrl: string; sub: string }) {
@@ -46,13 +50,13 @@ function Brand({ name, markUrl, sub }: { name: string; markUrl: string; sub: str
   );
 }
 
-export async function AdminTop({ signedIn, section, area = "staff" }: { signedIn: boolean; section?: Section; area?: "staff" | "family" }) {
+export async function AdminTop({ signedIn, section, area = "staff", familyPage = "overview" }: { signedIn: boolean; section?: Section; area?: "staff" | "family"; familyPage?: "overview" | "settings" }) {
   const school = await loadSchoolHeader();
 
   const { shortName, markUrl } = school.theme;
   const sub = area === "family" ? "Family portal" : "Staff portal";
   const out = area === "family" ? familySignOut : signOut;
-  if (area === "family" && signedIn) return <FamilySide shortName={shortName} markUrl={markUrl} />;
+  if (area === "family" && signedIn) return <FamilySide shortName={shortName} markUrl={markUrl} page={familyPage} />;
   if (!section) {
     // Sign-in, password and "no access" screens: only the school, no sections.
     return (
@@ -117,15 +121,16 @@ export async function AdminTop({ signedIn, section, area = "staff" }: { signedIn
 }
 
 // "My family": the same frame, with the parts of the page and the families-only pages.
-const FAMILY: { label: string; items: { icon: Parameters<typeof Icon>[0]["name"]; href: string; label: string; current?: boolean }[] }[] = [
+const FAMILY: { label: string; items: { icon: Parameters<typeof Icon>[0]["name"]; href: string; label: string; page?: "overview" | "settings" }[] }[] = [
   {
     label: "My family",
     items: [
-      { icon: "families", href: "/family", label: "Overview", current: true },
+      { icon: "families", href: "/family", label: "Overview", page: "overview" },
       { icon: "absence", href: "/family#absence", label: "Report an absence" },
       { icon: "request", href: "/family#request", label: "Make a request" },
       { icon: "children", href: "/family#children", label: "Children" },
       { icon: "details", href: "/family#details", label: "Family details" },
+      { icon: "settings", href: "/family/settings", label: "Settings", page: "settings" },
     ],
   },
   {
@@ -139,7 +144,7 @@ const FAMILY: { label: string; items: { icon: Parameters<typeof Icon>[0]["name"]
   },
 ];
 
-function FamilySide({ shortName, markUrl }: { shortName: string; markUrl: string }) {
+function FamilySide({ shortName, markUrl, page }: { shortName: string; markUrl: string; page: "overview" | "settings" }) {
   return (
     <>
       <a className="sp-skip" href="#main">Skip to content</a>
@@ -155,7 +160,7 @@ function FamilySide({ shortName, markUrl }: { shortName: string; markUrl: string
                 <ul aria-labelledby={`sp-g-${g.label}`}>
                   {g.items.map((it) => (
                     <li key={it.href}>
-                      <a href={it.href} aria-current={it.current ? "page" : undefined}>
+                      <a href={it.href} aria-current={it.page === page ? "page" : undefined}>
                         <Icon name={it.icon} />
                         {it.label}
                       </a>

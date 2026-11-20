@@ -18,7 +18,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <div className="adm-card adm-card--narrow">
             <h1>Staff sign-in</h1>
             <p className="lead">For school staff only. Families do not need to sign in.</p>
-            <SignInForm notice={sp.password === "set" ? "Your password is saved. Sign in with it." : undefined} />
+            <SignInForm notice={sp.password === "set" || sp.password === "reset" ? "Your password is saved. Sign in with it." : undefined} />
           </div>
         </main>
       </>

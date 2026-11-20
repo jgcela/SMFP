@@ -53,6 +53,10 @@ function factsButton(facts: Link | undefined) {
 `;
 }
 
+// Step 9: the way in for families, next to FACTS on every public page.
+const FAMILY_BUTTON = `        <a class="btn btn-family" href="/family" aria-label="Family sign-in"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Family<span class="lbl-fam-long">&nbsp;sign-in</span></span></a>
+`;
+
 export function schoolTitle(school: School) {
   return `Parent Portal — ${school.name}`;
 }
@@ -71,7 +75,7 @@ function contactParts(school: School, people: ContactPerson[]) {
       ? `          <a class="contact-line" href="${map}"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span>${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
       : "",
     "contact.tile_address": address
-      ? `      <a class="ctile" href="${map}"><span class="k">ADDRESS</span><span class="v">${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
+      ? `      <a class="ctile" href="${map}"><span class="k">Address</span><span class="v">${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
       : "",
     "contact.people": people.length
       ? `    <div class="contact-people">
@@ -95,7 +99,8 @@ function schoolValues(school: School, links: Link[], people: ContactPerson[]) {
     "school.phone_display": esc(school.phone_display),
     "school.email": esc(school.email),
     "school.office_hours": esc(school.office_hours),
-    "school.footer": esc([school.name, place, `Parent Portal, school year ${school.school_year}`].filter(Boolean).join(" · ")),
+    "school.footer": esc(`${[school.name, place].filter(Boolean).join(", ")}. Parent Portal, school year ${school.school_year}.`),
+    "family.button": FAMILY_BUTTON,
     "facts.button": factsButton(links.find((l) => l.placement === "facts")),
     ...contactParts(school, people),
   } as Record<string, string>;
@@ -127,7 +132,14 @@ function innerPageValues(school: School, links: Link[], people: ContactPerson[],
   values["school.logo_url"] = esc(logo && !/^(https?:)?\/\//.test(logo) && !logo.startsWith("/") ? `/${logo}` : logo);
   const top = links.filter((l) => l.placement === "top");
   const cur = (l: Link, html: string) => (current && l.href.replace(/^\//, "") === current ? html.replace("<a ", '<a aria-current="page" ') : html);
-  values["links.nav"] = top.map((l) => `        ${cur(l, a(l, l.short_label || l.label))}\n`).join("");
+  // Links to other websites (like the parish website) go in the thin bar above
+  // the header, as on the portal's home page; the main menu keeps the portal's pages.
+  const outside = (l: Link) => /^https?:\/\//i.test(l.href);
+  const util = top.filter(outside);
+  values["links.nav"] = top.filter((l) => !outside(l)).map((l) => `        ${cur(l, a(l, l.short_label || l.label))}\n`).join("");
+  values["links.util"] = util.length
+    ? `  <div class="util">\n    <div class="wrap">\n${util.map((l) => `      ${a(l, l.short_label || l.label)}\n`).join("")}    </div>\n  </div>\n`
+    : "";
   values["links.mobile"] = top.map((l) => `        <li>${cur(l, a(l, l.label))}</li>\n`).join("");
   return values;
 }

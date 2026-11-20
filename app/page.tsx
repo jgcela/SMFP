@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { loadPortal, schoolSlug } from "../lib/portal";
+// Look-and-feel option "sunny" (proposal): its font and its overrides, home page only.
+import "@fontsource-variable/nunito-sans";
+import "./looks/sunny.css";
 import { renderPortal, schoolDescription, schoolTitle } from "../lib/render";
 
 // The page is rebuilt from the database at most once a minute,
@@ -24,6 +27,8 @@ export default async function Home() {
       {/* Links to files and other websites open in a new tab. */}
       {/* eslint-disable-next-line @next/next/no-sync-scripts */}
       <script src="/new-tab.js" />
+      {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+      <script src="/header.js" />
     </body>
   );
 }

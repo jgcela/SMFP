@@ -39,7 +39,8 @@ async function load(f: Family) {
 }
 
 export default async function FamilyPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const n = (await searchParams).next;
+  const sp = await searchParams;
+  const n = sp.next;
   const next = typeof n === "string" && n.startsWith("/") && !n.startsWith("//") ? n : "";
   const { user, staff } = await currentStaff();
   const family = user ? await familyOfUser(user.id) : null;
@@ -67,7 +68,7 @@ export default async function FamilyPage({ searchParams }: { searchParams: Promi
           {next.startsWith("/volunteer") && <p className="adm-msg adm-msg--ok">Sign in with your family account to sign up for volunteer opportunities. You will go back to the Volunteer page.</p>}
           {next.startsWith("/staff-favorites") && <p className="adm-msg adm-msg--ok">Sign in with your family account to see the staff favorites. You will go back to that page.</p>}
           {next.startsWith("/wishlists") && <p className="adm-msg adm-msg--ok">Sign in with your family account to see the teacher wishlists. You will go back to that page.</p>}
-          <FamilySignInForm next={next} />
+          <FamilySignInForm next={next} notice={sp.password === "reset" ? "Your new password is saved. Sign in with it." : undefined} />
         </div>
       </main>
     </>

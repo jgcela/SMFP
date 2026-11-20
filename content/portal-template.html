@@ -30,7 +30,7 @@
       <nav class="main-nav" aria-label="Portal sections">
 {{links.sections}}      </nav>
       <div class="bar-actions">
-{{facts.button}}        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu">
+{{family.button}}{{facts.button}}        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu">
           <svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg><span class="sr-only">Menu</span>
         </button>
       </div>
@@ -56,61 +56,51 @@
 
 <main id="main">
   <section id="top" class="hero on-navy" aria-labelledby="hero-title">
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">Parent Portal · School year {{school.school_year}}</p>
-        <h1 id="hero-title">Everything your family needs, in one place.</h1>
-        <p class="lead" style="margin-top:8px">Find a form, check what's on this week, or add the school calendar to your phone.</p>
-      </div>
-      <form class="search" role="search" id="site-search" autocomplete="off">
-        <label for="q">Search forms, events and policies</label>
-        <div class="search-field">
-          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
-          <input id="q" type="search" placeholder="Try &quot;physical form&quot; or &quot;spring break&quot;" aria-describedby="q-status">
-        </div>
-        <p id="q-status" class="sr-only" aria-live="polite"></p>
-        <div id="q-results" class="results" hidden></div>
-      </form>
-      <div class="chips">
-        <span>Popular:</span>
-{{links.popular}}      </div>
-      <nav class="quick-nav" aria-label="Jump to">
-        <a href="#this-week">This week</a>
-        <a href="#documents">Documents</a>
-        <a href="#calendar">Calendar</a>
-      </nav>
-    </div>
-  </section>
-
-  <section id="this-week" class="section" aria-labelledby="week-title">
-    <div class="wrap week-grid">
-      <div class="week-main">
+    <div class="wrap hero-grid">
+      <div class="hero-find">
         <div class="sec-head">
-          <p class="eyebrow" id="today-label"></p>
-          <h2 class="h2" id="week-title">This week and next</h2>
-          <div class="rule"></div>
+          <h1 id="hero-title">Parent Portal</h1>
+          <p class="lead">Forms, this week's events and the school calendar for {{school.school_year}}.</p>
+        </div>
+        <form class="search" role="search" id="site-search" autocomplete="off">
+          <label for="q">Search forms, events and policies</label>
+          <div class="search-field">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <input id="q" type="search" placeholder="Try &quot;physical form&quot; or &quot;spring break&quot;" aria-describedby="q-status">
+          </div>
+          <p id="q-status" class="sr-only" aria-live="polite"></p>
+          <div id="q-results" class="results" hidden></div>
+        </form>
+        <div class="chips">
+          <span>Popular:</span>
+{{links.popular}}        </div>
+        <nav class="quick-nav" aria-label="Jump to">
+          <a href="#this-week">This week</a>
+          <a href="#documents">Documents</a>
+          <a href="#calendar">Calendar</a>
+        </nav>
+      </div>
+
+      <div class="hero-sub">
+        <h2 class="h3">Get the calendar on your phone</h2>
+        <p>Subscribe once. Every Mass, break and early dismissal appears in your own calendar and updates when the school changes it.</p>
+        <div class="card-actions">
+          <a class="btn btn--gold js-sub-google" href="#"><svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg>Add to Google Calendar</a>
+          <a class="btn btn-family js-sub-ics" href="#">Apple or Outlook (iCal)</a>
+        </div>
+      </div>
+
+      <div id="this-week" class="week-panel" role="region" aria-labelledby="week-title">
+        <div class="week-head">
+          <h2 class="h3" id="week-title">This week and next</h2>
+          <p class="small" id="today-label"></p>
         </div>
         <h3 class="caption" id="wk1-label"></h3>
-        <ul class="ev-list" id="wk1" style="margin-top:-12px"></ul>
-        <h3 class="caption" id="wk2-label" style="margin-top:8px"></h3>
-        <ul class="ev-list" id="wk2" style="margin-top:-12px"></ul>
-        <a href="#calendar" class="linkbtn" style="align-self:flex-start;text-decoration:underline">See the full calendar</a>
+        <ul class="ev-list" id="wk1"></ul>
+        <h3 class="caption" id="wk2-label"></h3>
+        <ul class="ev-list" id="wk2"></ul>
+        <a href="#calendar" class="linkbtn">See the full calendar</a>
       </div>
-      <aside class="week-aside" aria-label="Calendar subscription and office contact">
-        <div class="card card--tint">
-          <svg class="icon" style="width:28px;height:28px;color:var(--navy)" aria-hidden="true"><use href="#i-mobile"/></svg>
-          <h3 class="h3">Get the calendar on your phone</h3>
-          <p style="font-size:15px;line-height:22px">Subscribe once. Every Mass, break and early dismissal appears in your own calendar and updates when the school changes it.</p>
-          <a class="btn btn--primary js-sub-google" href="#">Add to Google Calendar</a>
-          <a class="btn btn--outline js-sub-ics" href="#">Apple or Outlook (iCal)</a>
-        </div>
-        <div class="card">
-          <h3 class="h3">Need the front office?</h3>
-          <a class="contact-line" href="{{school.phone_href}}"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>{{school.phone_display}}</a>
-          <a class="contact-line js-email" href="mailto:{{school.email}}"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><span class="js-email-text">{{school.email}}</span></a>
-          <p class="contact-line"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>{{school.office_hours}}</p>
-{{contact.aside_address}}        </div>
-      </aside>
     </div>
   </section>
 
@@ -118,10 +108,8 @@
     <div class="wrap" style="display:flex;flex-direction:column;gap:32px">
       <div class="docs-head">
         <div class="sec-head">
-          <p class="eyebrow">Resource center</p>
           <h2 class="h2" id="docs-title">Family documents</h2>
-          <div class="rule"></div>
-          <p style="margin-top:8px" id="docs-intro"></p>
+          <p id="docs-intro"></p>
         </div>
         <div class="filter">
           <label for="doc-filter">Filter documents</label>
@@ -144,9 +132,7 @@
     <div class="wrap" style="display:flex;flex-direction:column;gap:24px">
       <div class="cal-head">
         <div class="sec-head">
-          <p class="eyebrow">Academic calendar</p>
           <h2 class="h2" id="cal-title">School calendar {{school.school_year}}</h2>
-          <div class="rule"></div>
         </div>
         <div class="cal-tools">
           <div class="seg" role="group" aria-label="Calendar view">
@@ -154,7 +140,7 @@
             <button type="button" id="view-month" aria-pressed="false">Month</button>
           </div>
           <a class="btn btn--outline js-sub-ics" href="#" style="min-height:44px"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Subscribe</a>
-          <a href="assets/documents/Calendar_2026-27.pdf" style="font:600 14px/20px var(--font-brand);padding:12px 0">Full calendar PDF · 2.4 MB</a>
+          <a class="pdf-link" href="assets/documents/Calendar_2026-27.pdf">Full calendar (PDF, 2.4 MB)</a>
         </div>
       </div>
 
@@ -178,7 +164,7 @@
         </div>
         <table class="mgrid" id="m-grid">
           <caption class="sr-only">Events by day. Select a day to see its events.</caption>
-          <thead><tr><th scope="col"><abbr title="Sunday">SU</abbr></th><th scope="col"><abbr title="Monday">MO</abbr></th><th scope="col"><abbr title="Tuesday">TU</abbr></th><th scope="col"><abbr title="Wednesday">WE</abbr></th><th scope="col"><abbr title="Thursday">TH</abbr></th><th scope="col"><abbr title="Friday">FR</abbr></th><th scope="col"><abbr title="Saturday">SA</abbr></th></tr></thead>
+          <thead><tr><th scope="col"><abbr title="Sunday">Sun</abbr></th><th scope="col"><abbr title="Monday">Mon</abbr></th><th scope="col"><abbr title="Tuesday">Tue</abbr></th><th scope="col"><abbr title="Wednesday">Wed</abbr></th><th scope="col"><abbr title="Thursday">Thu</abbr></th><th scope="col"><abbr title="Friday">Fri</abbr></th><th scope="col"><abbr title="Saturday">Sat</abbr></th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="legend" aria-hidden="true">
@@ -197,13 +183,12 @@
 <footer id="contact" class="site-footer on-navy" aria-labelledby="contact-title">
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Need help?</p>
       <h2 class="h2" id="contact-title">We're here for your family.</h2>
     </div>
     <div class="contact-grid">
-      <a class="ctile" href="{{school.phone_href}}"><span class="k">CALL THE OFFICE</span><span class="v">{{school.phone_display}}</span></a>
-      <a class="ctile js-email" href="mailto:{{school.email}}"><span class="k">EMAIL</span><span class="v js-email-text">{{school.email}}</span></a>
-      <div class="ctile"><span class="k">OFFICE HOURS</span><span class="v">{{school.office_hours}}</span></div>
+      <a class="ctile" href="{{school.phone_href}}"><span class="k">Call the office</span><span class="v">{{school.phone_display}}</span></a>
+      <a class="ctile js-email" href="mailto:{{school.email}}"><span class="k">Email</span><span class="v js-email-text">{{school.email}}</span></a>
+      <div class="ctile"><span class="k">Office hours</span><span class="v">{{school.office_hours}}</span></div>
 {{contact.tile_address}}    </div>
 {{contact.people}}    <p class="legal">{{school.footer}}</p>
   </div>

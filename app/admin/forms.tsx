@@ -45,6 +45,7 @@ export function SignInForm({ notice }: { notice?: string }) {
       </label>
       <div className="adm-actions">
         <Submit pending={pending} busy="Signing in…">Sign in</Submit>
+        <a href="/admin/forgot-password">Forgot your password?</a>
       </div>
     </form>
   );

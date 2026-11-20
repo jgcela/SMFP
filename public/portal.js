@@ -23,9 +23,9 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   // ---- Dates (AP style) ----
   const MON_AP = ['Jan.','Feb.','March','April','May','June','July','Aug.','Sept.','Oct.','Nov.','Dec.'];
   const MON_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const MON_SHORT = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const DOW_S = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const DOW_S = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
   const key = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
@@ -110,11 +110,11 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   const weekStart = addDays(today, -today.getDay());
   const w1End = addDays(weekStart, 6), w2Start = addDays(weekStart, 7), w2End = addDays(weekStart, 13);
   $('#today-label').textContent = `Today is ${fmtLong(today)}`;
-  $('#wk1-label').textContent = `This week · ${fmtShort(weekStart)}–${w1End.getMonth() === weekStart.getMonth() ? w1End.getDate() : fmtShort(w1End)}`;
-  $('#wk2-label').textContent = `Next week · ${fmtShort(w2Start)}–${w2End.getMonth() === w2Start.getMonth() ? w2End.getDate() : fmtShort(w2End)}`;
+  $('#wk1-label').textContent = `This week, ${fmtShort(weekStart)}–${w1End.getMonth() === weekStart.getMonth() ? w1End.getDate() : fmtShort(w1End)}`;
+  $('#wk2-label').textContent = `Next week, ${fmtShort(w2Start)}–${w2End.getMonth() === w2Start.getMonth() ? w2End.getDate() : fmtShort(w2End)}`;
   const weekItem = (e, isSoon) => `<li><a class="ev-card" href="#${e.id}">
       <span class="date-chip${isSoon ? ' is-soon' : ''}"><span class="m">${MON_SHORT[e.d.getMonth()]}</span><span class="d">${e.d.getDate()}</span></span>
-      <span class="ev-body"><span class="ev-title">${esc(e.title)}</span><span class="ev-meta">${DOW[e.d.getDay()]}${e.detail ? ' · ' + esc(e.detail) : ''}</span></span>
+      <span class="ev-body"><span class="ev-title">${esc(e.title)}</span><span class="ev-meta">${DOW[e.d.getDay()]}${e.detail ? ', ' + esc(e.detail) : ''}</span></span>
       ${tagHTML(e)}</a></li>`;
   const w1 = events.filter(e => e.d >= today && e.d <= w1End);
   const w2 = events.filter(e => e.d >= w2Start && e.d <= w2End);

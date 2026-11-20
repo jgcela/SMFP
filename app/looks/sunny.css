@@ -1,0 +1,44 @@
+/* Hallmark · look B "Sunny day" · playful-soft · keeps navy + gold, light sky hero, rounded, Nunito Sans · deal: manual · sweep: manual
+   critique: friendlier for young families; the risk is it looks less "official" next to FACTS. */
+:root{
+  --surface:#FFFFFF; --ink:#22324A; --ink-soft:#3E5068; --line:#DCE7EE; --line-strong:#9CC6D6;
+  --hero-bg:var(--azure); --hero-hover:var(--light-blue); --sun:#FFF4D6;
+  --font-brand:"Nunito Sans Variable",system-ui,sans-serif; --font-text:"Nunito Sans Variable",system-ui,sans-serif;
+  --r-sm:10px; --r-md:18px; --shadow:0 1px 2px rgb(22 51 91 / .06),0 8px 24px rgb(22 51 91 / .08);
+}
+body{color:var(--ink)}
+h1,h2,h3,.ev-title,.row-title{font-weight:800}
+
+.hero{background:var(--hero-bg);color:var(--ink)}
+.hero h1{color:var(--navy)}
+.hero .lead,.hero-sub p{color:var(--ink-soft)}
+.hero .search label,.hero-sub h2{color:var(--navy)}
+.hero .chips span{color:var(--ink-soft)}
+.hero .chip-link{color:var(--navy);border-color:var(--line-strong);background:var(--surface)}
+.hero .chip-link:hover{background:var(--hero-hover);color:var(--navy)}
+.hero .quick-nav a{color:var(--navy);border-color:var(--line-strong);background:var(--surface)}
+.hero .btn-family{color:var(--navy);border-color:var(--line-strong);background:var(--surface)}
+.hero .btn-family:hover{background:var(--hero-hover);color:var(--navy)}
+.hero .search-field{border:1px solid var(--line-strong)}
+.hero.on-navy :focus-visible,.hero .search-field:focus-within{outline-color:var(--cerulean)}
+.hero-sub{border-top-color:var(--line)}
+
+.hero h1{font-size:52px;line-height:58px;font-weight:900}
+.btn,.search-field,.chip-link,.fchip,.quick-nav a{border-radius:var(--r-pill)}
+.btn{min-height:50px;padding:0 24px}
+.search-field{padding:0 22px;min-height:60px;border:2px solid var(--line-strong)}
+.week-panel{border-radius:var(--r-md);box-shadow:var(--shadow);padding:28px}
+.date-chip{border-radius:14px;background:var(--azure)}
+.section--tint{background:var(--sun)}
+.cat,.most a,.docs-empty{border:0;border-radius:var(--r-md);box-shadow:var(--shadow)}
+.most a:hover{box-shadow:0 0 0 2px var(--gold),var(--shadow)}
+.ev-list,.doc-list,.month .rows{border-top-color:var(--line)}
+.ev-list>li,.doc-list li,.row{border-bottom-color:var(--line)}
+.row{border-radius:12px}
+.cal-status{border-radius:var(--r-md)}
+.seg{border-radius:var(--r-pill)}
+.mgrid td{border-color:var(--line)}
+.tag{border-radius:var(--r-pill);padding:0 12px}
+.ctile{border-radius:var(--r-md);border-color:var(--navy-raised);background:var(--navy-hover)}
+.alert{background:var(--gold)}
+@media (max-width:640px){.hero h1{font-size:36px;line-height:42px}}
