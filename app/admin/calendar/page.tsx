@@ -3,13 +3,14 @@ import { db } from "../../../lib/db";
 import { currentStaff } from "../../../lib/staff";
 import { AdminTop } from "../chrome";
 import { CalendarManager, type AdminEvent } from "./manager";
+import { schoolPath } from "../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Calendar" };
 
 export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ imported?: string; skipped?: string }> }) {
   const [{ staff }, sp] = await Promise.all([currentStaff(), searchParams]);
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const events = await db()<AdminEvent[]>`
     select id, event_date::text as date, end_date::text as "endDate", to_char(start_time, 'HH24:MI') as time,
       category, title, details as note

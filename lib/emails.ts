@@ -6,17 +6,17 @@ import { sendMail, type Mail } from "./mail";
 import { readPanelTheme, textOn } from "./panel-theme";
 
 export type MailSchool = {
-  id: number; name: string; email: string; phone: string; notifyEmail: string;
+  id: number; slug: string; name: string; email: string; phone: string; notifyEmail: string;
   logo: string; ink: string; onInk: string; accent: string; onAccent: string; page: string; text: string; muted: string;
 };
 
 export async function mailSchool(schoolId: number): Promise<MailSchool | null> {
-  const [s] = await db()<{ id: number; name: string; email: string; phone_display: string; notify_email: string; logo_url: string | null; panel_theme: unknown }[]>`
-    select id, name, email, phone_display, notify_email, logo_url, panel_theme from schools where id = ${schoolId}`;
+  const [s] = await db()<{ id: number; slug: string; name: string; email: string; phone_display: string; notify_email: string; logo_url: string | null; panel_theme: unknown }[]>`
+    select id, slug, name, email, phone_display, notify_email, logo_url, panel_theme from schools where id = ${schoolId}`;
   if (!s) return null;
   const c = readPanelTheme(s.panel_theme, s.name).colors;
   return {
-    id: s.id, name: s.name, email: s.email, phone: s.phone_display, notifyEmail: s.notify_email,
+    id: s.id, slug: s.slug, name: s.name, email: s.email, phone: s.phone_display, notifyEmail: s.notify_email,
     logo: s.logo_url ?? "", ink: c.ink, onInk: textOn(c.ink, c.surface), accent: c.accent, onAccent: textOn(c.accent, c.ink),
     page: c.page, text: c.text, muted: c.muted,
   };
@@ -109,6 +109,19 @@ export const emails = {
       button: { label: "Review families", href: `${o}/admin/families` },
     }),
 
+  // Step 10: the first administrator of a school FAMITENLY just created.
+  staffInvite: (s: MailSchool, o: string, to: string, link: string) =>
+    mail(s, o, to, "staff_invite", `You are invited to manage the ${s.name} portal`, {
+      preheader: "Choose your password to start. The link works for 7 days.",
+      title: "Your school portal is ready",
+      paras: [
+        `You are the administrator of the ${s.name} family portal.`,
+        "Choose your password to sign in to the staff panel. The link works for 7 days, and only once.",
+      ],
+      button: { label: "Choose your password", href: link },
+      after: [`After that, sign in at ${o}/admin with this email and your password.`],
+    }),
+
   resetPassword: (s: MailSchool, o: string, to: string, link: string) =>
     mail(s, o, to, "reset_password", `Reset your password — ${s.name}`, {
       preheader: "This link works for 1 hour.",
@@ -138,7 +151,8 @@ export async function sendSchoolMail<K extends keyof typeof emails>(
   try {
     const s = await mailSchool(schoolId);
     if (!s) return false;
-    const o = await portalOrigin();
+    // Every link in the email starts at the school's own address (/s/<code>).
+    const o = `${await portalOrigin()}/s/${s.slug}`;
     const build = emails[kind] as (s: MailSchool, o: string, to: string, ...a: unknown[]) => Mail;
     return await sendMail(build(s, o, to, ...args));
   } catch (e) {

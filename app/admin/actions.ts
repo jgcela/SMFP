@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "../../lib/auth";
 import { db } from "../../lib/db";
 import { clearFailures, currentStaff, recordFailure, tooManyFailures } from "../../lib/staff";
+import { schoolPath } from "../../lib/portal";
 
 export type FormState = { error?: string; ok?: string } | undefined;
 
@@ -32,7 +33,7 @@ export async function signIn(_prev: FormState, fd: FormData): Promise<FormState>
     return { error: "Email or password is incorrect." };
   }
   await clearFailures(keys[0]);
-  redirect("/admin");
+  redirect(await schoolPath("/admin"));
 }
 
 export async function signOut() {
@@ -41,7 +42,7 @@ export async function signOut() {
   } catch {
     // already signed out
   }
-  redirect("/admin");
+  redirect(await schoolPath("/admin"));
 }
 
 // ---- The notice ----
@@ -115,5 +116,5 @@ export async function setPassword(_prev: FormState, fd: FormData): Promise<FormS
   if (credential) await ctx.internalAdapter.updatePassword(link.user_id, hashed);
   else await ctx.internalAdapter.createAccount({ userId: link.user_id, providerId: "credential", accountId: link.user_id, password: hashed });
   await ctx.internalAdapter.deleteUserSessions(link.user_id); // sign out everywhere
-  redirect("/admin?password=set");
+  redirect(await schoolPath("/admin?password=set"));
 }

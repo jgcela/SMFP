@@ -1,10 +1,9 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORIES, CATEGORY_LABEL } from "../../../lib/events";
 import { deleteEvent, saveEvent, type EventState } from "./actions";
-import { Cat, Head, PencilIcon, RowMenu } from "../ui";
+import { Cat, Head, PencilIcon, RowMenu, SLink } from "../ui";
 
 export type AdminEvent = { id: number; date: string; endDate: string | null; time: string | null; category: string; title: string; note: string };
 
@@ -170,7 +169,7 @@ export function CalendarManager({ events, notice }: { events: AdminEvent[]; noti
         title="Calendar"
         lead="These events appear in “This week and next”, the month view and the no-school notice of the portal."
         actions={<>
-          <Link href="/admin/calendar/import" className="btn btn--outline"><svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>Import .ics / .csv</Link>
+          <SLink href="/admin/calendar/import" className="btn btn--outline"><svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>Import .ics / .csv</SLink>
           <button type="button" className="btn btn--primary" onClick={() => { setMsg(null); setEditing("new"); }}><svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>Add event</button>
         </>}
       />

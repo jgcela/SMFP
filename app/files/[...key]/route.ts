@@ -11,7 +11,7 @@ const TYPES: Record<string, string> = { png: "image/png", jpg: "image/jpeg", jpe
 export async function GET(_req: Request, ctx: { params: Promise<{ key: string[] }> }) {
   const parts = (await ctx.params).key.map((k) => decodeURIComponent(k));
   const key = parts.join("/");
-  const [s] = await db()<{ id: number }[]>`select id from schools where slug = ${schoolSlug()}`;
+  const [s] = await db()<{ id: number }[]>`select id from schools where slug = ${await schoolSlug()}`;
   const ext = (/\.([a-z0-9]+)$/i.exec(key)?.[1] ?? "").toLowerCase();
   if (!s || parts[0] !== "pages" || parts[1] !== String(s.id) || parts.length !== 4 || !TYPES[ext] || key.includes(".."))
     return new Response("Not found", { status: 404 });

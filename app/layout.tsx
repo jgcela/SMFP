@@ -3,7 +3,6 @@ import "./portal.css";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  icons: { icon: { url: "/assets/favicon.png", type: "image/png" } },
 };
 
 export const viewport: Viewport = {

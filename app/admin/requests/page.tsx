@@ -6,6 +6,7 @@ import { formatRange, STATUS_LABEL, todayIn, when, type SubmissionKind, type Sub
 import { currentStaff } from "../../../lib/staff";
 import { AdminTop } from "../chrome";
 import { RequestsList, type StaffRow } from "./list";
+import { requireModule, schoolPath } from "../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Absences & requests" };
@@ -14,8 +15,9 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
 type Search = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function RequestsPage({ searchParams }: { searchParams: Search }) {
+  await requireModule("requests");
   const { staff } = await currentStaff();
-  if (!staff) redirect("/admin");
+  if (!staff) redirect(await schoolPath("/admin"));
   const sp = await searchParams;
   const one = (k: string) => { const v = sp[k]; return typeof v === "string" ? v : ""; };
   const from = ISO.test(one("from")) ? one("from") : "";

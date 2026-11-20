@@ -1,10 +1,9 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { categoryLabel, KIND_LABEL, STATUS_LABEL, type SubmissionKind, type SubmissionStatus } from "../../../lib/my-family";
 import { setSubmissionStatus, type StatusResult } from "./actions";
-import { Head } from "../ui";
+import { Head, SLink, useSchool } from "../ui";
 
 export type StaffRow = {
   id: number; kind: SubmissionKind; category: string; childName: string; dateFrom: string; dateTo: string; message: string;
@@ -17,6 +16,7 @@ const STATUSES: SubmissionStatus[] = ["received", "in_progress", "resolved"];
 
 export function RequestsList({ rows, filters, today, tomorrow, week }: { rows: StaffRow[]; filters: Filters; today: string; tomorrow: string; week: string }) {
   const router = useRouter();
+  const { base } = useSchool();
   const [f, setF] = useState(filters);
   const [msg, setMsg] = useState<(StatusResult & { id?: number }) | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
@@ -25,7 +25,7 @@ export function RequestsList({ rows, filters, today, tomorrow, week }: { rows: S
   const go = (next: Filters) => {
     setF(next); setMsg(null);
     const q = new URLSearchParams(Object.entries(next).filter(([, v]) => v));
-    router.push(`/admin/requests${q.size ? `?${q}` : ""}`);
+    router.push(`${base}/admin/requests${q.size ? `?${q}` : ""}`);
   };
   const range = (from: string, to: string) => go({ ...f, from, to });
   const isRange = (from: string, to: string) => f.from === from && f.to === to;
@@ -89,7 +89,7 @@ export function RequestsList({ rows, filters, today, tomorrow, week }: { rows: S
               <div className="what">
                 <strong>{categoryLabel(r.kind, r.category)} · {r.childName || "Whole family"}</strong>
                 <span className="note">
-                  <Link href={`/admin/families/${r.familyId}`}>{r.familyName}</Link>
+                  <SLink href={`/admin/families/${r.familyId}`}>{r.familyName}</SLink>
                   {r.parentNames && <> · {r.parentNames}</>}
                   {r.phone && <> · <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`}>{r.phone}</a></>}
                 </span>

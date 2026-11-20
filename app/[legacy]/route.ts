@@ -12,12 +12,12 @@ export async function GET(req: Request, ctx: { params: Promise<{ legacy: string 
   if (!/\.html?$/i.test(legacy)) return notFound();
   const [p] = await db()<{ slug: string }[]>`
     select p.slug from pages p join schools s on s.id = p.school_id
-    where s.slug = ${schoolSlug()} and p.legacy_path = ${legacy} and p.published_at is not null`;
+    where s.slug = ${await schoolSlug()} and p.legacy_path = ${legacy} and p.published_at is not null`;
   const url = new URL(req.url);
   if (p) return go(`/pages/${encodeURIComponent(p.slug)}${url.search}`);
   const [r] = await db()<{ target: string }[]>`
     select r.target from redirects r join schools s on s.id = r.school_id
-    where s.slug = ${schoolSlug()} and r.path = ${legacy}`;
+    where s.slug = ${await schoolSlug()} and r.path = ${legacy}`;
   if (!r) return notFound();
   return go(/^(https?:)?\/\//.test(r.target) || r.target.startsWith("/") ? r.target : `/${r.target}`);
 }

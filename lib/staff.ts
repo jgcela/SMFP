@@ -1,12 +1,16 @@
 // Who is signed in, and which school they may edit.
-// The school always comes from this deployment (PORTAL_SCHOOL) AND must be
-// listed for the user in school_staff; nothing from the browser decides it.
+// The school always comes from the address (/s/<code>, see proxy.ts) AND must be
+// listed for the user in school_staff; nothing else from the browser decides it.
+// Step 10: a FAMITENLY person in support mode (lib/platform.ts) also counts as
+// staff of that one school, while the school allows it; everything they change
+// is written to the FAMITENLY log.
 import { headers } from "next/headers";
 import { auth } from "./auth";
 import { db } from "./db";
+import { audit, supportVisit } from "./platform";
 import { schoolSlug } from "./portal";
 
-export type Staff = { userId: string; email: string; name: string; schoolId: number; schoolName: string };
+export type Staff = { userId: string; email: string; name: string; schoolId: number; schoolName: string; support?: boolean };
 
 export async function currentUser() {
   const s = await auth().api.getSession({ headers: await headers() });
@@ -19,8 +23,12 @@ export async function currentStaff(): Promise<{ user: Awaited<ReturnType<typeof 
   if (!user) return { user: null, staff: null };
   const rows = await db()<{ school_id: number; name: string }[]>`
     select s.id as school_id, s.name from school_staff ss join schools s on s.id = ss.school_id
-    where ss.user_id = ${user.id} and s.slug = ${schoolSlug()}`;
-  if (!rows.length) return { user, staff: null };
+    where ss.user_id = ${user.id} and s.slug = ${await schoolSlug()} and s.status <> 'suspended'`;
+  if (!rows.length) {
+    const v = await supportVisit();
+    if (v && v.userId === user.id) return { user, staff: { userId: user.id, email: user.email, name: user.name, schoolId: v.schoolId, schoolName: v.schoolName, support: true } };
+    return { user, staff: null };
+  }
   return { user, staff: { userId: user.id, email: user.email, name: user.name, schoolId: rows[0].school_id, schoolName: rows[0].name } };
 }
 
@@ -51,5 +59,13 @@ export async function requireStaff(): Promise<Staff> {
   const { user, staff } = await currentStaff();
   if (!user) throw new Error("Your session has ended. Sign in again.");
   if (!staff) throw new Error("This account cannot edit this school’s portal.");
+  if (staff.support) {
+    const h = await headers();
+    let page = "";
+    try {
+      page = new URL(h.get("referer") ?? "").pathname;
+    } catch {}
+    await audit({ userId: staff.userId, email: staff.email }, "support.change", staff.schoolId, `Change in the staff panel${page ? ` (${page})` : ""}`);
+  }
   return staff;
 }

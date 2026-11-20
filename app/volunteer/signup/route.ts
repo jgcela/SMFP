@@ -4,6 +4,7 @@ import { db } from "../../../lib/db";
 import { currentFamily } from "../../../lib/family";
 import { todayIn } from "../../../lib/my-family";
 import { changeSignup } from "../../../lib/volunteer-db";
+import { moduleOn } from "../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ const back = (req: Request, m: string, id?: number) =>
   new Response(null, { status: 303, headers: { Location: new URL(`/volunteer?m=${m}${id ? `#opp-${id}` : ""}`, req.url).toString() } });
 
 export async function POST(req: Request) {
+  if (!(await moduleOn("volunteer"))) return new Response("Not found", { status: 404 });
   const fd = await req.formData().catch(() => null);
   const id = Number(fd?.get("id") ?? 0);
   const join = fd?.get("do") !== "leave";

@@ -1,18 +1,36 @@
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { cache } from "react";
 import { db } from "./db";
 
-// Which school this deployment shows. Each school's content lives in the
+// Which school this request is for. Every school's address starts with
+// /s/<code>/ (proxy.ts); the proxy turns the code into the x-portal-school
+// header and removes any copy of that header the browser sent, so nothing from
+// the browser can pick another school. Each school's content lives in the
 // database under its own school_id; nothing about a specific school is in the code.
-export function schoolSlug() {
-  const slug = process.env.PORTAL_SCHOOL;
-  if (!slug) throw new Error("PORTAL_SCHOOL is not set");
+export const SCHOOL_HEADER = "x-portal-school";
+export const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?$/;
+
+export async function schoolSlug() {
+  const slug = (await headers()).get(SCHOOL_HEADER);
+  if (!slug || !SLUG_RE.test(slug)) notFound();
   return slug;
+}
+
+/** "/s/stmary": the start of every address of this request's school. */
+export async function schoolBase() {
+  return `/s/${await schoolSlug()}`;
+}
+
+/** An address of this request's school: schoolPath("/admin") -> "/s/stmary/admin". */
+export async function schoolPath(path: string) {
+  return `${await schoolBase()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 export type School = {
   id: number; slug: string; name: string; city: string; region: string; school_year: string;
   logo_url: string; phone_display: string; phone_href: string; email: string; office_hours: string; address: string;
-  google_calendar_id: string; notice_auto_days: number;
+  google_calendar_id: string; notice_auto_days: number; panel_theme: unknown; status: string; modules: string[]; calendar_pdf_url: string; calendar_pdf_label: string;
 };
 export type ContactPerson = { name: string; role: string; email: string };
 export type Link = { placement: string; label: string; short_label: string; href: string; new_tab: boolean };
@@ -45,7 +63,7 @@ const iso = (d: Date | string | null) => {
 export const loadPortal = cache(async function loadPortal(slug: string) {
   const sql = db();
   const [school] = await sql<School[]>`select * from schools where slug = ${slug}`;
-  if (!school) throw new Error(`No school with slug "${slug}"`);
+  if (!school) notFound();
 
   // Dates come back as text so no time zone can move them by a day.
   const [notices, events, cats, docs, links, contacts] = await Promise.all([
@@ -98,3 +116,19 @@ export const loadPortal = cache(async function loadPortal(slug: string) {
   };
   return { school, links, contacts, data };
 });
+
+// ---- Step 10: the modules a school has turned on (lib/plans.ts) ----
+export const currentSchoolRow = cache(async () => {
+  const slug = await schoolSlug();
+  const [s] = await db()<{ id: number; modules: string[]; status: string; timezone: string }[]>`
+    select id, modules, status, timezone from schools where slug = ${slug}`;
+  if (!s) notFound();
+  return s;
+});
+export async function moduleOn(id: string) {
+  return (await currentSchoolRow()).modules.includes(id);
+}
+/** In a page: "not found" when the school does not have this module on. */
+export async function requireModule(id: string) {
+  if (!(await moduleOn(id))) notFound();
+}

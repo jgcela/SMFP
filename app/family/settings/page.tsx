@@ -2,13 +2,14 @@ import { redirect } from "next/navigation";
 import { currentFamily } from "../../../lib/family";
 import { ChangeEmailForm } from "../../account/forms";
 import { AdminTop, PageHead } from "../../admin/chrome";
+import { schoolPath } from "../../../lib/portal";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Settings" };
 
 export default async function FamilySettingsPage() {
   const family = await currentFamily();
-  if (!family) redirect("/family");
+  if (!family) redirect(await schoolPath("/family"));
   return (
     <>
       <AdminTop signedIn area="family" familyPage="settings" />

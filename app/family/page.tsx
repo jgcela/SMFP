@@ -1,6 +1,5 @@
 // Family sign-in, and "My family" for a family the school approved (step 6a).
 // The public portal does not need any of this.
-import Link from "next/link";
 import { db } from "../../lib/db";
 import { familyOfUser, type Family } from "../../lib/family";
 import { formatRange, todayIn, when, type SubmissionRow } from "../../lib/my-family";
@@ -8,6 +7,7 @@ import { currentStaff } from "../../lib/staff";
 import { AdminTop } from "../admin/chrome";
 import { FamilySignInForm } from "./forms";
 import { MyFamily, type ChildRow, type Details, type Sent } from "./my-family";
+import { SLink } from "../admin/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "My family" };
@@ -63,7 +63,7 @@ export default async function FamilyPage({ searchParams }: { searchParams: Promi
       <main id="main" className="adm-main">
         <div className="adm-card adm-card--narrow">
           <h1>Family sign-in</h1>
-          {user && staff && <p className="adm-msg adm-msg--ok">You are signed in as school staff. <Link href="/admin">Go to the staff area</Link>.</p>}
+          {user && staff && <p className="adm-msg adm-msg--ok">You are signed in as school staff. <SLink href="/admin">Go to the staff area</SLink>.</p>}
           <p className="lead">For families of the school. The Parent Portal itself is open to everyone without signing in.</p>
           {next.startsWith("/volunteer") && <p className="adm-msg adm-msg--ok">Sign in with your family account to sign up for volunteer opportunities. You will go back to the Volunteer page.</p>}
           {next.startsWith("/staff-favorites") && <p className="adm-msg adm-msg--ok">Sign in with your family account to see the staff favorites. You will go back to that page.</p>}

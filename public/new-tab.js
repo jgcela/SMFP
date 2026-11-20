@@ -14,7 +14,9 @@
     var url = new URL(a.href, location.href);
     if (url.origin === location.origin) {
       if (url.hash && url.pathname === location.pathname && url.search === location.search) return;
-      if (url.pathname === "/" || /_202627\.html$/.test(url.pathname) || url.pathname.indexOf("/pages/") === 0 || /^\/(volunteer|family|staff-favorites|wishlists)(\/|$)/.test(url.pathname)) return; // a portal page
+      // Each school lives under /s/<code>/: its pages are checked without that start.
+      var path = url.pathname.replace(/^\/s\/[^\/]+/, "") || "/";
+      if (path === "/" || /_202627\.html$/.test(path) || path.indexOf("/pages/") === 0 || /^\/(volunteer|family|staff-favorites|wishlists)(\/|$)/.test(path)) return; // a portal page
     }
     a.target = "_blank";
     a.rel = "noopener";

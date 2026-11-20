@@ -1,11 +1,10 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { CATEGORIES, type ImportRow } from "../../../../lib/events";
 import { importEvents, previewImport, type PreviewState } from "../actions";
 import { fmtDay, fmtTime } from "../manager";
-import { Head } from "../../ui";
+import { Head, SLink, useSchool } from "../../ui";
 
 type Pick = ImportRow & { on: boolean };
 
@@ -15,6 +14,7 @@ export function Importer() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { base } = useSchool();
 
   useEffect(() => {
     setError(null);
@@ -30,12 +30,12 @@ export function Importer() {
     const res = await importEvents(chosen.map(({ title, date, time, endDate, category, note }) => ({ title, date, time, endDate, category, note })));
     setSaving(false);
     if (res.error) { setError(res.error); return; }
-    router.push(`/admin/calendar?imported=${res.added ?? 0}&skipped=${res.skipped ?? 0}`);
+    router.push(`${base}/admin/calendar?imported=${res.added ?? 0}&skipped=${res.skipped ?? 0}`);
   };
 
   return (
     <>
-    <Head back={<Link href="/admin/calendar">← Calendar</Link>} title="Import events"
+    <Head back={<SLink href="/admin/calendar">← Calendar</SLink>} title="Import events"
       lead="Choose a calendar file (.ics, for example exported from Google Calendar) or a spreadsheet saved as .csv. Nothing is saved until you check the preview and press Import." />
     <div className="adm-card">
 

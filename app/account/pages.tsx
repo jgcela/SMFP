@@ -24,7 +24,7 @@ function Frame({ kind, title, lead, children }: { kind: Kind; title: string; lea
 }
 
 async function schoolId() {
-  const [s] = await db()<{ id: number }[]>`select id from schools where slug = ${schoolSlug()}`;
+  const [s] = await db()<{ id: number }[]>`select id from schools where slug = ${await schoolSlug()}`;
   return s?.id ?? 0;
 }
 

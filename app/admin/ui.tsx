@@ -2,15 +2,23 @@
 // Pieces shared by every staff screen: the page heading, the "…" menu of a row,
 // status badges and initials. The school's name and category colours come from
 // the layout (database), never from the code.
+import NextLink from "next/link";
 import { createContext, useContext, useEffect, useId, useRef, useState } from "react";
 import type { Pill } from "../../lib/panel-theme";
 
-type SchoolInfo = { name: string; categories: Record<string, Pill> };
-const School = createContext<SchoolInfo>({ name: "", categories: {} });
+// base: the start of every address of the school ("/s/stmary", step 10).
+type SchoolInfo = { name: string; categories: Record<string, Pill>; base: string };
+const School = createContext<SchoolInfo>({ name: "", categories: {}, base: "" });
 export function SchoolProvider({ value, children }: { value: SchoolInfo; children: React.ReactNode }) {
   return <School.Provider value={value}>{children}</School.Provider>;
 }
 export const useSchool = () => useContext(School);
+
+/** A link to a page of this school: <SLink href="/admin/calendar"> goes to /s/<code>/admin/calendar. */
+export function SLink({ href, ...rest }: React.ComponentProps<typeof NextLink> & { href: string }) {
+  const { base } = useSchool();
+  return <NextLink href={href.startsWith("/") && !href.startsWith("//") ? `${base}${href}` : href} {...rest} />;
+}
 
 export function Head({ title, lead, actions, back }: { title: React.ReactNode; lead?: React.ReactNode; actions?: React.ReactNode; back?: React.ReactNode }) {
   const { name } = useSchool();

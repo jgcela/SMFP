@@ -29,7 +29,7 @@ insert into staff_setup_links (token_hash, user_id, expires_at)
   select ${q(hash)}, u.id, now() + interval '72 hours' from auth_user u where u.email = ${q(email)};
 commit;`;
 
-const link = `${base.replace(/\/+$/, "")}/admin/set-password?token=${token}`;
+const link = `${base.replace(/\/+$/, "")}/s/${slug}/admin/set-password?token=${token}`;
 
 if (flag === "--apply") {
   const { default: postgres } = await import("postgres");

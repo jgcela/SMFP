@@ -4,6 +4,7 @@ import { opensInNewTabByDefault } from "./links";
 import publicFiles from "./public-files.json";
 import { mapsHref } from "./contact";
 import { absolutePaths } from "./page-html";
+import { portalColorsCss, readPanelTheme } from "./panel-theme";
 import type { ContactPerson, Link, School } from "./portal";
 import { staffAnchors, VISIBLE_FAVORITES, type StaffCard, type Team } from "./staff-favorites";
 import { storeLabel, type Group, type Wishlist } from "./wishlists";
@@ -67,6 +68,44 @@ function headerLogo(url: string) {
   return navy !== local && PUBLIC.has(navy) ? url.replace(local, navy) : url;
 }
 
+const isBundledFile = (path: string) => {
+  if (PUBLIC.has(path)) return true;
+  try {
+    return PUBLIC.has(decodeURIComponent(path));
+  } catch {
+    return false;
+  }
+};
+
+// Step 10: every school lives under /s/<code>/. The finished page's links to the
+// portal's own pages ("/family", "/volunteer"...) get the school's start; the
+// bundled scripts, styles and files keep their plain address. The icon and, for a
+// school created with its own colours, the colours are the school's.
+export function forSchool(html: string, school: School) {
+  const base = `/s/${school.slug}`;
+  const theme = readPanelTheme(school.panel_theme, school.name);
+  let out = html.replace(/(\s(?:href|src|action)=")\/(?!\/)([^"]*)"/g, (m, start: string, rest: string) => {
+    const path = rest.split(/[?#]/)[0];
+    if (path.startsWith("_next/") || (path && isBundledFile(path))) return m;
+    return `${start}${base}/${rest}"`;
+  });
+  const icon = theme.markUrl ? (/^(https:)?\/\//.test(theme.markUrl) || isBundledFile(theme.markUrl.replace(/^\//, "")) ? theme.markUrl : `${base}${theme.markUrl}`) : "";
+  out = out.replace(/(<link rel="icon"[^>]*href=")[^"]*"/, (m, start: string) => (icon ? `${start}${esc(icon)}"` : m));
+  if (theme.portal) {
+    const style = `<style>${portalColorsCss(theme.portal)}</style>`;
+    out = out.includes("</head>") ? out.replace("</head>", `${style}\n</head>`) : style + out;
+  }
+  return out;
+}
+
+/** The browser tab icon of a school's pages: its mark (bundled file, or its own under /s/<code>). */
+export function schoolIcon(school: School) {
+  const mark = readPanelTheme(school.panel_theme, school.name).markUrl;
+  if (!mark) return undefined;
+  const url = /^(https:)?\/\//.test(mark) || isBundledFile(mark.replace(/^\//, "")) ? mark : `/s/${school.slug}${mark}`;
+  return { icon: { url } };
+}
+
 export function schoolTitle(school: School) {
   return `Parent Portal — ${school.name}`;
 }
@@ -110,7 +149,7 @@ function schoolValues(school: School, links: Link[], people: ContactPerson[]) {
     "school.email": esc(school.email),
     "school.office_hours": esc(school.office_hours),
     "school.footer": esc(`${[school.name, place].filter(Boolean).join(", ")}. Parent Portal, school year ${school.school_year}.`),
-    "family.button": FAMILY_BUTTON,
+    "family.button": school.modules?.includes("families") ? FAMILY_BUTTON : "",
     "facts.button": factsButton(links.find((l) => l.placement === "facts")),
     ...contactParts(school, people),
   } as Record<string, string>;
@@ -125,10 +164,14 @@ function fill(tpl: string, values: Record<string, string>) {
 
 export function renderPortal(school: School, links: Link[], people: ContactPerson[] = []) {
   const values = schoolValues(school, links, people);
+  // The full calendar as a PDF, when the school has one (step 10: it was fixed in the page).
+  values["calendar.pdf"] = school.calendar_pdf_url
+    ? `          <a class="pdf-link" href="${esc(school.calendar_pdf_url)}">${esc(school.calendar_pdf_label || "Full calendar (PDF)")}</a>\n`
+    : "";
   for (const [slot, { from, html }] of Object.entries(LINK_HTML)) {
     values[`links.${slot}`] = links.filter((l) => l.placement === from).map(html).join("");
   }
-  return fill(template, values);
+  return forSchool(fill(template, values), school);
 }
 
 export type PagePart = { title: string; summary: string; body: string; headings: number; preview?: string };
@@ -190,7 +233,7 @@ export function renderSchoolPage(school: School, links: Link[], people: ContactP
 `
     : "";
   // Pages live under /pages/, so the portal's relative links (menu, contact...) must start at the site root.
-  return absolutePaths(fill(pageTemplate, values));
+  return forSchool(absolutePaths(fill(pageTemplate, values)), school);
 }
 
 // ---------- Volunteer (step 6b) ----------
@@ -271,7 +314,7 @@ export function renderVolunteerPage(school: School, links: Link[], people: Conta
   values["volunteer.chips"] = Object.entries(KINDS).map(([k, l]) => `          <button type="button" class="fchip" data-f="${k}" aria-pressed="false">${esc(l)}</button>\n`).join("");
   values["volunteer.count"] = opps.length ? `Showing ${opps.length} of ${opps.length} opportunities` : "No opportunities right now. Check back soon.";
   values["volunteer.cards"] = opps.map((o) => card(o, st)).join("");
-  return absolutePaths(fill(volunteerTemplate, values));
+  return forSchool(absolutePaths(fill(volunteerTemplate, values)), school);
 }
 
 // ---------- Staff favorites (step 6c) ----------
@@ -370,7 +413,7 @@ export function renderStaffPage(school: School, links: Link[], people: ContactPe
   values["page.summary"] = esc(`Favorite drinks, snacks and treats of ${school.name} staff, for gift ideas. ${school.school_year}.`);
   values["page.lead"] = page.lead ? `      <p class="lead" id="page-lead">${esc(page.lead)}</p>\n` : "";
   values["staff.body"] = viewer === "allowed" ? staffBody(page, cards) : familiesOnly(viewer, "staff favorites", "/staff-favorites");
-  return absolutePaths(fill(staffTemplate, values));
+  return forSchool(absolutePaths(fill(staffTemplate, values)), school);
 }
 
 // ---------- Teacher wishlists (step 6d) ----------
@@ -433,5 +476,5 @@ export function renderWishlistPage(school: School, links: Link[], people: Contac
   values["page.summary"] = esc(`Classroom wishlists of ${school.name} teachers, ${school.school_year}.`);
   values["page.lead"] = page.lead ? `      <p class="lead" id="page-lead">${esc(page.lead)}</p>\n` : "";
   values["staff.body"] = viewer === "allowed" ? wishBody(page, lists, anchors) : familiesOnly(viewer, "the teacher wishlists", "/wishlists");
-  return absolutePaths(fill(wishlistTemplate, values));
+  return forSchool(absolutePaths(fill(wishlistTemplate, values)), school);
 }
