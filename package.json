@@ -10,7 +10,6 @@
     "import-original": "python3 scripts/import-original.py"
   },
   "dependencies": {
-    "@fontsource-variable/nunito-sans": "^5.3.0",
     "@tiptap/extension-image": "3.32.2",
     "@tiptap/extension-list": "3.32.2",
     "@tiptap/extension-table": "3.32.2",
