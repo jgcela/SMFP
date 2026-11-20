@@ -24,6 +24,8 @@ export default async function Home() {
       {/* Links to files and other websites open in a new tab. */}
       {/* eslint-disable-next-line @next/next/no-sync-scripts */}
       <script src="/new-tab.js" />
+      {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+      <script src="/header.js" />
     </body>
   );
 }

@@ -199,5 +199,5 @@ The staff area (/admin) and "My family" (/family) share one look: a sidebar (a "
 - Forgotten password, for staff (/admin/forgot-password) and families (/family/forgot-password): the email gets a link that works once, for 1 hour (`lib/email-links.ts`, table `email_links`, which keeps only a hash of the token). The screen says the same whether or not the account exists. Setting a new password signs the account out everywhere.
 - Changing the account's email: Settings (/admin/settings, /family/settings). It needs the current password and is confirmed with a link sent to the new address; until then the old email stays.
 - At most 8 emails per address and per computer every 15 minutes.
-- A "Family sign-in" button sits in the public header on every page, on computers and phones, and leads to /family.
+- A "Family sign-in" button sits in the public header on every page, on computers and phones, and leads to /family. When a family is signed in it shows the family's name instead (`/api/me`, `public/header.js`). When the links and buttons do not fit on one line, the header switches to the Menu button instead of breaking links onto two lines.
 - Migration: `db/migrations/2026-11-20-step9-email.sql`.

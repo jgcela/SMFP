@@ -62,7 +62,7 @@ abbr[title]{text-decoration:none}
 .bar-actions{display:flex;align-items:center;gap:8px}
 .menu-btn{display:none;width:44px;height:44px;align-items:center;justify-content:center;border:1px solid var(--sky);border-radius:var(--r-md);background:transparent;color:var(--white);cursor:pointer}
 .mobile-menu{display:none}
-@media (max-width:900px){
+@media (max-width:1060px){
   .util,.main-nav{display:none}
   .menu-btn{display:inline-flex}
   .bar .wrap{min-height:68px}
@@ -244,8 +244,19 @@ a.ctile .v{text-decoration:underline}
 .btn-family:hover{background:#22477a;color:var(--white)}
 .btn-family .icon{width:16px;height:16px;flex:none}
 .logo{flex:none}
-.bar-actions .btn{white-space:nowrap}
+.bar-actions .btn,.main-nav a{white-space:nowrap}
 @media (max-width:640px){.bar .wrap{gap:12px}.bar-actions .btn{padding:0 12px;gap:6px}.btn-facts .lbl-long{display:none}}
 @media (max-width:480px){.logo img{height:36px}.bar-actions{gap:6px}.bar-actions .btn{padding:0 10px}.bar-actions .btn .icon{display:none}}
 @media (max-width:379px){.btn-family .lbl-fam-long{display:none}}
 @media (max-width:350px){.logo img{height:30px}.bar-actions .btn{padding:0 8px}}
+.btn-family .fam-name{display:inline-block;max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+@media (max-width:640px){.btn-family .fam-name{max-width:11ch}}
+@media (max-width:379px){.btn-family .fam-name{max-width:7ch}}
+.site-header.nav-collapsed .main-nav,.site-header.nav-collapsed .util{display:none}
+.site-header.nav-collapsed .menu-btn{display:inline-flex}
+.site-header.nav-collapsed .mobile-menu:not([hidden]){display:block;border-top:1px solid var(--cerulean);padding:8px 0 16px}
+.site-header.nav-collapsed .mobile-menu ul{list-style:none;margin:0;padding:0}
+.site-header.nav-collapsed .mobile-menu a{display:flex;align-items:center;min-height:48px;color:var(--white);font:500 16px/20px var(--font-brand);text-decoration:none;border-bottom:1px solid #22477a}
+.site-header.nav-collapsed .mobile-menu a[aria-current="page"]{color:var(--gold)}
+.site-header.nav-collapsed .mobile-menu .sub a{color:var(--azure);font-size:15px}
+.site-header.fam-compact .btn-family .fam-name{max-width:9ch}
