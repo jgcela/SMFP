@@ -1,0 +1,10 @@
+{
+  "_about": "Step 6c: health details removed from the old Staff favorites page when it is imported (approved by the school on 2026-11-19). Birthdays and the whole Allergies field are never imported. If a text below is not found, the import stops, so nothing slips through.",
+  "remove": [
+    { "name": "Mrs. Luna", "field": "Candy", "text": "(milk intolerant)" },
+    { "name": "Mrs. Weir", "field": "Sweet treat", "text": "Gluten Free" },
+    { "name": "Ms. Eckard", "field": "Not a fan of", "text": "Gluten" },
+    { "name": "Mrs. Vea", "field": "Not a fan of", "text": "nuts and peanuts" }
+  ],
+  "never_import_fields": ["Allergies"]
+}

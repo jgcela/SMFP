@@ -1,0 +1,53 @@
+/* FAMITENLY's own pages: the panel of step 7 (admin.css, panel.css, sunny.css)
+   with a neutral FAMITENLY look, plus the few pieces only /platform uses. */
+.pf-solo{min-height:100vh;margin:0;padding:48px 16px;box-sizing:border-box;background:var(--p-page,#F3F5F9);font-family:"Nunito Sans Variable",system-ui,sans-serif;color:#1F2937}
+.pf-card{background:#fff;border-radius:18px;padding:28px 24px;box-shadow:0 1px 2px rgb(23 32 51 / .06),0 8px 24px rgb(23 32 51 / .08);box-sizing:border-box}
+.pf-card--narrow{max-width:520px;margin:0 auto}
+.pf-card h1{margin:4px 0 8px;font:800 26px/32px "Nunito Sans Variable",system-ui,sans-serif;color:#172033}
+.pf-brand{margin:0;font:800 14px/20px "Nunito Sans Variable",system-ui,sans-serif;letter-spacing:.08em;color:#2F5BEA}
+.pf-lead{margin:0 0 12px;color:#4B5563}
+.pf-card a{color:#2F5BEA}
+
+.pf .sp-brand-id .pf-mark{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--p-ink);color:var(--p-on-ink);font:800 18px/1 var(--font-brand)}
+.pf-table td,.pf-table th{white-space:normal}
+.pf-table td:nth-child(2){white-space:nowrap}
+.pf-table a{font-weight:700}
+.pf-status{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:0 10px;border-radius:999px;font:700 13px/18px var(--font-brand);white-space:nowrap}
+.pf-status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pf-status--active{background:#E3F4E8;color:#17643A}
+.pf-status--trial{background:#FFF4D6;color:#7A4B00}
+.pf-status--suspended{background:#FDECEA;color:#9B1C1C}
+.pf-codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(140px,100%),1fr));gap:8px;margin:12px 0 16px;padding:0;list-style:none}
+.pf-codes li{padding:10px 12px;border:1px dashed var(--p-line);border-radius:10px;font:600 16px/20px ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center;background:var(--p-page)}
+.pf-qr{display:block;width:200px;height:200px;margin:8px 0 12px;padding:8px;background:#fff;border:1px solid var(--p-line);border-radius:12px}
+.pf-secret{font:600 15px/22px ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;background:var(--p-page);padding:8px 10px;border-radius:8px}
+.pf-mods{list-style:none;margin:8px 0 0;padding:0}
+.pf-mods li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--p-line)}
+.pf-mods li:first-child{border-top:0}
+.pf-mods input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--p-ink)}
+.pf-mods .what{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pf-mods .note{color:var(--p-muted);font-size:14px;line-height:20px}
+.pf-plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:10px;margin:8px 0 16px;padding:0;border:0}
+.pf-plans label{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--p-line);border-radius:14px;cursor:pointer;font-weight:400}
+.pf-plans label:has(input:checked){border-color:var(--p-ink);box-shadow:0 0 0 2px var(--p-ink) inset}
+.pf-plans strong{font:800 16px/22px var(--font-brand);color:var(--p-ink)}
+.pf-plans .price{font-size:13px;line-height:18px;color:var(--p-muted)}
+.pf-plans input{position:absolute;opacity:0;pointer-events:none}
+.pf-plans label:focus-within{outline:3px solid color-mix(in srgb,var(--p-ink) 35%,transparent)}
+.pf-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:12px;margin:0;padding:0}
+.pf-facts div{padding:12px 14px;background:var(--p-page);border-radius:12px;min-width:0}
+.pf-facts dt{font:600 13px/18px var(--font-brand);color:var(--p-muted)}
+.pf-facts dd{margin:2px 0 0;font:700 16px/22px var(--font-brand);color:var(--p-ink);overflow-wrap:anywhere}
+.pf-colors{display:flex;flex-wrap:wrap;gap:16px}
+.pf-colors label{flex:1 1 160px}
+.pf-colors input[type=color]{width:100%;min-height:46px;padding:4px;border:1px solid var(--p-line);border-radius:12px;background:var(--p-surface)}
+.pf-link{overflow-wrap:anywhere}
+.pf-log td:first-child{white-space:nowrap}
+
+/* Support mode: the strip at the top of a school's staff panel. */
+.sp-support{position:fixed;left:0;right:0;bottom:0;z-index:60;box-shadow:0 -4px 16px rgb(0 0 0 / .18);padding:10px 16px;background:#7A2E0E;color:#fff;font:600 15px/22px var(--font-brand);text-align:center}
+.sp-support strong{display:inline-block;margin-right:8px;padding:0 10px;border-radius:999px;background:#FFF4D6;color:#7A2E0E}
+.sp-support-end{display:inline;margin-left:12px}
+.sp-support-end button{min-height:32px;padding:0 12px;border:1px solid #fff;border-radius:999px;background:transparent;color:#fff;font:700 14px/20px var(--font-brand);cursor:pointer}
+.sp-support-end button:hover{background:#fff;color:#7A2E0E}
+.sp:has(.sp-support){padding-bottom:72px}
