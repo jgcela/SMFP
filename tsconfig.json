@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "paths": { "@famitenly/*": ["./famitenly/*"] },
     "target": "ES2017",
     "lib": [
       "dom",

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { loadPortal, schoolSlug } from "../lib/portal";
 // Look-and-feel option "sunny" (proposal): its font and its overrides, home page only.
+import "./portal.css";
 import "./looks/sunny.css";
 import { renderPortal, schoolDescription, schoolIcon, schoolTitle } from "../lib/render";
 

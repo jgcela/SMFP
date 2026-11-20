@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import "./portal.css";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

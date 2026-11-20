@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { panelVars } from "../../lib/panel-theme";
+import "../portal.css";
 import "./admin.css";
 import "./panel.css";
 import "./sunny.css";

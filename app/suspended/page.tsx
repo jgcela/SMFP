@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { db } from "../../lib/db";
+import "../portal.css";
+import "../admin/admin.css";
 import "../platform/platform.css";
 
 // What every address of a suspended school shows (proxy.ts sends it here).

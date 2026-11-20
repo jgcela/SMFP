@@ -7,7 +7,7 @@
 //    before step 10) to the right school: the one of the page the person came
 //    from, else the last school they visited, else the school whose files are
 //    bundled with the code (PORTAL_SCHOOL);
-//  - shows FAMITENLY's own home page at "/";
+//  - shows FAMITENLY's own website at "/" (and /privacy, /terms...);
 //  - keeps the bundled files of that school (PDFs, flyers, logos...) out of
 //    every other school's address.
 // The FAMITENLY panel (/platform) never belongs to a school.
@@ -16,6 +16,8 @@ import { db } from "./lib/db";
 import publicFiles from "./lib/public-files.json";
 
 const HEADER = "x-portal-school";
+// FAMITENLY's own website at the root (famitenly/, copied from family-portal/marketing).
+const SITE = new Set(["/welcome", "/privacy", "/terms", "/thank-you", "/school-login"]);
 const COOKIE = "portal_school";
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?$/;
 const BUNDLED_SCHOOL = process.env.PORTAL_SCHOOL ?? "";
@@ -81,7 +83,7 @@ export async function proxy(req: NextRequest) {
   headers.delete(HEADER);
   const pass = () => NextResponse.next({ request: { headers } });
 
-  if (path.startsWith("/platform") || path.startsWith("/_next/") || path === "/api/health" || path === "/welcome") return pass();
+  if (path.startsWith("/platform") || path.startsWith("/_next/") || path === "/api/health" || SITE.has(path)) return pass();
   if (path === "/suspended") return notFound();
 
   const m = /^\/s\/([^/]+)(\/.*)?$/.exec(path);
@@ -99,7 +101,7 @@ export async function proxy(req: NextRequest) {
       if (bundledOnly(rest) && slug !== BUNDLED_SCHOOL) return notFound();
       return NextResponse.rewrite(new URL(`${rest}${url.search}`, req.url), { request: { headers } });
     }
-    if (rest.startsWith("/platform") || rest === "/welcome" || rest === "/suspended") return notFound();
+    if (rest.startsWith("/platform") || SITE.has(rest) || rest === "/suspended") return notFound();
     headers.set(HEADER, slug);
     // A suspended school: every page of it (portal, staff and family areas, forms)
     // shows the notice instead; nobody of the school can sign in.

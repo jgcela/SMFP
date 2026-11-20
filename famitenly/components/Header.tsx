@@ -1,0 +1,69 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { brand, nav, schoolLoginUrl } from '@famitenly/config/site';
+import { Close, Menu } from './Icons';
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  const close = () => setOpen(false);
+
+  return (
+    <header className="site-header" data-scrolled={scrolled}>
+      <div className="wrap header-row">
+        <a className="wordmark" href="/" aria-label={`${brand.name} home`} onClick={close}>
+          <img className="wordmark-logo" src="/logo.svg" alt="" width={1188} height={216} />
+          <span className="wordmark-name">{brand.name}</span>
+          <span className="wordmark-desc">{brand.descriptor}</span>
+        </a>
+        {/* Always visible on phones, where the main nav folds into the menu. */}
+        <a className="btn btn-primary btn-sm header-cta" href="/#demo" onClick={close}>
+          Book a Demo
+        </a>
+        <button
+          type="button"
+          className="menu-toggle"
+          aria-expanded={open}
+          aria-controls="main-nav"
+          aria-label={open ? 'Close menu' : 'Menu'}
+          onClick={() => setOpen((o) => !o)}
+        >
+          {open ? <Close /> : <Menu />}
+          <span className="menu-label">{open ? 'Close' : 'Menu'}</span>
+        </button>
+        <nav id="main-nav" className="main-nav" aria-label="Main" data-open={open}>
+          {nav.map((n) => (
+            <a key={n.href} className="nav-link" href={n.href} onClick={close}>
+              {n.label}
+            </a>
+          ))}
+          <a className="nav-link nav-login" href={schoolLoginUrl} onClick={close}>
+            School login
+          </a>
+          <a className="btn btn-primary btn-sm nav-cta" href="/#demo" onClick={close}>
+            Book a Demo
+          </a>
+        </nav>
+      </div>
+    </header>
+  );
+}
