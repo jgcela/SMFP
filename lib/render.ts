@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { opensInNewTabByDefault } from "./links";
+import publicFiles from "./public-files.json";
 import { mapsHref } from "./contact";
 import { absolutePaths } from "./page-html";
 import type { ContactPerson, Link, School } from "./portal";
@@ -57,6 +58,15 @@ function factsButton(facts: Link | undefined) {
 const FAMILY_BUTTON = `        <a class="btn btn-family" href="/family" aria-label="Family sign-in"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Family<span class="lbl-fam-long">&nbsp;sign-in</span></span></a>
 `;
 
+// The header is light ("Sunny day"), so a white logo is swapped for its navy
+// twin when the portal has one (assets/logo_white.png -> assets/logo_navy.png).
+const PUBLIC = new Set<string>(publicFiles as string[]);
+function headerLogo(url: string) {
+  const local = url.replace(/^\//, "");
+  const navy = local.replace(/_white(\.[a-z]+)$/i, "_navy$1");
+  return navy !== local && PUBLIC.has(navy) ? url.replace(local, navy) : url;
+}
+
 export function schoolTitle(school: School) {
   return `Parent Portal — ${school.name}`;
 }
@@ -92,7 +102,7 @@ function schoolValues(school: School, links: Link[], people: ContactPerson[]) {
   const place = [school.city, school.region].filter(Boolean).join(", ");
   return {
     "school.name": esc(school.name),
-    "school.logo_url": esc(school.logo_url),
+    "school.logo_url": esc(headerLogo(school.logo_url)),
     "school.logo_alt": esc(`${school.name}${school.city ? `, ${school.city}` : ""} — Parent Portal home`),
     "school.school_year": esc(school.school_year),
     "school.phone_href": esc(school.phone_href),
@@ -128,7 +138,7 @@ export type PagePart = { title: string; summary: string; body: string; headings:
 // Header and footer of the portal's inner pages (text pages, Volunteer).
 function innerPageValues(school: School, links: Link[], people: ContactPerson[], current = "") {
   const values = schoolValues(school, links, people);
-  const logo = school.logo_url;
+  const logo = headerLogo(school.logo_url);
   values["school.logo_url"] = esc(logo && !/^(https?:)?\/\//.test(logo) && !logo.startsWith("/") ? `/${logo}` : logo);
   const top = links.filter((l) => l.placement === "top");
   const cur = (l: Link, html: string) => (current && l.href.replace(/^\//, "") === current ? html.replace("<a ", '<a aria-current="page" ') : html);

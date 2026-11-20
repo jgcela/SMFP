@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { panelVars } from "../../lib/panel-theme";
 import "./admin.css";
 import "./panel.css";
+import "./sunny.css";
 import { loadSchoolHeader } from "./school";
 import { SchoolProvider } from "./ui";
 
