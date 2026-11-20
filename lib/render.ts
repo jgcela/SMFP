@@ -75,7 +75,7 @@ function contactParts(school: School, people: ContactPerson[]) {
       ? `          <a class="contact-line" href="${map}"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span>${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
       : "",
     "contact.tile_address": address
-      ? `      <a class="ctile" href="${map}"><span class="k">ADDRESS</span><span class="v">${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
+      ? `      <a class="ctile" href="${map}"><span class="k">Address</span><span class="v">${lines}</span><span class="sr-only">(opens the map)</span></a>\n`
       : "",
     "contact.people": people.length
       ? `    <div class="contact-people">
@@ -99,7 +99,7 @@ function schoolValues(school: School, links: Link[], people: ContactPerson[]) {
     "school.phone_display": esc(school.phone_display),
     "school.email": esc(school.email),
     "school.office_hours": esc(school.office_hours),
-    "school.footer": esc([school.name, place, `Parent Portal, school year ${school.school_year}`].filter(Boolean).join(" · ")),
+    "school.footer": esc(`${[school.name, place].filter(Boolean).join(", ")}. Parent Portal, school year ${school.school_year}.`),
     "family.button": FAMILY_BUTTON,
     "facts.button": factsButton(links.find((l) => l.placement === "facts")),
     ...contactParts(school, people),
