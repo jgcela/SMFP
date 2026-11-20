@@ -331,3 +331,8 @@ a.ctile .v{text-decoration:underline}
 .site-header.nav-collapsed .mobile-menu a[aria-current="page"]{color:var(--gold)}
 .site-header.nav-collapsed .mobile-menu .sub a{color:var(--azure);font-size:15px}
 .site-header.fam-compact .btn-family .fam-name{max-width:9ch}
+.util{border-bottom:1px solid var(--cerulean)}
+.util .wrap{display:flex;justify-content:flex-end;gap:24px}
+.util a{color:var(--azure);font:500 13px/36px var(--font-brand)}
+.util a:hover{color:var(--white)}
+@media (max-width:1060px){.util{display:none}}

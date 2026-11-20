@@ -132,7 +132,14 @@ function innerPageValues(school: School, links: Link[], people: ContactPerson[],
   values["school.logo_url"] = esc(logo && !/^(https?:)?\/\//.test(logo) && !logo.startsWith("/") ? `/${logo}` : logo);
   const top = links.filter((l) => l.placement === "top");
   const cur = (l: Link, html: string) => (current && l.href.replace(/^\//, "") === current ? html.replace("<a ", '<a aria-current="page" ') : html);
-  values["links.nav"] = top.map((l) => `        ${cur(l, a(l, l.short_label || l.label))}\n`).join("");
+  // Links to other websites (like the parish website) go in the thin bar above
+  // the header, as on the portal's home page; the main menu keeps the portal's pages.
+  const outside = (l: Link) => /^https?:\/\//i.test(l.href);
+  const util = top.filter(outside);
+  values["links.nav"] = top.filter((l) => !outside(l)).map((l) => `        ${cur(l, a(l, l.short_label || l.label))}\n`).join("");
+  values["links.util"] = util.length
+    ? `  <div class="util">\n    <div class="wrap">\n${util.map((l) => `      ${a(l, l.short_label || l.label)}\n`).join("")}    </div>\n  </div>\n`
+    : "";
   values["links.mobile"] = top.map((l) => `        <li>${cur(l, a(l, l.label))}</li>\n`).join("");
   return values;
 }
