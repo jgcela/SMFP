@@ -4,18 +4,19 @@ import { loadStaffCards, loadStaffPage } from "../../../lib/staff-favorites-db";
 import { getStorage, storageConfigured } from "../../../lib/storage";
 import { AdminTop } from "../chrome";
 import { StaffFavoritesManager } from "./manager";
-import { requireModule, schoolPath } from "../../../lib/portal";
+import { schoolPath } from "../../../lib/portal";
+import { requirePanelModule } from "../../../lib/years";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Staff favorites" };
 
 export default async function StaffFavoritesAdmin() {
-  await requireModule("staff_favorites");
+  await requirePanelModule("staff_favorites");
   const { staff } = await currentStaff();
   if (!staff) redirect(await schoolPath("/admin"));
   const [cards, page, storageReady] = await Promise.all([
-    loadStaffCards(staff.schoolId, { includeHidden: true }),
-    loadStaffPage(staff.schoolId),
+    loadStaffCards(staff.yearId, { includeHidden: true }),
+    loadStaffPage(staff.yearId),
     storageConfigured() ? getStorage().ping() : Promise.resolve(false),
   ]);
   return (

@@ -41,7 +41,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   const [n] = await db()<{ message: string; link_label: string; link_href: string; is_active: boolean }[]>`
     select message, link_label, link_href, is_active from notices
-    where school_id = ${staff.schoolId} order by created_at desc, id desc limit 1`;
+    where school_id = ${staff.schoolId} and year_id = ${staff.yearId} order by created_at desc, id desc limit 1`;
   const initial = n
     ? { message: n.message, linkLabel: n.link_href ? n.link_label : "", linkHref: n.link_href, show: n.is_active }
     : { message: "", linkLabel: "", linkHref: "", show: false };

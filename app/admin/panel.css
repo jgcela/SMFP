@@ -312,3 +312,41 @@
 }
 @media (max-width:640px){.sp .my-sent{grid-template-columns:60px minmax(0,1fr)}}
 .sp .adm-card>.adm-h2:first-child{margin:0 0 12px}
+
+/* Step 11a: school years */
+.sp-year{display:flex;flex-direction:column;gap:4px;padding:0 20px 12px;border-bottom:1px solid var(--p-line);margin:0 0 8px}
+.sp-year label{font:600 12px/16px var(--font-brand);color:var(--p-muted);text-transform:uppercase;letter-spacing:.04em}
+.sp-year select{width:100%;min-height:40px;border:1px solid var(--p-line);border-radius:12px;padding:6px 10px;background:var(--p-surface);color:var(--p-ink);font:600 15px/20px var(--font-brand)}
+.sp-year select:focus-visible{outline:3px solid var(--p-accent);outline-offset:1px}
+.sp-yearbar{margin:20px 32px 0 300px;padding:10px 16px;border-radius:14px;font:500 15px/22px var(--font-text);color:#3D2A00;background:#FFF4D6;border:1px solid #F2D27A}
+.sp-yearbar strong{font-family:var(--font-brand);margin-right:8px}
+.sp-yearbar a{color:inherit;font-weight:700}
+.sp-yearbar--archived{background:#ECEFF4;border-color:#CDD3DE;color:#27303F}
+.sp-badge.is-prep{background:#FFF4D6;color:#7A5200}
+.sp .btn--sm{min-height:36px;padding:0 14px;font-size:14px}
+.yr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.yr-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:14px 0;border-top:1px solid var(--p-line)}
+.yr-item:first-child{border-top:0}
+.yr-name{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;font:700 18px/24px var(--font-brand);color:var(--p-ink)}
+.yr-main .note{margin:2px 0 0}
+.yr-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
+.yr-actions form{margin:0}
+.yr-edit,.yr-on,.yr-confirm{grid-column:1/-1}
+.yr-edit{order:3;width:100%;padding:16px;border-radius:14px;background:var(--p-page)}
+.yr-confirm{padding:16px;border-radius:14px;background:#FFF4D6;color:#3D2A00}
+.yr-choice{flex-direction:row!important;align-items:flex-start;gap:10px!important;font-weight:400!important}
+.yr-choice input{margin-top:4px;width:18px;height:18px;flex:none}
+.yr-choice strong{display:block;font:600 15px/20px var(--font-brand);color:var(--p-ink)}
+.yr-table select{min-height:38px;border:1px solid var(--p-line);border-radius:10px;padding:4px 8px;font:400 15px/20px var(--font-text);background:var(--p-surface);color:var(--p-text);max-width:100%}
+.yr-table th[scope=row]{font-weight:600;text-align:left;background:transparent}
+.yr-table tr.is-review td,.yr-table tr.is-review th{background:#FFF8E6}
+.sp .pill--warn{background:#FFE7A8;color:#5C3D00;margin-left:8px}
+.adm-msg--warn{background:#FFF4D6;color:#5C3D00}
+div.adm-msg--warn{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+div.adm-msg--warn p{margin:0}
+@media (max-width:959px){
+  .sp-year{grid-column:1/-1;padding:0 16px 12px;border:0}
+  .sp-yearbar{margin:12px 16px 0}
+  .yr-item{grid-template-columns:1fr}
+  .yr-actions{justify-content:flex-start}
+}

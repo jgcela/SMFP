@@ -20,7 +20,7 @@ export default async function SchoolPage({ params, searchParams }: { params: Pro
   const sp = await searchParams;
   if (!Number.isInteger(id) || id <= 0) notFound();
   const [s] = await db()<Row[]>`
-    select s.id, s.slug, s.name, s.plan, s.status, s.modules, s.timezone, s.created_at, s.support_until,
+    select s.id, s.slug, s.name, s.plan, s.status, (select y.modules from school_years y where y.school_id = s.id and y.status = 'active') as modules, s.timezone, s.created_at, s.support_until,
       (select count(*)::int from families f where f.school_id = s.id and f.status = 'approved') as families,
       (select count(*)::int from families f where f.school_id = s.id and f.status = 'pending') as pending
     from schools s where s.id = ${id}`;

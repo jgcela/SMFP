@@ -9,8 +9,10 @@ import { loadSchoolHeader } from "./school";
 import { supportVisit } from "../../lib/platform";
 import { endSupport } from "../platform/actions";
 import { SideNav } from "./side-nav";
+import { YearPicker } from "./years/picker";
+import { listYears, STATUS_LABEL } from "../../lib/years";
 
-export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages" | "families" | "requests" | "volunteer" | "staff-favorites" | "wishlists" | "settings";
+export type Section = "notice" | "calendar" | "documents" | "links" | "contact" | "pages" | "families" | "requests" | "volunteer" | "staff-favorites" | "wishlists" | "years" | "settings";
 
 // module: shown only when the school has that module on (step 10).
 const GROUPS: { label: string; items: { id: Section; href: string; label: string; module?: string }[] }[] = [
@@ -37,7 +39,10 @@ const GROUPS: { label: string; items: { id: Section; href: string; label: string
   },
   {
     label: "Account",
-    items: [{ id: "settings", href: "/admin/settings", label: "Settings" }],
+    items: [
+      { id: "years", href: "/admin/years", label: "School years" },
+      { id: "settings", href: "/admin/settings", label: "Settings" },
+    ],
   },
 ];
 
@@ -57,7 +62,7 @@ export async function AdminTop({ signedIn, section, area = "staff", familyPage =
   const school = await loadSchoolHeader();
 
   const { shortName, markUrl } = school.theme;
-  const { base, modules } = school;
+  const { base, modules, panelModules, year } = school;
   const support = area === "staff" ? await supportVisit() : null;
   const sub = area === "family" ? "Family portal" : "Staff portal";
   const out = area === "family" ? familySignOut : signOut;
@@ -87,9 +92,10 @@ export async function AdminTop({ signedIn, section, area = "staff", familyPage =
         <div className="sp-brand">
           <Brand name={shortName} markUrl={markUrl} sub="Staff portal" />
         </div>
+        {signedIn && year && <YearPicker current={year.id} years={(await listYears(school.id)).map((y) => ({ id: y.id, label: `${y.label} · ${y.status === "preparing" ? "Preparing" : STATUS_LABEL[y.status]}` }))} />}
         <SideNav menuIcon={<Icon name="menu" />} closeIcon={<Icon name="close" />}>
           <nav aria-label="Sections">
-            {GROUPS.map((g) => ({ ...g, items: g.items.filter((it) => !it.module || modules.includes(it.module)) })).filter((g) => g.items.length).map((g) => (
+            {GROUPS.map((g) => ({ ...g, items: g.items.filter((it) => !it.module || panelModules.includes(it.module)) })).filter((g) => g.items.length).map((g) => (
               <div key={g.label} className="sp-group">
                 <p className="sp-group-l" id={`sp-g-${g.label}`}>{g.label}</p>
                 <ul aria-labelledby={`sp-g-${g.label}`}>
@@ -122,6 +128,7 @@ export async function AdminTop({ signedIn, section, area = "staff", familyPage =
           </div>
         </SideNav>
       </aside>
+      {signedIn && year && year.status !== "active" && <YearBar label={year.label} status={year.status} base={base} />}
     </>
   );
 }
@@ -201,6 +208,19 @@ export async function PageHead({ title, lead, actions }: { title: string; lead?:
         {lead && <p className="sp-lead">{lead}</p>}
       </div>
       {actions && <div className="sp-head-a">{actions}</div>}
+    </div>
+  );
+}
+
+// Step 11a: the panel is working on a year families do not see.
+function YearBar({ label, status, base }: { label: string; status: string; base: string }) {
+  return (
+    <div className={`sp-yearbar sp-yearbar--${status}`} role="status">
+      {status === "archived" ? (
+        <><strong>Archived year {label}</strong> You can look at this year, but not change it. Families cannot see it.</>
+      ) : (
+        <><strong>Preparing {label}</strong> Families cannot see this year until you switch it on in <a href={`${base}/admin/years`}>School years</a>.</>
+      )}
     </div>
   );
 }

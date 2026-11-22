@@ -83,6 +83,9 @@ export async function proxy(req: NextRequest) {
   headers.delete(HEADER);
   const pass = () => NextResponse.next({ request: { headers } });
 
+  if (path.startsWith("/platform")) headers.set("x-portal-area", "platform");
+  else headers.delete("x-portal-area");
+
   if (path.startsWith("/platform") || path.startsWith("/_next/") || path === "/api/health" || SITE.has(path)) return pass();
   if (path === "/suspended") return notFound();
 

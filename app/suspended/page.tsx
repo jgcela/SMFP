@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Portal not available", robots: { ind
 export default async function Suspended() {
   const slug = (await headers()).get("x-portal-school") ?? "";
   const [s] = slug ? await db()<{ name: string; email: string; phone_display: string }[]>`
-    select name, email, phone_display from schools where slug = ${slug}` : [];
+    select s.name, y.email, y.phone_display from schools s join school_years y on y.school_id = s.id and y.status = 'active' where s.slug = ${slug}` : [];
   return (
     <body className="pf pf-solo">
       <main id="main" className="pf-card pf-card--narrow">

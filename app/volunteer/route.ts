@@ -1,5 +1,6 @@
 // The Volunteer page (step 6b): built from the school's volunteer opportunities.
 // Open to everyone; families who signed in can sign up from it.
+import { withTheme } from "../../lib/theme";
 import { db } from "../../lib/db";
 import { familyOfUser } from "../../lib/family";
 import { todayIn } from "../../lib/my-family";
@@ -15,8 +16,9 @@ export async function GET(req: Request) {
   const { school, links, contacts } = await loadPortal(await schoolSlug());
   const [[extra], opps, { user, staff }] = await Promise.all([
     db()<{ title: string; lead: string; intro: string; timezone: string }[]>`
-      select volunteer_title as title, volunteer_lead as lead, volunteer_intro_html as intro, timezone from schools where id = ${school.id}`,
-    loadOpportunities(school.id),
+      select y.volunteer_title as title, y.volunteer_lead as lead, y.volunteer_intro_html as intro, s.timezone
+      from school_years y join schools s on s.id = y.school_id where y.id = ${school.year_id}`,
+    loadOpportunities(school.year_id),
     currentStaff(),
   ]);
   const family = user ? await familyOfUser(user.id) : null;
@@ -29,5 +31,5 @@ export async function GET(req: Request) {
   const m = new URL(req.url).searchParams.get("m") ?? "";
   const notice = m in SIGNUP_MESSAGE ? SIGNUP_MESSAGE[m as keyof typeof SIGNUP_MESSAGE] : undefined;
   const html = renderVolunteerPage(school, links, contacts, extra, [...opps], { signedIn, mine, notice, today: todayIn(extra.timezone || "UTC") });
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-store" } });
+  return new Response(withTheme(html), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-store" } });
 }

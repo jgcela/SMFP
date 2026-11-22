@@ -14,7 +14,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const events = await db()<AdminEvent[]>`
     select id, event_date::text as date, end_date::text as "endDate", to_char(start_time, 'HH24:MI') as time,
       category, title, details as note
-    from events where school_id = ${staff.schoolId}
+    from events where school_id = ${staff.schoolId} and year_id = ${staff.yearId}
     order by event_date, sort_order, id`;
   const imported = Number(sp.imported ?? NaN);
   const skipped = Number(sp.skipped ?? 0);

@@ -20,11 +20,12 @@ async function load(f: Family) {
       from families where id = ${f.id}`,
     db()<ChildRow[]>`
       select id, name, grade, teacher
-      from children where family_id = ${f.id} order by id`,
+      from children where family_id = ${f.id} and not left_school order by id`,
     db()<SubmissionRow[]>`
       select id, kind, category, child_name as "childName", date_from::text as "dateFrom", date_to::text as "dateTo",
         message, status, created_at::text as "createdAt", status_at::text as "statusAt"
       from family_submissions where family_id = ${f.id}
+        and year_id = (select id from school_years where school_id = ${f.schoolId} and status = 'active')
       order by created_at desc, id desc limit 200`,
     db()<{ timezone: string }[]>`select timezone from schools where id = ${f.schoolId}`,
   ]);

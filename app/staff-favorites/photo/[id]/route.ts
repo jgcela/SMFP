@@ -3,6 +3,7 @@
 import { db } from "../../../../lib/db";
 import { schoolSlug, moduleOn } from "../../../../lib/portal";
 import { staffViewer } from "../../../../lib/staff-favorites-db";
+import { currentStaff } from "../../../../lib/staff";
 import { getStorage } from "../../../../lib/storage";
 
 export const dynamic = "force-dynamic";
@@ -14,9 +15,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const id = Number((await ctx.params).id);
   if (!Number.isInteger(id) || id <= 0) return new Response("Not found", { status: 404 });
   if ((await staffViewer()) !== "allowed") return new Response("Sign in to see this photo.", { status: 403 });
+  // Families see the active year's photos; the school's staff, any year's (step 11a).
+  const isStaff = !!(await currentStaff()).staff;
   const [row] = await db()<{ key: string | null }[]>`
     select f.photo_key as key from staff_favorites f join schools s on s.id = f.school_id
-    where f.id = ${id} and s.slug = ${await schoolSlug()}`;
+      join school_years y on y.id = f.year_id
+    where f.id = ${id} and s.slug = ${await schoolSlug()} and (y.status = 'active' or ${isStaff})`;
   const ext = (/\.([a-z0-9]+)$/i.exec(row?.key ?? "")?.[1] ?? "").toLowerCase();
   if (!row?.key || !TYPES[ext]) return new Response("Not found", { status: 404 });
   try {

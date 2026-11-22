@@ -2,18 +2,18 @@
 import { db } from "./db";
 import type { Group, Wishlist } from "./wishlists";
 
-export async function loadWishlists(schoolId: number, opts: { includeHidden?: boolean } = {}) {
+export async function loadWishlists(yearId: number, opts: { includeHidden?: boolean } = {}) {
   const sql = db();
   return sql<Wishlist[]>`
     select w.id, w.staff_id as "staffId", coalesce(f.name, w.name) as name, w.name as "ownName", w.class_text as "classText",
       w.grp, w.store_url as "storeUrl", w.hidden, w.imported
-    from wishlists w left join staff_favorites f on f.id = w.staff_id and f.school_id = w.school_id
-    where w.school_id = ${schoolId} ${opts.includeHidden ? sql`` : sql`and not w.hidden`}
+    from wishlists w left join staff_favorites f on f.id = w.staff_id and f.year_id = w.year_id
+    where w.year_id = ${yearId} ${opts.includeHidden ? sql`` : sql`and not w.hidden`}
     order by w.sort_order, w.id`;
 }
 
-export async function loadWishlistPage(schoolId: number) {
+export async function loadWishlistPage(yearId: number) {
   const [s] = await db()<{ title: string; lead: string; intro: string; groups: Group[] }[]>`
-    select wishlist_title as title, wishlist_lead as lead, wishlist_intro_html as intro, wishlist_groups as groups from schools where id = ${schoolId}`;
+    select wishlist_title as title, wishlist_lead as lead, wishlist_intro_html as intro, wishlist_groups as groups from school_years where id = ${yearId}`;
   return s ?? { title: "", lead: "", intro: "", groups: [] };
 }

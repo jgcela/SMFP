@@ -6,7 +6,8 @@ import { formatRange, STATUS_LABEL, todayIn, when, type SubmissionKind, type Sub
 import { currentStaff } from "../../../lib/staff";
 import { AdminTop } from "../chrome";
 import { RequestsList, type StaffRow } from "./list";
-import { requireModule, schoolPath } from "../../../lib/portal";
+import { schoolPath } from "../../../lib/portal";
+import { requirePanelModule } from "../../../lib/years";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Absences & requests" };
@@ -15,7 +16,7 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
 type Search = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function RequestsPage({ searchParams }: { searchParams: Search }) {
-  await requireModule("requests");
+  await requirePanelModule("requests");
   const { staff } = await currentStaff();
   if (!staff) redirect(await schoolPath("/admin"));
   const sp = await searchParams;
@@ -33,7 +34,7 @@ export default async function RequestsPage({ searchParams }: { searchParams: Sea
       s.message, s.status, s.created_at::text as "createdAt", s.status_at::text as "statusAt", s.status_by as "statusBy",
       f.id as "familyId", f.name as "familyName", f.phone, f.parent_names as "parentNames"
     from family_submissions s join families f on f.id = s.family_id and f.school_id = s.school_id
-    where s.school_id = ${staff.schoolId}
+    where s.school_id = ${staff.schoolId} and s.year_id = ${staff.yearId}
       ${from ? sql`and s.date_to >= ${from}` : sql``}
       ${to ? sql`and s.date_from <= ${to}` : sql``}
       ${status === "open" ? sql`and s.status <> 'resolved'` : status ? sql`and s.status = ${status}` : sql``}

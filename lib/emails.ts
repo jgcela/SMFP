@@ -12,7 +12,8 @@ export type MailSchool = {
 
 export async function mailSchool(schoolId: number): Promise<MailSchool | null> {
   const [s] = await db()<{ id: number; slug: string; name: string; email: string; phone_display: string; notify_email: string; logo_url: string | null; panel_theme: unknown }[]>`
-    select id, slug, name, email, phone_display, notify_email, logo_url, panel_theme from schools where id = ${schoolId}`;
+    select s.id, s.slug, s.name, y.email, y.phone_display, s.notify_email, y.logo_url, y.panel_theme
+    from schools s join school_years y on y.school_id = s.id and y.status = 'active' where s.id = ${schoolId}`;
   if (!s) return null;
   const c = readPanelTheme(s.panel_theme, s.name).colors;
   return {

@@ -3,14 +3,14 @@ import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { ACCEPT_ATTR, MAX_FILE_BYTES } from "../../../lib/files";
 import {
-  deleteCategory, deleteDocument, moveCategory, moveDocument, saveCategory, saveDocument, startUpload, type DocState,
+  deleteCategory, deleteDocument, markUpToDate, moveCategory, moveDocument, saveCategory, saveDocument, startUpload, type DocState,
 } from "./actions";
 import { Head, PencilIcon, RowMenu } from "../ui";
 
 export type AdminCategory = { id: number; key: string; name: string; description: string };
 export type AdminDoc = {
   id: number; categoryId: number; title: string; description: string; href: string; meta: string; kind: string;
-  mostUsed: boolean; uploaded: boolean; fileName: string | null;
+  mostUsed: boolean; uploaded: boolean; fileName: string | null; reviewFrom: string | null;
 };
 
 type Msg = { text: string; err?: boolean } | null;
@@ -165,6 +165,7 @@ function DocRow({ d, first, last, onEdit, report }: { d: AdminDoc; first: boolea
         <span className="note">
           {[d.description, d.meta].filter(Boolean).join(" · ")}
           {d.mostUsed && <span className="pill">Most used</span>}
+          {d.reviewFrom && <span className="pill pill--warn">From {d.reviewFrom}: check it</span>}
         </span>
       </div>
       <div className="act">
@@ -176,6 +177,7 @@ function DocRow({ d, first, last, onEdit, report }: { d: AdminDoc; first: boolea
             <a href={d.href.startsWith("http") ? d.href : `/${d.href}`} target="_blank" rel="noopener">Open<span className="sr-only"> {d.title} (opens in a new tab)</span></a>
             <button type="button" className="sp-edit" onClick={onEdit} aria-label={`Edit ${d.title}`}><PencilIcon />Edit</button>
             <RowMenu label={d.title} items={[
+              ...(d.reviewFrom ? [{ label: "Mark as up to date", onSelect: async () => report(await markUpToDate(d.id)) }] : []),
               { label: "Move up", disabled: first, onSelect: () => move(-1) },
               { label: "Move down", disabled: last, onSelect: () => move(1) },
               { label: "Delete", danger: true, onSelect: () => setConfirming(true) },
@@ -206,6 +208,7 @@ export function DocumentsManager({ categories, docs, storageReady }: { categorie
   };
   const done = (text: string) => { setEditing(null); if (text) { setMsg({ text }); router.refresh(); } };
   const open = (e: Editing) => { setMsg(null); setEditing(e); };
+  const toCheck = docs.filter((d) => d.reviewFrom);
 
   return (
     <>
@@ -214,6 +217,15 @@ export function DocumentsManager({ categories, docs, storageReady }: { categorie
         <button type="button" className="btn btn--primary" onClick={() => open({ type: "doc", doc: null })}>Add document</button>
       </>} />
       <div className="adm-card">
+      {toCheck.length > 0 && (
+        <div className="adm-msg adm-msg--warn" role="note">
+          <p>
+            <strong>{toCheck.length} {toCheck.length === 1 ? "document was" : "documents were"} copied from {toCheck[0].reviewFrom} and may be out of date.</strong>{" "}
+            Open each one marked &ldquo;check it&rdquo;: upload the new version with Edit, or choose &ldquo;Mark as up to date&rdquo; in its menu if it is still right. Families do not see this mark.
+          </p>
+          <button type="button" className="btn btn--outline btn--sm" onClick={async () => report(await markUpToDate("all"))}>Mark all as up to date</button>
+        </div>
+      )}
       {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
       {editing?.type === "doc" && (
         <DocumentForm key={editing.doc?.id ?? "new"} doc={editing.doc} categories={categories} defaultCategory={editing.category}

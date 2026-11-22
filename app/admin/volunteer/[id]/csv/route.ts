@@ -18,7 +18,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     select o.title, o.event_date::text as "eventDate", to_char(o.start_time, 'HH24:MI') as "startTime", to_char(o.end_time, 'HH24:MI') as "endTime",
       o.when_text as "whenText", s.timezone
     from volunteer_opportunities o join schools s on s.id = o.school_id
-    where o.id = ${Number.isInteger(id) ? id : 0} and o.school_id = ${staff.schoolId}`;
+    where o.id = ${Number.isInteger(id) ? id : 0} and o.school_id = ${staff.schoolId} and o.year_id = ${staff.yearId}`;
   if (!o) return new Response("Not found", { status: 404 });
   const rows = await loadSignups(staff.schoolId, id);
   const lines = [

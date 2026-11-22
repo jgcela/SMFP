@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "../../../lib/db";
 import { storageSafeName } from "../../../lib/files";
 import { cleanPageHtml } from "../../../lib/page-html";
-import { requireStaff, type Staff } from "../../../lib/staff";
+import { requireYearStaff, type Staff } from "../../../lib/staff";
 import { getStorage, storageConfigured } from "../../../lib/storage";
 
 export type PageCopy = { title: string; summary: string; html: string };
@@ -27,7 +27,7 @@ function clean(copy: PageCopy): PageCopy {
 }
 
 async function ownPage(staff: Staff, id: number) {
-  const [p] = await db()<{ id: number; slug: string }[]>`select id, slug from pages where id = ${Number(id)} and school_id = ${staff.schoolId}`;
+  const [p] = await db()<{ id: number; slug: string }[]>`select id, slug from pages where id = ${Number(id)} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
   if (!p) throw new Error("This page no longer exists.");
   return p;
 }
@@ -37,15 +37,15 @@ const slugify = (s: string) =>
 
 export async function createPage(title: string): Promise<PageResult & { id?: number }> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const copy = clean({ title, summary: "", html: "" });
     const sql = db();
-    const taken = new Set((await sql<{ slug: string }[]>`select slug from pages where school_id = ${staff.schoolId}`).map((r) => r.slug));
+    const taken = new Set((await sql<{ slug: string }[]>`select slug from pages where school_id = ${staff.schoolId} and year_id = ${staff.yearId}`).map((r) => r.slug));
     const base = slugify(copy.title);
     let slug = base;
     for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
     const [p] = await sql<{ id: number }[]>`
-      insert into pages (school_id, slug, draft_title) values (${staff.schoolId}, ${slug}, ${copy.title}) returning id`;
+      insert into pages (school_id, year_id, slug, draft_title) values (${staff.schoolId}, ${staff.yearId}, ${slug}, ${copy.title}) returning id`;
     await sql`insert into page_versions (page_id, kind, title, summary, html, author) values (${p.id}, 'draft', ${copy.title}, '', '', ${author(staff)})`;
     revalidatePath("/admin/pages");
     return { ok: "Page created.", id: p.id };
@@ -57,7 +57,7 @@ export async function createPage(title: string): Promise<PageResult & { id?: num
 async function writeDraft(staff: Staff, id: number, copy: PageCopy, kind: "draft" | "restored") {
   const sql = db();
   await sql`update pages set draft_title = ${copy.title}, draft_summary = ${copy.summary}, draft_html = ${copy.html}, updated_at = now()
-    where id = ${id} and school_id = ${staff.schoolId}`;
+    where id = ${id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
   // Saving the same draft twice in a row does not add another version.
   const [last] = await sql<PageCopy[]>`select title, summary, html from page_versions where page_id = ${id} order by created_at desc, id desc limit 1`;
   if (!last || last.title !== copy.title || last.summary !== copy.summary || last.html !== copy.html || kind === "restored")
@@ -66,7 +66,7 @@ async function writeDraft(staff: Staff, id: number, copy: PageCopy, kind: "draft
 
 export async function saveDraft(id: number, input: PageCopy): Promise<PageResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const page = await ownPage(staff, id);
     const copy = clean(input);
     await writeDraft(staff, page.id, copy, "draft");
@@ -79,13 +79,13 @@ export async function saveDraft(id: number, input: PageCopy): Promise<PageResult
 
 export async function publishPage(id: number, input: PageCopy): Promise<PageResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const page = await ownPage(staff, id);
     const copy = clean(input);
     await writeDraft(staff, page.id, copy, "draft");
     const sql = db();
     await sql`update pages set title = ${copy.title}, summary = ${copy.summary}, html = ${copy.html}, published_at = now(), updated_at = now()
-      where id = ${page.id} and school_id = ${staff.schoolId}`;
+      where id = ${page.id} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
     await sql`insert into page_versions (page_id, kind, title, summary, html, author) values (${page.id}, 'published', ${copy.title}, ${copy.summary}, ${copy.html}, ${author(staff)})`;
     revalidatePath("/admin/pages");
     revalidatePath(`/pages/${page.slug}`);
@@ -98,7 +98,7 @@ export async function publishPage(id: number, input: PageCopy): Promise<PageResu
 // Puts an earlier version back in the draft. Families see it after "Publish".
 export async function restoreVersion(id: number, versionId: number): Promise<PageResult> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     const page = await ownPage(staff, id);
     const [v] = await db()<PageCopy[]>`select title, summary, html from page_versions where id = ${Number(versionId)} and page_id = ${page.id}`;
     if (!v) return { error: "This version no longer exists." };
@@ -112,11 +112,11 @@ export async function restoreVersion(id: number, versionId: number): Promise<Pag
 
 export async function deletePage(id: number): Promise<PageResult> {
   try {
-    const staff = await requireStaff();
-    const [p] = await db()<{ legacy_path: string }[]>`select legacy_path from pages where id = ${Number(id)} and school_id = ${staff.schoolId}`;
+    const staff = await requireYearStaff();
+    const [p] = await db()<{ legacy_path: string }[]>`select legacy_path from pages where id = ${Number(id)} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
     if (!p) return { error: "This page no longer exists." };
     if (p.legacy_path) return { error: "This page replaces one of the portal’s original pages, so it cannot be deleted." };
-    await db()`delete from pages where id = ${Number(id)} and school_id = ${staff.schoolId}`;
+    await db()`delete from pages where id = ${Number(id)} and school_id = ${staff.schoolId} and year_id = ${staff.yearId}`;
     revalidatePath("/admin/pages");
     return { ok: "Page deleted." };
   } catch (err) {
@@ -128,7 +128,7 @@ export async function deletePage(id: number): Promise<PageResult> {
 const IMAGE_EXT = ["png", "jpg", "jpeg", "gif", "webp"];
 export async function startImageUpload(fileName: string, size: number): Promise<{ putUrl: string; src: string; contentType: string } | { error: string }> {
   try {
-    const staff = await requireStaff();
+    const staff = await requireYearStaff();
     if (!storageConfigured()) return { error: "Image uploads are not set up yet." };
     const ext = (/\.([a-z0-9]{1,5})$/i.exec(fileName)?.[1] ?? "").toLowerCase();
     if (!IMAGE_EXT.includes(ext)) return { error: "Choose a PNG, JPG, GIF or WebP image." };
