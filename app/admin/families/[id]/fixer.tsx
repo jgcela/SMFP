@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { GRADE_SUGGESTIONS } from "../../../../lib/my-family";
 import { removeChild, saveChild, type ChildFix } from "./actions";
 
-export type KidRow = { id: number; name: string; grade: string; teacher: string };
+export type KidRow = { id: number; name: string; grade: string; teacher: string; factsId: string };
 
 function ChildForm({ familyId, child, onDone }: { familyId: number; child?: KidRow; onDone: (r?: ChildFix) => void }) {
   const router = useRouter();
@@ -34,6 +34,8 @@ function ChildForm({ familyId, child, onDone }: { familyId: number; child?: KidR
         <label>Grade<input type="text" name="grade" defaultValue={child?.grade} maxLength={40} list="grades" placeholder="For example: 3rd grade" {...bad("grade")} /></label>
         <label>Teacher <span className="hint">Optional</span><input type="text" name="teacher" defaultValue={child?.teacher} maxLength={100} autoComplete="off" /></label>
       </div>
+      <label>FACTS Student ID <span className="hint">Optional. “Student ID (System)” in FACTS. When set, only the adults FACTS gives access to see this child.</span>
+        <input type="text" name="facts_id" defaultValue={child?.factsId} maxLength={64} autoComplete="off" inputMode="numeric" {...bad("facts_id")} /></label>
       <div className="adm-actions">
         <button type="submit" className="btn btn--primary" disabled={pending}>{pending ? "Saving…" : child ? "Save" : "Add child"}</button>
         <button type="button" className="btn btn--outline" onClick={() => onDone()}>Cancel</button>
@@ -67,7 +69,7 @@ export function ChildrenFixer({ familyId, kids }: { familyId: number; kids: KidR
             <li key={k.id} className="adm-doc">
               <div className="what">
                 <strong>{k.name}</strong>
-                <span className="note">{k.grade}{k.teacher && <> · {k.teacher}</>}</span>
+                <span className="note">{k.grade}{k.teacher && <> · {k.teacher}</>}{k.factsId && <> · FACTS {k.factsId}</>}</span>
               </div>
               <div className="act">
                 {confirm === k.id ? (

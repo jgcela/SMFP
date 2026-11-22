@@ -25,7 +25,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
         f.contact2_name as "c2Name", f.contact2_phone as "c2Phone", f.contact2_relation as "c2Rel"
       from families f join auth_user u on u.id = f.user_id
       where f.id = ${id} and f.school_id = ${staff.schoolId}`,
-    db()<KidRow[]>`select id, name, grade, teacher from children where family_id = ${id} and school_id = ${staff.schoolId} and not left_school order by id`,
+    db()<KidRow[]>`select id, name, grade, teacher, coalesce(facts_id, '') as "factsId" from children where family_id = ${id} and school_id = ${staff.schoolId} and not left_school order by id`,
     db()<{ open: number }[]>`select count(*)::int as open from family_submissions where family_id = ${id} and school_id = ${staff.schoolId} and status <> 'resolved'`,
   ]);
   if (!f) notFound();
@@ -47,7 +47,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
         </div>
         <div className="adm-card">
           <h2 className="adm-h2">Children</h2>
-          <p className="lead">The school keeps this list; the family sees it on “My family” and chooses from it when reporting an absence. Later it will come from FACTS.</p>
+          <p className="lead">The school keeps this list; the family sees it on “My family” and chooses from it when reporting an absence. A child with a FACTS Student ID is shown only to the adults FACTS gives access to (see <SLink href="/admin/families/facts">FACTS access</SLink>), also in this family.</p>
           <ChildrenFixer familyId={f.id} kids={[...kids]} />
         </div>
       </main>
