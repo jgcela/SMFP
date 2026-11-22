@@ -6,6 +6,8 @@
 // password; FACTS sign-in (SSO) can be added later as another way to reach the
 // same families row (columns sso_provider / sso_subject), without changing the
 // approval flow or anything that reads currentFamily().
+// A family can have several accounts (family_users: each parent signs in with
+// their own email) or none yet (a family the school created from FACTS).
 import { randomInt } from "node:crypto";
 import { db } from "./db";
 import { schoolSlug } from "./portal";
@@ -17,9 +19,10 @@ export type Family = { id: number; userId: string; name: string; email: string; 
 /** The family row of a sign-in for this deployment's school, whatever its status. */
 export async function familyOfUser(userId: string): Promise<Family | null> {
   const [f] = await db()<Family[]>`
-    select f.id, f.user_id as "userId", f.name, u.email, f.school_id as "schoolId", f.status
-    from families f join schools s on s.id = f.school_id join auth_user u on u.id = f.user_id
-    where f.user_id = ${userId} and s.slug = ${await schoolSlug()} and s.status <> 'suspended'`;
+    select f.id, fu.user_id as "userId", f.name, u.email, f.school_id as "schoolId", f.status
+    from family_users fu join families f on f.id = fu.family_id
+      join schools s on s.id = f.school_id join auth_user u on u.id = fu.user_id
+    where fu.user_id = ${userId} and s.slug = ${await schoolSlug()} and s.status <> 'suspended'`;
   return f ?? null;
 }
 

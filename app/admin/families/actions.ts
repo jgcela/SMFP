@@ -21,18 +21,22 @@ export async function setFamilyStatus(id: number, status: FamilyStatus): Promise
   try {
     const staff = await requireStaff();
     if (!Number.isInteger(id) || !["approved", "rejected", "disabled"].includes(status)) return { error: "That change is not possible." };
-    const [f] = await db()<{ user_id: string; name: string; before: FamilyStatus; email: string }[]>`
+    const [f] = await db()<{ name: string; before: FamilyStatus }[]>`
       with old as (select id, status from families where id = ${id} and school_id = ${staff.schoolId})
       update families f set status = ${status}, decided_at = now(), decided_by = ${staff.name || staff.email}
-      from old, auth_user u
-      where f.id = old.id and u.id = f.user_id
-      returning f.user_id, f.name, old.status as before, u.email`;
+      from old where f.id = old.id
+      returning f.name, old.status as before`;
     if (!f) return { error: "This family is no longer in the list. Reload the page." };
-    // Step 9: the family gets an email when it is approved or rejected (not when it was already).
-    if (f.before !== status && status === "approved") await sendSchoolMail(staff.schoolId, "familyApproved", f.email, f.name);
-    if (f.before !== status && status === "rejected") await sendSchoolMail(staff.schoolId, "familyRejected", f.email, f.name);
-    // Anyone who is not approved loses any session they had.
-    if (status !== "approved") await (await auth().$context).internalAdapter.deleteUserSessions(f.user_id);
+    // The family's accounts (none for a family created from FACTS until a parent accepts an invitation).
+    const users = await db()<{ user_id: string; email: string }[]>`
+      select fu.user_id, u.email from family_users fu join auth_user u on u.id = fu.user_id where fu.family_id = ${id}`;
+    for (const u of users) {
+      // Step 9: the family gets an email when it is approved or rejected (not when it was already).
+      if (f.before !== status && status === "approved") await sendSchoolMail(staff.schoolId, "familyApproved", u.email, f.name);
+      if (f.before !== status && status === "rejected") await sendSchoolMail(staff.schoolId, "familyRejected", u.email, f.name);
+      // Anyone who is not approved loses any session they had.
+      if (status !== "approved") await (await auth().$context).internalAdapter.deleteUserSessions(u.user_id);
+    }
     revalidatePath("/admin/families");
     return { ok: `${f.name}: ${DONE[status]}` };
   } catch (e) {

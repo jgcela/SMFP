@@ -53,7 +53,9 @@ export async function registerFamily(_prev: FamilyFormState, fd: FormData): Prom
     const user = await ctx.internalAdapter.createUser({ name, email, emailVerified: false }, { method: "email-password" });
     userId = user.id;
     await ctx.internalAdapter.createAccount({ userId: user.id, providerId: "credential", accountId: user.id, password: await ctx.password.hash(password) });
-    await db()`insert into families (school_id, user_id, name) values (${school.id}, ${user.id}, ${name})`;
+    await db()`
+      with f as (insert into families (school_id, user_id, name) values (${school.id}, ${user.id}, ${name}) returning id)
+      insert into family_users (family_id, user_id, school_id) select id, ${user.id}, ${school.id} from f`;
   } catch {
     if (userId) await db()`delete from auth_user where id = ${userId}`.catch(() => {});
     return { error: "The account could not be created. Try again in a moment." };

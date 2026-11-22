@@ -15,8 +15,11 @@ export default async function FamiliesPage() {
   if (!staff) redirect(await schoolPath("/admin"));
   const [families, [school]] = await Promise.all([
     db()<FamilyRow[]>`
-      select f.id, f.name, u.email, f.status, f.created_at::text as "createdAt", f.decided_at::text as "decidedAt", f.decided_by as "decidedBy"
-      from families f join auth_user u on u.id = f.user_id
+      select f.id, f.name, f.status, f.created_at::text as "createdAt", f.decided_at::text as "decidedAt", f.decided_by as "decidedBy",
+        coalesce((select string_agg(u.email, ', ' order by fu.created_at) from family_users fu join auth_user u on u.id = fu.user_id where fu.family_id = f.id), '') as email,
+        f.facts_family_id is not null as "fromFacts",
+        (select count(*)::int from children c where c.family_id = f.id and not c.left_school) as kids
+      from families f
       where f.school_id = ${staff.schoolId}
       order by f.created_at desc, f.id desc`,
     db()<{ family_code: string | null }[]>`select family_code from schools where id = ${staff.schoolId}`,

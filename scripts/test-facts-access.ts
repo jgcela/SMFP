@@ -48,6 +48,7 @@ async function user(email: string) {
 }
 async function family(schoolId: number, userId: string, name: string) {
   const [f] = await sql<{ id: number }[]>`insert into families (school_id, user_id, name, status) values (${schoolId}, ${userId}, ${name}, 'approved') returning id`;
+  await sql`insert into family_users (family_id, user_id, school_id) values (${f.id}, ${userId}, ${schoolId})`;
   return f.id;
 }
 async function child(schoolId: number, familyId: number, name: string, factsId: string | null) {

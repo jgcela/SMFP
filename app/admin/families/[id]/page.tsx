@@ -11,7 +11,7 @@ import { requirePanelModule } from "../../../../lib/years";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Family" };
 
-type Fam = { id: number; name: string; email: string; status: string; parentNames: string; phone: string; c2Name: string; c2Phone: string; c2Rel: string };
+type Fam = { id: number; name: string; email: string; factsFamilyId: string; status: string; parentNames: string; phone: string; c2Name: string; c2Phone: string; c2Rel: string };
 
 export default async function FamilyDetail({ params }: { params: Promise<{ id: string }> }) {
   await requirePanelModule("families");
@@ -21,11 +21,20 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
   if (!Number.isInteger(id) || id <= 0) notFound();
   const [[f], kids, [counts]] = await Promise.all([
     db()<Fam[]>`
-      select f.id, f.name, u.email, f.status, f.parent_names as "parentNames", f.phone,
-        f.contact2_name as "c2Name", f.contact2_phone as "c2Phone", f.contact2_relation as "c2Rel"
-      from families f join auth_user u on u.id = f.user_id
+      select f.id, f.name, f.status, f.parent_names as "parentNames", f.phone,
+        f.contact2_name as "c2Name", f.contact2_phone as "c2Phone", f.contact2_relation as "c2Rel",
+        coalesce((select string_agg(u.email, ', ' order by fu.created_at) from family_users fu join auth_user u on u.id = fu.user_id where fu.family_id = f.id), '') as email,
+        coalesce(f.facts_family_id, '') as "factsFamilyId"
+      from families f
       where f.id = ${id} and f.school_id = ${staff.schoolId}`,
-    db()<KidRow[]>`select id, name, grade, teacher, coalesce(facts_id, '') as "factsId" from children where family_id = ${id} and school_id = ${staff.schoolId} and not left_school order by id`,
+    // Its own children, and the FACTS students of its FACTS family placed in another family.
+    db()<KidRow[]>`
+      select c.id, c.name, c.grade, c.teacher, coalesce(c.facts_id, '') as "factsId", c.family_id <> ${id} as "elsewhere"
+      from children c
+      where c.school_id = ${staff.schoolId} and not c.left_school and (c.family_id = ${id} or c.facts_id in (
+        select s.student_facts_id from facts_family_students s join families f on f.school_id = s.school_id and f.facts_family_id = s.family_facts_id
+        where f.id = ${id} and s.school_id = ${staff.schoolId}))
+      order by c.name, c.id`,
     db()<{ open: number }[]>`select count(*)::int as open from family_submissions where family_id = ${id} and school_id = ${staff.schoolId} and status <> 'resolved'`,
   ]);
   if (!f) notFound();
@@ -34,7 +43,7 @@ export default async function FamilyDetail({ params }: { params: Promise<{ id: s
     <>
       <AdminTop signedIn section="families" />
       <main id="main" className="adm-main">
-        <Head back={<SLink href="/admin/families">← All families</SLink>} title={f.name} lead={<>{f.email}{f.status === "disabled" && " · turned off"}</>} />
+        <Head back={<SLink href="/admin/families">← All families</SLink>} title={f.name} lead={<>{f.email || "No account yet"}{f.factsFamilyId && ` · FACTS Family ID ${f.factsFamilyId}`}{f.status === "disabled" && " · turned off"}</>} />
         <div className="adm-card">
           <h2 className="sp-card-h">Contact details</h2>
           <dl className="my-dl">

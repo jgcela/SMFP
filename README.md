@@ -210,3 +210,22 @@ The staff area (/admin) and "My family" (/family) share one look: a sidebar (a "
 - Quién ve a qué alumno se decide solo en `lib/student-access.ts`. Un niño con `children.facts_id` lo ven solo los adultos con cuenta verificada y "Yes" en FACTS.
 - Migración: `db/migrations/2026-11-22-facts-access.sql` (solo tablas nuevas y un índice).
 - Pruebas (base desechable): `TEST_DATABASE_URL=… npx tsx scripts/test-facts-access.ts`.
+
+## FACTS families and children (provisional)
+
+Until the portal has a direct connection to FACTS, the school can create its
+families and children from the same FACTS report (Families → FACTS access →
+"Create families and children from FACTS"). Migration:
+`db/migrations/2026-11-22-facts-families.sql`.
+
+- Each FACTS family becomes a family (`families.facts_family_id`), approved and
+  without an account. Each student becomes a child (`children.facts_id`) with
+  name and grade. A student in two families is placed in the first one (lowest
+  Family ID) and listed under both. Nothing is deleted on a later import.
+- A family can have several accounts (`family_users`), or none. A parent who
+  accepts a FACTS invitation joins their FACTS family (`facts_family_parents`);
+  an account that already has a family keeps it.
+- FACTS grade codes are shown with the portal grade they become; the school's
+  choice is saved in `schools.facts_grade_map`.
+- Who sees each child is still decided only by FACTS access (`lib/student-access.ts`).
+- Checks: `TEST_DATABASE_URL=... npx tsx scripts/test-facts-families.ts`.
