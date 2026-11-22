@@ -77,7 +77,7 @@ export async function checkInvitations(sql: Db, schoolId: number, reqs: InviteRe
   const accounts = new Map(
     (await sql<{ email: string; id: string; other_school: boolean; linked_parent: string | null }[]>`
       select lower(u.email) as email, u.id,
-        exists (select 1 from families f where f.user_id = u.id and f.school_id <> ${schoolId}) as other_school,
+        exists (select 1 from family_users f where f.user_id = u.id and f.school_id <> ${schoolId}) as other_school,
         (select p.parent_facts_id from facts_parents p where p.school_id = ${schoolId} and p.user_id = u.id) as linked_parent
       from auth_user u where lower(u.email) = any(${emails}::text[])`).map((r) => [r.email, r]),
   );
@@ -223,6 +223,32 @@ async function verify(tx: Db, schoolId: number, parentId: string, userId: string
 }
 
 class LinkError extends Error {}
+
+/**
+ * Puts an account that has no family in this school into the family of its FACTS
+ * parent (the family the school created from FACTS, lowest Family ID first). If
+ * there is none, the account gets a family of its own, approved, as before.
+ * Returns the status of that family.
+ */
+async function joinFamily(tx: Db, schoolId: number, parentId: string, userId: string, name: string): Promise<string> {
+  const [fam] = await tx<{ id: number; status: string }[]>`
+    select f.id, f.status from facts_family_parents fp
+    join families f on f.school_id = fp.school_id and f.facts_family_id = fp.family_facts_id
+    where fp.school_id = ${schoolId} and fp.parent_facts_id = ${parentId}
+    order by length(f.facts_family_id), f.facts_family_id limit 1`;
+  if (fam) {
+    await tx`insert into family_users (family_id, user_id, school_id) values (${fam.id}, ${userId}, ${schoolId})`;
+    if (fam.status !== "pending") return fam.status;
+    await tx`update families set status = 'approved', decided_at = now(), decided_by = 'FACTS invitation' where id = ${fam.id}`;
+    return "approved";
+  }
+  await tx`
+    with f as (
+      insert into families (school_id, user_id, name, status, decided_at, decided_by)
+      values (${schoolId}, ${userId}, ${name}, 'approved', now(), 'FACTS invitation') returning id)
+    insert into family_users (family_id, user_id, school_id) select id, ${userId}, ${schoolId} from f`;
+  return "approved";
+}
 class InvalidLink extends Error {}
 
 /**
@@ -244,9 +270,7 @@ export async function acceptAsNewAccount(
     const uid = userId;
     await sql.begin(async (txRaw) => {
       const tx = txRaw as unknown as Db;
-      await tx`
-        insert into families (school_id, user_id, name, status, decided_at, decided_by)
-        values (${schoolId}, ${uid}, ${familyName}, 'approved', now(), 'FACTS invitation')`;
+      await joinFamily(tx, schoolId, c.parent_facts_id, uid, familyName);
       await verify(tx, schoolId, c.parent_facts_id, uid, "new_account");
       await tx`update auth_user set email_verified = true, updated_at = now() where id = ${uid}`;
     });
@@ -270,7 +294,7 @@ export async function acceptAsExistingAccount(
   const open = await peekInvitation(sql, schoolId, token);
   if (!open) return INVALID;
   const [u] = await sql<{ id: string; name: string; other_school: boolean }[]>`
-    select u.id, u.name, exists (select 1 from families f where f.user_id = u.id and f.school_id <> ${schoolId}) as other_school
+    select u.id, u.name, exists (select 1 from family_users f where f.user_id = u.id and f.school_id <> ${schoolId}) as other_school
     from auth_user u where lower(u.email) = ${open.email}`;
   if (!u) return { ok: false, code: "no_account", error: "There is no account with this email yet. Create one with this link." };
   if (!(await checkPassword(u.id))) return { ok: false, code: "failed", error: "The password is not right." };
@@ -281,14 +305,11 @@ export async function acceptAsExistingAccount(
       const c = await claim(tx, schoolId, token);
       if (!c) throw new InvalidLink();
       await verify(tx, schoolId, c.parent_facts_id, u.id, "existing_account");
-      const [f] = await tx<{ status: string }[]>`select status from families where user_id = ${u.id} and school_id = ${schoolId}`;
-      if (!f) {
-        await tx`insert into families (school_id, user_id, name, status, decided_at, decided_by)
-          values (${schoolId}, ${u.id}, ${u.name || open.email}, 'approved', now(), 'FACTS invitation')`;
-        return "approved";
-      }
+      const [f] = await tx<{ id: number; status: string }[]>`
+        select f.id, f.status from family_users fu join families f on f.id = fu.family_id where fu.user_id = ${u.id} and fu.school_id = ${schoolId}`;
+      if (!f) return joinFamily(tx, schoolId, c.parent_facts_id, u.id, u.name || open.email);
       if (f.status === "pending") {
-        await tx`update families set status = 'approved', decided_at = now(), decided_by = 'FACTS invitation' where user_id = ${u.id} and school_id = ${schoolId}`;
+        await tx`update families set status = 'approved', decided_at = now(), decided_by = 'FACTS invitation' where id = ${f.id}`;
         return "approved";
       }
       return f.status;

@@ -26,7 +26,7 @@ async function accountOf(userId: string): Promise<{ kind: "staff" | "family"; sc
   const [r] = await db()<{ staff: boolean; family: boolean; school_id: number }[]>`
     select s.id as school_id,
       exists (select 1 from school_staff ss where ss.user_id = ${userId} and ss.school_id = s.id) as staff,
-      exists (select 1 from families f where f.user_id = ${userId} and f.school_id = s.id) as family
+      exists (select 1 from family_users fu where fu.user_id = ${userId} and fu.school_id = s.id) as family
     from schools s where s.slug = ${await schoolSlug()}`;
   if (!r) return null;
   if (r.staff) return { kind: "staff", schoolId: r.school_id };

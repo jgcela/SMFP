@@ -2,7 +2,9 @@
 // FACTS access in the staff panel: import the FACTS "Parents Web" report, import
 // a file of parent emails, and invite / re-invite one parent. Only staff of this
 // school; every query is limited to the school of the address (staff.schoolId).
-// Nothing is saved by a preview. No names, grades or Family Order are read.
+// Nothing is saved by a preview. The access import reads no names, grades or
+// Family Order; the families import (provisional, until a direct FACTS
+// connection) reads student and family names and grades, never Family Order.
 import { revalidatePath } from "next/cache";
 import { db } from "../../../../lib/db";
 import { portalOrigin, sendSchoolMail } from "../../../../lib/emails";
@@ -12,6 +14,9 @@ import {
 import {
   analyzeEmailsCsv, checkInvitations, createInvitations, normEmail, type CreatedInvite, type InviteCheck,
 } from "../../../../lib/facts-accounts";
+import {
+  analyzeFamiliesCsv, applyFamiliesImport, familiesSummary, planFamiliesImport, type FamiliesPlan, type GradeMap, type StudentIssue,
+} from "../../../../lib/facts-families";
 import { schoolPath } from "../../../../lib/portal";
 import { requireStaff, type Staff } from "../../../../lib/staff";
 import { requirePanelModule } from "../../../../lib/years";
@@ -161,5 +166,64 @@ export async function applyEmails(fd: FormData): Promise<EmailsPreview> {
     const sent = await sendInvites(staff, created);
     revalidatePath("/admin/families/facts");
     return { ...emailsPreview(a, checks, f.name), done: true, sent };
+  } catch (e) { return fail(e); }
+}
+
+// ---------------------------------------------------------------------------
+// Families and students (same FACTS report)
+
+export type FamiliesPreview = {
+  error?: string; stale?: boolean; done?: boolean; fileName?: string; fingerprint?: string;
+  summary?: ReturnType<typeof familiesSummary>;
+  grades?: FamiliesPlan["grades"];
+  schoolGrades?: string[];
+  invalidRows?: RowIssue[];
+  issues?: StudentIssue[];
+};
+
+function readMap(fd: FormData): GradeMap | null {
+  const raw = fd.get("grades");
+  if (typeof raw !== "string" || !raw) return null;
+  try {
+    const m = JSON.parse(raw) as unknown;
+    if (!m || typeof m !== "object") return null;
+    const out: GradeMap = {};
+    for (const [k, v] of Object.entries(m as Record<string, unknown>)) if (typeof v === "string" && v.trim()) out[k.slice(0, 40)] = v.trim().slice(0, 40);
+    return out;
+  } catch { return null; }
+}
+
+async function familiesPreview(plan: FamiliesPlan, schoolId: number, fileName: string): Promise<FamiliesPreview> {
+  const [s] = await db()<{ grades: string[] }[]>`select grades from schools where id = ${schoolId}`;
+  return {
+    fileName, fingerprint: plan.fingerprint, summary: familiesSummary(plan), grades: plan.grades, schoolGrades: s?.grades ?? [],
+    invalidRows: plan.invalidRows.slice(0, LIST), issues: plan.issues.slice(0, LIST),
+  };
+}
+
+/** Also used when the school changes how a grade reads: the preview is made again. */
+export async function previewFamilies(_prev: FamiliesPreview | undefined, fd: FormData): Promise<FamiliesPreview> {
+  try {
+    const staff = await staffHere();
+    const f = await readFile(fd);
+    if ("error" in f) return { error: f.error };
+    const a = analyzeFamiliesCsv(f.text);
+    if (a.error) return { error: a.error };
+    return familiesPreview(await planFamiliesImport(sql(), staff.schoolId, a, readMap(fd)), staff.schoolId, f.name);
+  } catch (e) { return fail(e); }
+}
+
+export async function applyFamilies(fd: FormData): Promise<FamiliesPreview> {
+  try {
+    const staff = await staffHere();
+    const f = await readFile(fd);
+    if ("error" in f) return { error: f.error };
+    const r = await applyFamiliesImport(sql(), staff.schoolId, f.text, readMap(fd) ?? {}, String(fd.get("fingerprint") ?? ""), staff.name || staff.email);
+    if (r.error) return { error: r.error };
+    if (r.stale && r.plan) return { ...(await familiesPreview(r.plan, staff.schoolId, f.name)), stale: true };
+    revalidatePath("/admin/families");
+    revalidatePath("/admin/families/facts");
+    revalidatePath("/family");
+    return { ...(await familiesPreview(r.plan!, staff.schoolId, f.name)), done: true };
   } catch (e) { return fail(e); }
 }

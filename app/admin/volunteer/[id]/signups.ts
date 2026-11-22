@@ -4,10 +4,11 @@ export type SignupRow = { familyId: number; family: string; parents: string; pho
 
 export function loadSignups(schoolId: number, oppId: number) {
   return db()<SignupRow[]>`
-    select f.id as "familyId", f.name as family, f.parent_names as parents, f.phone, u.email,
+    select f.id as "familyId", f.name as family, f.parent_names as parents, f.phone,
+      coalesce((select string_agg(u.email, ', ' order by fu.created_at) from family_users fu join auth_user u on u.id = fu.user_id where fu.family_id = f.id), '') as email,
       trim(both ' ' from f.contact2_name || case when f.contact2_phone <> '' then ' ' || f.contact2_phone else '' end) as contact2,
       v.created_at::text as "signedUp"
-    from volunteer_signups v join families f on f.id = v.family_id join auth_user u on u.id = f.user_id
+    from volunteer_signups v join families f on f.id = v.family_id
     where v.opportunity_id = ${oppId} and v.school_id = ${schoolId} and f.school_id = ${schoolId}
     order by v.created_at, v.id`;
 }

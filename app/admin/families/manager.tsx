@@ -7,6 +7,7 @@ import { Head, SLink } from "../ui";
 
 export type FamilyRow = {
   id: number; name: string; email: string; status: FamilyStatus; createdAt: string; decidedAt: string | null; decidedBy: string;
+  fromFacts?: boolean; kids?: number;
 };
 
 type Tab = "pending" | "approved" | "rejected";
@@ -44,7 +45,9 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
     show(r); setBusy(false); router.refresh();
   };
 
-  const list = families.filter((f) => tabOf(f.status) === tab);
+  const [q, setQ] = useState("");
+  const needle = q.trim().toLowerCase();
+  const list = families.filter((f) => tabOf(f.status) === tab && (!needle || f.name.toLowerCase().includes(needle) || f.email.toLowerCase().includes(needle)));
   const count = (t: Tab) => families.filter((f) => tabOf(f.status) === t).length;
 
   const actions = (f: FamilyRow) => {
@@ -86,6 +89,11 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
             </button>
           ))}
         </div>
+        {families.length > 10 && (
+          <div className="adm-f" style={{ marginTop: 12 }}>
+            <label>Search<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Family name or email" /></label>
+          </div>
+        )}
         <div id="fam-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
           {list.length ? (
             <ul className="adm-list">
@@ -93,9 +101,12 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
                 <li key={f.id} className={`adm-doc${f.status === "disabled" ? " is-hidden" : ""}`}>
                   <div className="what">
                     <strong>{f.name}{f.status === "disabled" && <span className="pill pill--muted">Turned off</span>}</strong>
-                    <span className="note adm-href">{f.email}</span>
+                    {f.email
+                      ? <span className="note adm-href">{f.email}</span>
+                      : <span className="note">{f.fromFacts ? "No account yet: a parent joins when they accept their FACTS invitation" : "No account"}</span>}
                     <span className="note">
-                      Registered {when(f.createdAt)}
+                      {f.kids ? <>{f.kids} {f.kids === 1 ? "child" : "children"} · </> : null}
+                      {f.fromFacts ? "Created from FACTS" : "Registered"} {when(f.createdAt)}
                       {f.decidedAt && f.status !== "pending" && <> · {f.status === "approved" ? "approved" : f.status === "rejected" ? "rejected" : "turned off"} {when(f.decidedAt)}{f.decidedBy && <> by {f.decidedBy}</>}</>}
                     </span>
                   </div>

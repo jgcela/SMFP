@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { GRADE_SUGGESTIONS } from "../../../../lib/my-family";
 import { removeChild, saveChild, type ChildFix } from "./actions";
 
-export type KidRow = { id: number; name: string; grade: string; teacher: string; factsId: string };
+export type KidRow = { id: number; name: string; grade: string; teacher: string; factsId: string; elsewhere?: boolean };
 
 function ChildForm({ familyId, child, onDone }: { familyId: number; child?: KidRow; onDone: (r?: ChildFix) => void }) {
   const router = useRouter();
@@ -69,7 +69,7 @@ export function ChildrenFixer({ familyId, kids }: { familyId: number; kids: KidR
             <li key={k.id} className="adm-doc">
               <div className="what">
                 <strong>{k.name}</strong>
-                <span className="note">{k.grade}{k.teacher && <> · {k.teacher}</>}{k.factsId && <> · FACTS {k.factsId}</>}</span>
+                <span className="note">{k.grade}{k.teacher && <> · {k.teacher}</>}{k.factsId && <> · FACTS {k.factsId}</>}{k.elsewhere && <> · also in another FACTS family</>}</span>
               </div>
               <div className="act">
                 {confirm === k.id ? (

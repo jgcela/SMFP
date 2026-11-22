@@ -4,7 +4,7 @@
 import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useMemo, useRef, useState, useTransition } from "react";
 import { PARENT_STATUS_LABEL, type ParentRow, type ParentStatus } from "../../../../lib/facts-labels";
-import { applyAccess, applyEmails, inviteParent, previewAccess, previewEmails, type AccessPreview, type EmailsPreview, type InviteResult } from "./actions";
+import { applyAccess, applyEmails, applyFamilies, inviteParent, previewAccess, previewEmails, previewFamilies, type AccessPreview, type EmailsPreview, type FamiliesPreview, type InviteResult } from "./actions";
 import { Head, SLink } from "../../ui";
 
 const n = (x: number | undefined, one: string, many = `${one}s`) => `${x ?? 0} ${(x ?? 0) === 1 ? one : many}`;
@@ -112,6 +112,120 @@ function AccessImport({ onReset }: { onReset: () => void }) {
               </button>
             )}
             <button type="button" className="btn btn--outline" onClick={reset} disabled={saving}>{shown?.done ? "Import another file" : "Choose another file"}</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+function FamiliesImport({ onReset }: { onReset: () => void }) {
+  const router = useRouter();
+  const [shown, setShown] = useState<FamiliesPreview | null>(null);
+  const [busy, setBusy] = useState<"" | "reading" | "saving">("");
+  const [map, setMap] = useState<Record<string, string>>({});
+  const file = useRef<File | null>(null);
+  const s = shown?.summary;
+
+  const run = async (kind: "preview" | "apply", m: Record<string, string>) => {
+    if (!file.current) return;
+    setBusy(kind === "apply" ? "saving" : "reading");
+    const fd = new FormData();
+    fd.set("file", file.current);
+    fd.set("grades", JSON.stringify(m));
+    if (kind === "apply") fd.set("fingerprint", shown?.fingerprint ?? "");
+    const r = kind === "apply" ? await applyFamilies(fd) : await previewFamilies(undefined, fd);
+    setBusy("");
+    setShown(r);
+    if (r.grades) setMap(Object.fromEntries(r.grades.map((g) => [g.code, g.grade])));
+    if (r.done) router.refresh();
+  };
+  const setGrade = (code: string, grade: string) => {
+    const m = { ...map, [code]: grade };
+    setMap(m);
+    void run("preview", m);
+  };
+
+  return (
+    <div className="adm-card">
+      <h2 className="adm-h2">Create families and children from FACTS</h2>
+      <p className="lead">
+        The same FACTS report. Each FACTS family becomes a family of the portal (approved, without an account yet) and each student
+        a child in it, with name and grade. Parents join their family when they accept their invitation. Who sees each child is still
+        decided by FACTS access above. Importing the file again updates names and grades and never deletes anything.
+      </p>
+      {!s && (
+        <form className="adm-f" onSubmit={(e) => {
+          e.preventDefault();
+          const f = new FormData(e.currentTarget).get("file");
+          file.current = f instanceof File ? f : null;
+          setMap({});
+          void run("preview", {});
+        }}>
+          <Msg text={shown?.error} err />
+          <label>File<input type="file" name="file" accept=".csv,text/csv" required /></label>
+          <div className="adm-actions"><button type="submit" className="btn btn--primary" disabled={!!busy}>{busy ? "Reading…" : "Preview"}</button></div>
+        </form>
+      )}
+      {s && (
+        <>
+          {shown?.done && <Msg text={`Done. Families created: ${s.newFamilies}, renamed: ${s.renamedFamilies}. Children created: ${s.newStudents}, updated: ${s.updatedStudents}.`} />}
+          {shown?.stale && <Msg err text="Something changed since this preview. Here is the new preview: check it and press Apply again." />}
+          {shown?.error && <Msg err text={shown.error} />}
+          <p className="note">{shown?.fileName}</p>
+          <div className="adm-tablewrap">
+            <table className="adm-table">
+              <tbody>
+                <tr><th scope="row">Rows read</th><td>{s.rowsRead}</td></tr>
+                <tr><th scope="row">FACTS families in the file</th><td>{s.families} <span className="note">({s.newFamilies} new · {s.renamedFamilies} with a new name)</span></td></tr>
+                <tr><th scope="row">Students in the file</th><td>{s.students} <span className="note">({s.newStudents} new · {s.updatedStudents} with a new name or grade · {s.unchangedStudents} up to date)</span></td></tr>
+                <tr><th scope="row">Students in two families</th><td>{s.inTwoFamilies} <span className="note">(placed in the first one, listed in both)</span></td></tr>
+                <tr><th scope="row">Students not changed (see below)</th><td>{s.issues}</td></tr>
+                <tr><th scope="row">Invalid rows (not applied)</th><td>{s.invalidRows}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          {!!shown?.grades?.length && (
+            <>
+              <h3 style={{ marginTop: 16 }}>How each FACTS grade will read</h3>
+              <div className="adm-tablewrap">
+                <table className="adm-table">
+                  <thead><tr><th scope="col">FACTS grade</th><th scope="col">Students</th><th scope="col">In the portal</th></tr></thead>
+                  <tbody>
+                    {shown.grades.map((g) => (
+                      <tr key={g.code}>
+                        <td>{g.code}</td>
+                        <td>{g.students}</td>
+                        <td>
+                          <select aria-label={`Grade for ${g.code}`} value={map[g.code] ?? g.grade} disabled={!!busy || shown.done}
+                            onChange={(e) => setGrade(g.code, e.target.value)}>
+                            {!(shown.schoolGrades ?? []).includes(g.code) && <option value={g.code}>{g.code} (as in FACTS)</option>}
+                            {(shown.schoolGrades ?? []).map((x) => <option key={x} value={x}>{x}</option>)}
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="note">The list comes from School years → Grades. Your choice is remembered for the next import.</p>
+            </>
+          )}
+          <Details title="Students not changed" count={shown?.issues?.length ?? 0}>
+            <ul>{shown?.issues?.map((i) => <li key={i.student}>Student {i.student} {i.problem}</li>)}</ul>
+          </Details>
+          <Details title="Invalid rows" count={shown?.invalidRows?.length ?? 0}>
+            <ul>{shown?.invalidRows?.map((r) => <li key={r.line}>Line {r.line}: {r.problem}</li>)}</ul>
+          </Details>
+          <div className="adm-actions">
+            {!shown?.done && (
+              <button type="button" className="btn btn--primary" onClick={() => run("apply", map)} disabled={!!busy || !file.current}>
+                {busy === "saving" ? "Applying…" : busy === "reading" ? "Updating preview…" : "Apply"}
+              </button>
+            )}
+            <button type="button" className="btn btn--outline" onClick={onReset} disabled={!!busy}>{shown?.done ? "Import another file" : "Choose another file"}</button>
           </div>
         </>
       )}
@@ -282,12 +396,13 @@ function EmailsImport({ onReset }: { onReset: () => void }) {
 }
 
 export function FactsManager({ parents }: { parents: ParentRow[] }) {
-  const [k, setK] = useState({ access: 0, emails: 0 });
+  const [k, setK] = useState({ access: 0, emails: 0, families: 0 });
   return (
     <>
       <Head back={<SLink href="/admin/families">← Families</SLink>} title="FACTS access"
         lead="Which parents may see which students, from the FACTS Parents Web report. A child is matched by its FACTS Student ID (set it in “Children & details”). For those children, only FACTS decides who sees them." />
       <AccessImport key={`a${k.access}`} onReset={() => setK({ ...k, access: k.access + 1 })} />
+      <FamiliesImport key={`f${k.families}`} onReset={() => setK({ ...k, families: k.families + 1 })} />
       <Parents parents={parents} />
       <EmailsImport key={`e${k.emails}`} onReset={() => setK({ ...k, emails: k.emails + 1 })} />
     </>
