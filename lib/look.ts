@@ -1,5 +1,5 @@
 // Design proposals (preview only): two alternative looks for the family portal and
-// the panels, chosen with ?look=editorial | ?look=bento | ?look=current (proxy.ts
+// the panels, chosen with ?look=<name> (see LOOKS) or ?look=current (proxy.ts
 // keeps the choice in the portal_look cookie). Each look is one stylesheet in
 // public/looks/ loaded after every other style, so nothing else changes: same
 // pages, same data, same colours per school (panel_theme). Production never
@@ -15,7 +15,8 @@ export async function currentLook(): Promise<Look | null> {
   return (LOOKS as readonly string[]).includes(v ?? "") ? (v as Look) : null;
 }
 
-const NAMES: [string, string][] = [["current", "Current"], ["editorial", "A · Editorial"], ["bento", "B · Bento"]];
+// A (editorial) and B (bento) stay reachable with ?look=, the switcher shows the latest round.
+const NAMES: [string, string][] = [["current", "Current"], ["brutal", "C · Brutal"], ["night", "D · Night"]];
 
 // The small switcher shown at the bottom of every page while the proposals are open.
 export function switcherHtml(look: Look | null) {
