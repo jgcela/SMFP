@@ -6,8 +6,8 @@
 // shows them.
 import { cookies } from "next/headers";
 
-import { LOOKS, LOOK_COOKIE, looksEnabled, type Look } from "./look-names";
-export { LOOKS, LOOK_COOKIE, looksEnabled, type Look };
+import { LOOKS, LOOK_COOKIE, MOTION_LOOKS, looksEnabled, type Look } from "./look-names";
+export { LOOKS, LOOK_COOKIE, MOTION_LOOKS, looksEnabled, type Look };
 
 export async function currentLook(): Promise<Look | null> {
   if (!looksEnabled()) return null;
@@ -16,7 +16,7 @@ export async function currentLook(): Promise<Look | null> {
 }
 
 // Earlier rounds (editorial, bento, brutal, night) stay reachable with ?look=; the switcher shows the latest round.
-const NAMES: [string, string][] = [["current", "Current"], ["swiss", "E · Swiss"], ["bands", "F · Bands"], ["varsity", "G · Varsity"]];
+const NAMES: [string, string][] = [["current", "Current"], ["spotlight", "H · Spotlight"], ["aurora", "I · Aurora"]];
 
 // The small switcher shown at the bottom of every page while the proposals are open.
 export function switcherHtml(look: Look | null) {
@@ -27,7 +27,8 @@ export function switcherHtml(look: Look | null) {
 }
 
 export const lookLinkHtml = (look: Look | null) =>
-  `<link rel="stylesheet" href="/looks/switch.css">${look ? `<link rel="stylesheet" href="/looks/${look}.css">` : ""}`;
+  `<link rel="stylesheet" href="/looks/switch.css">${look ? `<link rel="stylesheet" href="/looks/${look}.css">` : ""}${
+    look && MOTION_LOOKS.includes(look) ? `<script src="/looks/kit.js" defer></script>` : ""}`;
 
 // For the pages written as a full HTML document (inner pages, Volunteer, Staff favorites, Wishlists).
 export async function withLook(html: string) {

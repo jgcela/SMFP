@@ -7,3 +7,6 @@
 .look-switch a:focus-visible{outline:2px solid #FCBC40;outline-offset:2px}
 @media (max-width:520px){.look-switch{left:50%;right:auto;transform:translateX(-50%);bottom:10px}.look-switch span{display:none}.look-switch a{padding:0 10px}}
 @media print{.look-switch{display:none}}
+/* Aurora keeps its section dock at the bottom: the switcher sits above it. */
+html[data-look="aurora"] .look-switch{bottom:96px}
+@media (max-width:640px){html[data-look="aurora"] .look-switch{bottom:84px}}

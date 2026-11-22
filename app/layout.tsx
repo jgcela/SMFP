@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { currentLook, lookLinkHtml, looksEnabled } from "../lib/look";
+import { MOTION_LOOKS, currentLook, lookLinkHtml, looksEnabled } from "../lib/look";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -36,5 +36,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 function LookHead({ look }: { look: Awaited<ReturnType<typeof currentLook>> }) {
   // Plain <link> tags (not hoisted by React): the look's rules are scoped to html[data-look] so their order does not matter.
   const hrefs = lookLinkHtml(look).match(/href="([^"]+)"/g)!.map((s) => s.slice(6, -1));
-  return <>{hrefs.map((href) => <link key={href} rel="stylesheet" href={href} precedence="look" />)}</>;
+  return (
+    <>
+      {hrefs.map((href) => <link key={href} rel="stylesheet" href={href} precedence="look" />)}
+      {look && MOTION_LOOKS.includes(look) && <script src="/looks/kit.js" async />}
+    </>
+  );
 }
