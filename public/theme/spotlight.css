@@ -215,6 +215,10 @@ html[data-theme="spotlight"]{
     & .row.is-noschool{background:color-mix(in srgb,var(--gold) 26%,#fff)}
     & .row-date{background:var(--hs-ink);color:#fff;border-radius:14px}
     & .row-date .w{color:var(--gold)}
+    /* Same box as the dates of "This week and next": small gold label on top, big day below */
+    & .row-date{flex:0 0 52px;height:56px;justify-content:center;flex-direction:column-reverse;align-self:flex-start;border-radius:16px}
+    & .row-date .w{font:600 13px/16px var(--hs-body)}
+    & .row-date .d{font:800 24px/26px var(--hs-display);letter-spacing:-.03em;color:#fff}
     & .row-title{font:600 17px/24px var(--hs-body)}
     & .tag{border-radius:999px}
     & .mgrid td{border-color:var(--hs-line)}
