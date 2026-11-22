@@ -1,12 +1,11 @@
-/* Motion layer for design proposals H (spotlight) and I (aurora). Preview only.
+/* Motion layer of the portal design ("Spotlight", lib/theme.ts).
    Loads the Motion library (motion.dev, vendored) and adds movement on top of the
    existing pages without changing what they do: everything stays a real link,
    button or form, works with the keyboard, and nothing moves when the system asks
    for reduced motion. */
 (() => {
   const root = document.documentElement;
-  const look = root.dataset.look;
-  if (look !== "spotlight" && look !== "aurora") return;
+  if (root.dataset.theme !== "spotlight") return;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(pointer: fine)").matches;
   const $ = (s, r = document) => r.querySelector(s);
@@ -16,7 +15,7 @@
   function boot() {
     if (window.Motion) return start(window.Motion);
     const s = document.createElement("script");
-    s.src = "/looks/vendor/motion-14.10.1.js";
+    s.src = "/theme/vendor/motion-14.10.1.js";
     s.onload = () => start(window.Motion);
     document.head.appendChild(s);
   }
@@ -137,7 +136,7 @@
     /* ---------- 5. Press feedback on every button (60fps: Tap, Spring Physics) ---------- */
     if (!reduce) {
       document.addEventListener("pointerdown", (e) => {
-        const b = e.target.closest(".btn, .chip-link, .fchip, .seg button, .sp-edit, .sp-more, .kit-dock a, .most a, .ctile");
+        const b = e.target.closest(".btn, .chip-link, .fchip, .seg button, .sp-edit, .sp-more, .most a, .ctile");
         if (!b) return;
         animate(b, { scale: 0.95 }, { duration: 0.1 });
         const up = () => { animate(b, { scale: 1 }, { type: spring, stiffness: 500, damping: 14 }); removeEventListener("pointerup", up); removeEventListener("pointercancel", up); };
@@ -182,10 +181,9 @@
         <span class="kit-next-go" aria-hidden="true">→</span>`;
       a.setAttribute("aria-label", `Next up: ${ev.title}, ${when.toLowerCase()}, ${DOW[ev.d.getDay()]} ${MON[ev.d.getMonth()]} ${ev.d.getDate()}`);
       // Open the calendar list and jump to the event, like the week panel does.
-      const target = look === "spotlight" ? $(".hero-grid") : $(".hero-find");
+      const target = $(".hero-grid");
       if (!target) return;
-      if (look === "spotlight") target.insertBefore(a, $(".week-panel", target) || null);
-      else target.appendChild(a);
+      target.insertBefore(a, $(".week-panel", target) || null);
       const num = $(".kit-next-num", a);
       if (!reduce && days > 0) animate(Math.min(days + 30, 99), days, { duration: 1.6, ease, onUpdate: (v) => { num.textContent = Math.round(v); } });
     }
@@ -239,57 +237,7 @@
       if (location.hash === "#search") setTimeout(show, 300);
     }
 
-    /* ---------- 9. Dock with magnification (aurora): the section links, at thumb height ---------- */
-    function dock() {
-      const nav = $(".main-nav");
-      if (!nav || nav.dataset.kitDock) return;
-      nav.dataset.kitDock = "1";
-      nav.classList.add("kit-dock");
-      const items = $$("a", nav);
-      items.forEach((a) => {
-        const h = (a.getAttribute("href") || "").toLowerCase();
-        const kind = /week/.test(h) ? "week" : /document/.test(h) ? "docs" : /calendar/.test(h) ? "cal" : /contact/.test(h) ? "contact"
-          : /volunteer/.test(h) ? "hand" : /favorite/.test(h) ? "star" : /wishlist/.test(h) ? "gift" : /messenger/.test(h) ? "mail" : "home";
-        a.dataset.icon = kind;
-      });
-      if (!finePointer || reduce) return;
-      nav.addEventListener("pointermove", (e) => {
-        items.forEach((a) => {
-          const r = a.getBoundingClientRect();
-          const d = Math.abs(e.clientX - (r.left + r.width / 2));
-          const s = 1 + Math.max(0, 1 - d / 160) * 0.28;
-          animate(a, { scale: s, y: -(s - 1) * 26 }, { type: spring, stiffness: 400, damping: 24 });
-        });
-      });
-      nav.addEventListener("pointerleave", () => animate(items, { scale: 1, y: 0 }, { type: spring, stiffness: 300, damping: 20 }));
-    }
-
-    /* ---------- 10. This week as a carousel (aurora): cards scale as they reach the centre ---------- */
-    function carousel() {
-      const lists = $$("#wk1, #wk2");
-      if (!lists.length || reduce) return;
-      lists.forEach((ul) => {
-        if (ul.dataset.kitCar) return;
-        ul.dataset.kitCar = "1";
-        const upd = () => {
-          const r = ul.getBoundingClientRect(); const c = r.left + r.width / 2;
-          $$(":scope > li", ul).forEach((li) => {
-            const b = li.getBoundingClientRect(); const d = Math.min(1, Math.abs(b.left + b.width / 2 - c) / r.width);
-            li.style.setProperty("--kit-d", d.toFixed(3));
-          });
-        };
-        ul.addEventListener("scroll", upd, { passive: true });
-        upd();
-        // Drag to scroll with the mouse (touch already scrolls).
-        let down = null;
-        ul.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse") down = { x: e.clientX, s: ul.scrollLeft, moved: false }; });
-        addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - down.x; if (Math.abs(dx) > 4) down.moved = true; ul.scrollLeft = down.s - dx; });
-        addEventListener("pointerup", () => { setTimeout(() => { down = null; }, 0); });
-        ul.addEventListener("click", (e) => { if (down && down.moved) { e.preventDefault(); e.stopPropagation(); } }, true);
-      });
-    }
-
-    /* ---------- 11. Panels: sliding pill under the current section ---------- */
+    /* ---------- 9. Panels: sliding pill under the current section ---------- */
     function panelPill() {
       const side = $(".sp-side");
       if (!side) return;
@@ -327,7 +275,6 @@
         $$(".cat, .week-panel, .hero-sub, .kit-next, .card, .step, .staff").forEach(spotlight);
         $$(".cat-top .caption").forEach(countUp);
         countUp($("#docs-intro"));
-        if (look === "aurora") { dock(); carousel(); }
       }
       scan();
     }

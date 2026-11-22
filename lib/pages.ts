@@ -1,6 +1,6 @@
 // Loads and shows the school's text pages (step 4e).
 import { db } from "./db";
-import { withLook } from "./look";
+import { withTheme } from "./theme";
 import { absolutePaths, withHeadingIds } from "./page-html";
 import { loadPortal, schoolSlug } from "./portal";
 import { renderSchoolPage } from "./render";
@@ -13,7 +13,7 @@ const html = (body: string, status = 200) =>
 export async function pageResponse(copy: PageCopy, preview?: string) {
   const { school, links, contacts } = await loadPortal(await schoolSlug());
   const { html: body, headings } = withHeadingIds(absolutePaths(copy.html));
-  return html(await withLook(renderSchoolPage(school, links, contacts, { title: copy.title, summary: copy.summary, body, headings, preview })));
+  return html(withTheme(renderSchoolPage(school, links, contacts, { title: copy.title, summary: copy.summary, body, headings, preview })));
 }
 
 export async function findPublished(slug: string) {

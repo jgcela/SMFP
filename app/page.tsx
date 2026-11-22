@@ -3,7 +3,6 @@ import { loadPortal, schoolSlug } from "../lib/portal";
 // Look-and-feel option "sunny" (proposal): its font and its overrides, home page only.
 import "./portal.css";
 import "./looks/sunny.css";
-import { LookSwitcher } from "./look";
 import { renderPortal, schoolDescription, schoolIcon, schoolTitle } from "../lib/render";
 
 // Built for each visit: the school comes from the address (/s/<code>/, proxy.ts).
@@ -29,7 +28,6 @@ export default async function Home() {
       <script src="/new-tab.js" />
       {/* eslint-disable-next-line @next/next/no-sync-scripts */}
       <script src="/header.js" />
-      <LookSwitcher />
     </body>
   );
 }

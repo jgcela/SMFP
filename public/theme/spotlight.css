@@ -1,16 +1,16 @@
-/* Proposal H · "Spotlight" — a live dashboard for families, with motion.
+/* Portal design "Spotlight" (chosen 2026-11-22) — a live dashboard for families, with motion.
    References from the guide: bento portada (bentogrids.com), floating capsule
    navbar that shrinks on scroll (navbar.gallery, sticky), ⌘K search like the
    galleries themselves (404s.design, unsection.com), giant typographic footer
    (footer.design), staggered reveals / counters / spring press / tilt
    (60fps.design: Stagger, Counter, Tap, Spring Physics, Card Scale Morph).
-   Motion comes from public/looks/kit.js (Motion library). Scoped to
-   html[data-look=spotlight]. Without JS or with "reduce motion" it is a static page. */
+   Motion comes from public/theme/kit.js (Motion library). Scoped to
+   html[data-theme=spotlight], set by lib/theme.ts. Without JS or with "reduce motion" it is a static page. */
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap");
 
 @view-transition { navigation: auto; }
 
-html[data-look="spotlight"]{
+html[data-theme="spotlight"]{
   --hs-bg:#F3F1EA;
   --hs-ink:#0E1626;
   --hs-muted:#5B6474;
@@ -77,10 +77,10 @@ html[data-look="spotlight"]{
     /* Alert: a slim pill that slides in */
     & .alert{background:transparent;border:0;color:var(--hs-ink)}
     & .alert .wrap{padding-top:14px;padding-bottom:0}
-    & .alert .wrap>*:first-child{flex:1}
+    & .alert .wrap>p{flex:1}
     & .alert-inner,& .alert .wrap{display:flex;align-items:center;gap:12px}
     & .alert p,& .alert strong{font:600 16px/22px var(--hs-body);color:var(--hs-ink)}
-    & .alert .icon{color:var(--hs-ink);background:var(--gold);border-radius:999px;padding:6px;width:32px;height:32px;box-sizing:border-box;flex:none;min-width:32px;min-height:32px;aspect-ratio:1}
+    & .alert .icon{color:var(--hs-ink);background:var(--gold);border-radius:999px;padding:6px;width:32px!important;height:32px!important;box-sizing:border-box;flex:none}
     & .alert a{color:var(--hs-ink);font-weight:600}
 
     /* Hero as a bento: search, next-up countdown, this week, subscribe */

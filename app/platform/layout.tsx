@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { LookSwitcher } from "../look";
 import { panelVars, readPanelTheme } from "../../lib/panel-theme";
 import "../portal.css";
 import "../admin/admin.css";
@@ -16,5 +15,5 @@ const THEME = readPanelTheme({
 }, "FAMITENLY");
 
 export default function PlatformLayout({ children }: { children: React.ReactNode }) {
-  return <body className="adm sp pf" style={panelVars(THEME)}>{children}<LookSwitcher /></body>;
+  return <body className="adm sp pf" style={panelVars(THEME)}>{children}</body>;
 }

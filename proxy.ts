@@ -14,7 +14,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "./lib/db";
 import publicFiles from "./lib/public-files.json";
-import { LOOKS, LOOK_COOKIE, looksEnabled } from "./lib/look-names";
 
 const HEADER = "x-portal-school";
 // FAMITENLY's own website at the root (famitenly/, copied from family-portal/marketing).
@@ -84,17 +83,6 @@ export async function proxy(req: NextRequest) {
   headers.delete(HEADER);
   const pass = () => NextResponse.next({ request: { headers } });
 
-  // Design proposals (preview only): ?look=editorial|bento|current is kept in a
-  // cookie and taken out of the address.
-  const look = url.searchParams.get("look");
-  if (look !== null && looksEnabled() && req.method === "GET") {
-    const clean = new URL(req.url);
-    clean.searchParams.delete("look");
-    const res = NextResponse.redirect(clean, 307);
-    if ((LOOKS as readonly string[]).includes(look)) res.cookies.set(LOOK_COOKIE, look, { path: "/", sameSite: "lax", maxAge: 60 * 60 * 24 * 30 });
-    else res.cookies.delete(LOOK_COOKIE);
-    return res;
-  }
   if (path.startsWith("/platform")) headers.set("x-portal-area", "platform");
   else headers.delete("x-portal-area");
 
