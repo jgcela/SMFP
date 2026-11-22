@@ -395,8 +395,9 @@ function lockNote(viewer: Exclude<StaffViewer, "allowed">, what: string, pagePat
       (keepHash ? `
           <script>(function(){var a=document.getElementById("sf-signin");if(location.hash)a.href="/family?next="+encodeURIComponent("${pagePath}"+location.hash);})();</script>` : "")
     : viewer === "other" ? `<p class="card-actions"><a class="btn btn--outline" href="${signIn}">Go to family sign-in</a></p>` : "";
+  // The home page has no "info" icon in its set; it uses the document one.
   return `<div class="note sf-lock" role="status">
-        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+        <svg class="icon" aria-hidden="true"><use href="#${keepHash ? "i-info" : "i-doc"}"/></svg>
         <div class="stack" style="gap:8px">
           <h3 class="h3" id="lock-title">${esc(text[0])}</h3>
           <p>${esc(text[1])}</p>

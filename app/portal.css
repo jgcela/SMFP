@@ -288,3 +288,9 @@ a.ctile .v{text-decoration:underline}
 .site-header.nav-collapsed .mobile-menu a[aria-current="page"]{color:var(--gold)}
 .site-header.nav-collapsed .mobile-menu .sub a{color:var(--azure);font-size:15px}
 .site-header.fam-compact .btn-family .fam-name{max-width:9ch}
+/* Sign-in notice in place of the Family documents list (families only) */
+.note{display:flex;gap:16px;align-items:flex-start;padding:24px;border-radius:var(--r-md);background:var(--azure);color:var(--jet)}
+.note .icon{flex:none;width:24px;height:24px;color:var(--navy);margin-top:2px}
+.note p{min-width:0;overflow-wrap:anywhere}
+#documents .note .btn--primary,#documents .note .btn--primary:hover{color:#fff}
+
