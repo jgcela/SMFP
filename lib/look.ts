@@ -15,8 +15,8 @@ export async function currentLook(): Promise<Look | null> {
   return (LOOKS as readonly string[]).includes(v ?? "") ? (v as Look) : null;
 }
 
-// A (editorial) and B (bento) stay reachable with ?look=, the switcher shows the latest round.
-const NAMES: [string, string][] = [["current", "Current"], ["brutal", "C · Brutal"], ["night", "D · Night"]];
+// Earlier rounds (editorial, bento, brutal, night) stay reachable with ?look=; the switcher shows the latest round.
+const NAMES: [string, string][] = [["current", "Current"], ["swiss", "E · Swiss"], ["bands", "F · Bands"], ["varsity", "G · Varsity"]];
 
 // The small switcher shown at the bottom of every page while the proposals are open.
 export function switcherHtml(look: Look | null) {
