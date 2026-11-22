@@ -729,7 +729,8 @@ create table if not exists facts_family_students (
 
 -- Each FACTS parent of the school, its email (typed by the school or imported)
 -- and, once verified, the portal account. The association counts only when
--- verified_at is set, which happens only through an invitation link.
+-- user_id is set, which happens only through an invitation link (verified_at says when).
+-- If the account is deleted, user_id becomes empty and the parent can be invited again.
 create table if not exists facts_parents (
   school_id        integer not null references schools(id) on delete cascade,
   parent_facts_id  text not null,
@@ -739,8 +740,7 @@ create table if not exists facts_parents (
   verified_via     text check (verified_via in ('new_account', 'existing_account')),
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now(),
-  primary key (school_id, parent_facts_id),
-  check ((user_id is null) = (verified_at is null))
+  primary key (school_id, parent_facts_id)
 );
 -- An account is linked to at most one FACTS parent per school.
 create unique index if not exists facts_parents_user on facts_parents(school_id, user_id) where user_id is not null;

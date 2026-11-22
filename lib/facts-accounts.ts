@@ -7,7 +7,7 @@
 //      * No account with that email: they choose a family name and a password.
 //      * An account already uses that email: they confirm with that account's
 //        password. Never automatic.
-//  - Only then is facts_parents.verified_at set, and every FACTS "Yes" of that
+//  - Only then are facts_parents.user_id and verified_at set, and every FACTS "Yes" of that
 //    parent starts to count at once (lib/student-access.ts reads it live).
 // Nothing is ever matched by name, Family ID or position in a file.
 import { createHash, randomBytes } from "node:crypto";
@@ -30,7 +30,7 @@ export async function listParents(sql: Db, schoolId: number): Promise<ParentRow[
   return sql<ParentRow[]>`
     select p.parent_facts_id as "parentId", p.email, u.email as "accountEmail",
       i.created_at::text as "invitedAt", i.expires_at::text as "expiresAt",
-      case when p.verified_at is not null then 'active'
+      case when p.user_id is not null then 'active'
            when i.id is null then 'pending_email'
            when i.used_at is null and i.cancelled_at is null and i.expires_at > now() then 'invited'
            else 'expired' end as status,
@@ -64,7 +64,7 @@ export async function checkInvitations(sql: Db, schoolId: number, reqs: InviteRe
   const emails = reqs.map((r) => normEmail(r.email));
   const parents = new Map(
     (await sql<{ parent_facts_id: string; verified: boolean; open_email: string | null }[]>`
-      select p.parent_facts_id, p.verified_at is not null as verified,
+      select p.parent_facts_id, p.user_id is not null as verified,
         (select i.email from facts_invitations i where i.school_id = p.school_id and i.parent_facts_id = p.parent_facts_id
            and i.used_at is null and i.cancelled_at is null and i.expires_at > now() order by i.created_at desc limit 1) as open_email
       from facts_parents p where p.school_id = ${schoolId} and p.parent_facts_id = any(${ids}::text[])`).map((r) => [r.parent_facts_id, r]),
@@ -193,7 +193,7 @@ export async function peekInvitation(sql: Db, schoolId: number, token: string): 
       exists (select 1 from auth_user u where lower(u.email) = i.email) as "accountExists"
     from facts_invitations i join facts_parents p on p.school_id = i.school_id and p.parent_facts_id = i.parent_facts_id
     where i.token_hash = ${hash(token)} and i.school_id = ${schoolId}
-      and i.used_at is null and i.cancelled_at is null and i.expires_at > now() and p.verified_at is null`;
+      and i.used_at is null and i.cancelled_at is null and i.expires_at > now() and p.user_id is null`;
   return r ?? null;
 }
 
@@ -206,7 +206,7 @@ async function claim(tx: Db, schoolId: number, token: string) {
     update facts_invitations i set used_at = now()
     from facts_parents p
     where i.token_hash = ${hash(token)} and i.school_id = ${schoolId}
-      and p.school_id = i.school_id and p.parent_facts_id = i.parent_facts_id and p.verified_at is null
+      and p.school_id = i.school_id and p.parent_facts_id = i.parent_facts_id and p.user_id is null
       and i.used_at is null and i.cancelled_at is null and i.expires_at > now()
     returning i.id, i.parent_facts_id, i.email`;
   return r ?? null;
@@ -218,7 +218,7 @@ async function verify(tx: Db, schoolId: number, parentId: string, userId: string
   if (linked) throw new LinkError("This account is already linked to another FACTS parent of the school. Contact the school office.");
   const done = await tx`
     update facts_parents set user_id = ${userId}, verified_at = now(), verified_via = ${via}, updated_at = now()
-    where school_id = ${schoolId} and parent_facts_id = ${parentId} and verified_at is null`;
+    where school_id = ${schoolId} and parent_facts_id = ${parentId} and user_id is null`;
   if (!done.count) throw new LinkError("This FACTS parent is already linked to an account.");
 }
 

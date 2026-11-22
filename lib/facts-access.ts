@@ -166,7 +166,7 @@ export async function planAccessImport(sql: Db, schoolId: number, a: AccessAnaly
     parents.length
       ? (await sql<{ parent_facts_id: string }[]>`
           select parent_facts_id from facts_parents
-          where school_id = ${schoolId} and parent_facts_id = any(${parents}::text[]) and verified_at is not null`).map((r) => r.parent_facts_id)
+          where school_id = ${schoolId} and parent_facts_id = any(${parents}::text[]) and user_id is not null`).map((r) => r.parent_facts_id)
       : [],
   );
   const knownStudents = new Set(

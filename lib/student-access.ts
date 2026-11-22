@@ -8,7 +8,7 @@
 //  - Children with a FACTS Student ID (children.facts_id): FACTS decides. The
 //    adult sees the child only if
 //      1. their account is linked to a FACTS Parent Individual ID of this school
-//         through a verified invitation (facts_parents.verified_at), and
+//         through a verified invitation (facts_parents.user_id, set only by an invitation), and
 //      2. FACTS gave that parent access to that student (facts_student_access = granted).
 //    "No", a Yes/No conflict, or no verified account means no access, also for
 //    the family the child is listed under. FACTS Family ID never grants access.
@@ -27,7 +27,7 @@ function allowed(sql: Db, a: Adult) {
         select 1 from facts_parents p
         join facts_student_access g
           on g.school_id = p.school_id and g.parent_facts_id = p.parent_facts_id
-        where p.school_id = c.school_id and p.user_id = ${a.userId} and p.verified_at is not null
+        where p.school_id = c.school_id and p.user_id = ${a.userId} and p.user_id is not null
           and g.student_facts_id = c.facts_id and g.state = 'granted'))
     )`;
 }

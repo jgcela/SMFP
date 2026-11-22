@@ -172,6 +172,10 @@ async function main() {
   const aNew: Adult = { familyId: nf.id, userId: newUser, schoolId: A };
   check("pending FACTS access is active at once: sees Xavi", (await ids(aNew)).includes("Xavi"), await ids(aNew));
   check("the link works only once", !(await acceptAsNewAccount(sql, A, resent.created[0].token, "Again", async (e) => user(e), async () => {})).ok);
+  await sql`delete from auth_user where id = ${newUser}`;
+  check("deleting the account removes the association; the parent can be invited again",
+    (await listParents(sql, A)).find((p) => p.parentId === "P3")?.status !== "active"
+    && (await checkInvitations(sql, A, [{ parentId: "P3", email: "new.parent@example.test" }], { skipIfInvited: false }))[0].kind === "invite");
 
   section("8. Verification from the emails file (existing account, password)");
   const emailsCsv = "﻿" + [
