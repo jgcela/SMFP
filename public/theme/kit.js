@@ -136,7 +136,7 @@
     /* ---------- 5. Press feedback on every button (60fps: Tap, Spring Physics) ---------- */
     if (!reduce) {
       document.addEventListener("pointerdown", (e) => {
-        const b = e.target.closest(".btn, .chip-link, .fchip, .seg button, .sp-edit, .sp-more, .most a, .ctile");
+        const b = e.target.closest(".btn, .chip-link, .fchip, .seg button, .sp-edit, .sp-more, .main-nav a, .most a, .ctile");
         if (!b) return;
         animate(b, { scale: 0.95 }, { duration: 0.1 });
         const up = () => { animate(b, { scale: 1 }, { type: spring, stiffness: 500, damping: 14 }); removeEventListener("pointerup", up); removeEventListener("pointercancel", up); };
@@ -237,7 +237,24 @@
       if (location.hash === "#search") setTimeout(show, 300);
     }
 
-    /* ---------- 9. Panels: sliding pill under the current section ---------- */
+    /* ---------- 9. Dock with magnification: the section links at the bottom, at thumb height ---------- */
+    function dock() {
+      const nav = $(".main-nav");
+      if (!nav || nav.dataset.kitDock || !finePointer || reduce) return;
+      nav.dataset.kitDock = "1";
+      const items = $$("a", nav);
+      nav.addEventListener("pointermove", (e) => {
+        items.forEach((a) => {
+          const r = a.getBoundingClientRect();
+          const d = Math.abs(e.clientX - (r.left + r.width / 2));
+          const s = 1 + Math.max(0, 1 - d / 160) * 0.28;
+          animate(a, { scale: s, y: -(s - 1) * 26 }, { type: spring, stiffness: 400, damping: 24 });
+        });
+      });
+      nav.addEventListener("pointerleave", () => animate(items, { scale: 1, y: 0 }, { type: spring, stiffness: 300, damping: 20 }));
+    }
+
+    /* ---------- 10. Panels: sliding pill under the current section ---------- */
     function panelPill() {
       const side = $(".sp-side");
       if (!side) return;
@@ -275,6 +292,7 @@
         $$(".cat, .week-panel, .hero-sub, .kit-next, .card, .step, .staff").forEach(spotlight);
         $$(".cat-top .caption").forEach(countUp);
         countUp($("#docs-intro"));
+        dock();
       }
       scan();
     }

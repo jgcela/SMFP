@@ -23,6 +23,16 @@ html[data-theme="spotlight"]{
   --r-sm:12px;--r-md:18px;--r-pill:999px;
   background:var(--hs-bg);
   scroll-padding-top:110px;
+  /* Dock icons */
+  --hs-i-home:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/%3E%3C/svg%3E");
+  --hs-i-week:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.2 5.3L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.7z'/%3E%3C/svg%3E");
+  --hs-i-docs:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z'/%3E%3Cpath d='M14 3v5h5M9 13h6M9 17h6'/%3E%3C/svg%3E");
+  --hs-i-cal:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E");
+  --hs-i-contact:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/%3E%3C/svg%3E");
+  --hs-i-hand:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'/%3E%3C/svg%3E");
+  --hs-i-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4l-5.5 2.9 1-6.2L3 9.7l6.2-.9z'/%3E%3C/svg%3E");
+  --hs-i-gift:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='5'/%3E%3Cpath d='M5 13v8h14v-8M12 8v13M12 8S10 3 7.5 4.5 9 8 12 8zM12 8s2-5 4.5-3.5S15 8 12 8z'/%3E%3C/svg%3E");
+  --hs-i-mail:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='M3 7l9 6 9-6'/%3E%3C/svg%3E");
 
   &::view-transition-old(root){animation:220ms cubic-bezier(.4,0,1,1) both hs-out}
   &::view-transition-new(root){animation:420ms cubic-bezier(.22,1,.36,1) both hs-in}
@@ -43,16 +53,45 @@ html[data-theme="spotlight"]{
     & .util{background:transparent;border:0;transition:opacity .25s,max-height .35s;max-height:40px;overflow:hidden}
     & .util a{color:var(--hs-muted);font:500 13px/28px var(--hs-body);text-decoration:none}
     & .util a:hover{color:var(--hs-ink)}
-    & .bar>.wrap{background:rgba(255,255,255,.78);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);
+    & .bar>.wrap{position:relative;isolation:isolate;background:transparent;
       border:1px solid rgba(255,255,255,.9);border-radius:999px;box-shadow:0 10px 30px -14px rgba(14,22,38,.25);min-height:68px;padding:0 10px 0 24px;transition:min-height .35s var(--hs-spring),box-shadow .35s,max-width .45s var(--hs-spring)}
+    & .bar>.wrap::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:rgba(255,255,255,.78);
+      backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);pointer-events:none}
     &.kit-scrolled .site-header,.kit-scrolled & .site-header{padding-top:8px}
     .kit-scrolled & .util{opacity:0;max-height:0}
     .kit-scrolled & .bar>.wrap{min-height:58px;box-shadow:0 18px 40px -16px rgba(14,22,38,.35)}
     & .logo img{height:40px;width:auto}
-    & .main-nav{gap:2px}
-    & .main-nav a{color:var(--hs-ink);font:500 15px/20px var(--hs-body);border-radius:999px;padding:10px 14px;text-decoration:none;transition:background .2s}
-    & .main-nav a:hover{background:rgba(14,22,38,.06)}
+    /* Dock: the section links live at the bottom, at thumb height, like an app */
+    padding-bottom:104px;
+    & .main-nav,& .site-header.nav-collapsed .main-nav{display:flex!important;position:fixed;z-index:80;left:50%;bottom:18px;translate:-50% 0;gap:4px;align-items:flex-end;
+      padding:8px;border-radius:26px;background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.95);
+      backdrop-filter:saturate(170%) blur(20px);-webkit-backdrop-filter:saturate(170%) blur(20px);
+      box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 24px 50px -18px color-mix(in srgb,var(--navy) 55%,transparent),0 0 0 1px rgba(14,22,38,.06)}
+    & .main-nav a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:48px;min-width:76px;padding:4px 10px;box-sizing:border-box;border-radius:18px;
+      font:600 11px/13px var(--hs-body);letter-spacing:.01em;color:var(--hs-muted);transform-origin:50% 100%;will-change:transform;text-decoration:none;transition:background .2s,color .2s}
+    & .main-nav a::before{content:"";width:22px;height:22px;flex:none;background:currentColor;
+      -webkit-mask:var(--hs-ic) center/contain no-repeat;mask:var(--hs-ic) center/contain no-repeat}
+    & .main-nav a:hover{background:rgba(14,22,38,.06);color:var(--hs-ink)}
     & .main-nav a[aria-current="page"]{background:var(--hs-ink);color:#fff}
+    & .main-nav a[aria-current="page"]::after{content:"";position:absolute;bottom:-6px;width:4px;height:4px;border-radius:4px;background:var(--gold)}
+    & .main-nav a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    & .main-nav a{--hs-ic:var(--hs-i-home)}
+    & .main-nav a[href*="week"]{--hs-ic:var(--hs-i-week)}
+    & .main-nav a[href*="document"]{--hs-ic:var(--hs-i-docs)}
+    & .main-nav a[href*="calendar"]{--hs-ic:var(--hs-i-cal)}
+    & .main-nav a[href*="contact"]{--hs-ic:var(--hs-i-contact)}
+    & .main-nav a[href*="volunteer"]{--hs-ic:var(--hs-i-hand)}
+    & .main-nav a[href*="favorite"]{--hs-ic:var(--hs-i-star)}
+    & .main-nav a[href*="wishlist"]{--hs-ic:var(--hs-i-gift)}
+    & .main-nav a[href*="messenger"]{--hs-ic:var(--hs-i-mail)}
+    /* The Menu keeps only the links that are not in the dock (other websites, extra pages) */
+    & .mobile-menu ul:not(.sub){display:none}
+    /* The dock is fixed at the bottom, so on a computer the top bar never needs the Menu button */
+    @media (min-width:1061px){
+      & .site-header.nav-collapsed .util{display:block}
+      & .site-header.nav-collapsed .menu-btn{display:none}
+      & .site-header.nav-collapsed .mobile-menu{display:none!important}
+    }
     & .btn{border-radius:999px;font:600 15px/20px var(--hs-body);transition:background .2s,box-shadow .2s}
     & .btn--gold,& .btn-facts{background:var(--gold);color:var(--hs-ink);border-color:var(--gold);box-shadow:0 8px 20px -10px color-mix(in srgb,var(--gold) 90%,#000)}
     & .btn--gold .icon,& .btn-facts .icon{color:var(--hs-ink)}
@@ -219,6 +258,11 @@ html[data-theme="spotlight"]{
     }
     @media (max-width:640px){
       & .bar>.wrap{padding:0 6px 0 14px;min-height:60px;margin:0 8px}
+      padding-bottom:92px;
+      & .main-nav,& .site-header.nav-collapsed .main-nav{left:10px;right:10px;bottom:10px;translate:none;justify-content:space-around;border-radius:22px;padding:6px}
+      & .main-nav a{min-width:0;flex:1;padding:4px 2px}
+      & .main-nav:has(a:nth-child(5)) a{font-size:0;gap:0}
+      & .main-nav:has(a:nth-child(5)) a::before{width:24px;height:24px}
       & .kit-k span,& .kit-k kbd{display:none}
       & .kit-k{padding:0;width:44px;justify-content:center}
       & .site-header .btn-family>span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
