@@ -14,6 +14,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "./lib/db";
 import publicFiles from "./lib/public-files.json";
+import { isDocumentFile, mayOpenDocuments } from "./lib/doc-access";
 
 const HEADER = "x-portal-school";
 // FAMITENLY's own website at the root (famitenly/, copied from family-portal/marketing).
@@ -102,6 +103,11 @@ export async function proxy(req: NextRequest) {
     if (rest.length > 1 && rest.endsWith("/")) return NextResponse.redirect(new URL(`/s/${slug}${rest.replace(/\/+$/, "")}${url.search}`, req.url), 308);
     if (isFile(rest)) {
       if (bundledOnly(rest) && slug !== BUNDLED_SCHOOL) return notFound();
+      // Family documents: only the school's approved families and its staff.
+      // Anyone else signs in first and then comes back to the file.
+      if (status !== "suspended" && (await isDocumentFile(rest, slug)) && !(await mayOpenDocuments(req.headers, slug)))
+        return NextResponse.redirect(new URL(`/s/${slug}/family?next=${encodeURIComponent(rest)}`, req.url), 307);
+      if (status === "suspended" && (await isDocumentFile(rest, slug))) return notFound();
       return NextResponse.rewrite(new URL(`${rest}${url.search}`, req.url), { request: { headers } });
     }
     if (rest.startsWith("/platform") || SITE.has(rest) || rest === "/suspended") return notFound();
@@ -116,7 +122,13 @@ export async function proxy(req: NextRequest) {
   }
 
   // Files at their plain address (/assets/..., /header.js) are served as always.
-  if (isFile(path)) return pass();
+  if (isFile(path)) {
+    // A family document at its plain address goes through the school's address,
+    // where it is guarded (above).
+    if (SLUG.test(BUNDLED_SCHOOL) && (await isDocumentFile(path, BUNDLED_SCHOOL)))
+      return NextResponse.redirect(new URL(`/s/${BUNDLED_SCHOOL}${path}${url.search}`, req.url), 307);
+    return pass();
+  }
   if (path.length > 1 && path.endsWith("/")) return NextResponse.redirect(new URL(`${path.replace(/\/+$/, "")}${url.search}`, req.url), 308);
 
   const fromPage = schoolFromReferer(req);

@@ -3,6 +3,7 @@
 import { db } from "../../../lib/db";
 import { schoolSlug } from "../../../lib/portal";
 import { currentStaff } from "../../../lib/staff";
+import { staffViewer } from "../../../lib/staff-favorites-db";
 import { getStorage } from "../../../lib/storage";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     where d.id = ${id} and s.slug = ${await schoolSlug()} and d.file_key is not null`;
   if (d && !d.active && !(await currentStaff()).staff) return new Response("Not found", { status: 404 });
   if (!d) return new Response("Not found", { status: 404 });
+  // Family documents are only for the school's approved families and its staff.
+  if ((await staffViewer()) !== "allowed")
+    return new Response(null, { status: 307, headers: { Location: `/s/${await schoolSlug()}/family?next=${encodeURIComponent(`/doc/${id}`)}`, "Cache-Control": "private, no-store" } });
   try {
     const url = await getStorage().signedGetUrl(d.file_key, { fileName: d.file_name, contentType: d.content_type, inline: true, expiresIn: 600 });
     return new Response(null, { status: 302, headers: { Location: url, "Cache-Control": "private, no-store" } });

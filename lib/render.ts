@@ -380,29 +380,54 @@ ${groups}      </div>
 }
 
 // The notice for someone who may not see a families-only page (Staff favorites, Wishlists).
-function familiesOnly(viewer: Exclude<StaffViewer, "allowed">, what: string, pagePath: string) {
+function lockNote(viewer: Exclude<StaffViewer, "allowed">, what: string, pagePath: string, keepHash = true) {
   const text = {
     nobody: [`Sign in to see ${what}`, "This page is only for families of the school. Sign in with your family account to see it."],
     pending: ["Your family account is not approved yet", "You can see this page once the school approves your family account. If it is taking long, contact the school office."],
     other: ["This page is for families of the school", "The account you signed in with cannot see this page. Sign out and sign in with your family account."],
   }[viewer];
+  // The home page's documents section (keepHash false): the text speaks of the documents, and
+  // the link is relative because the page is already at the school's address (/s/<code>/).
+  if (!keepHash) text[1] = viewer === "nobody" ? `Only families of the school can see ${what}. Sign in with your family account to see them.` : text[1].replace("this page", what);
+  const signIn = keepHash ? "/family" : "family";
   const button = viewer === "nobody"
-    ? `<p class="card-actions"><a class="btn btn--primary" id="sf-signin" href="/family?next=${encodeURIComponent(pagePath)}">Sign in</a></p>
-          <script>(function(){var a=document.getElementById("sf-signin");if(location.hash)a.href="/family?next="+encodeURIComponent("${pagePath}"+location.hash);})();</script>`
-    : viewer === "other" ? `<p class="card-actions"><a class="btn btn--outline" href="/family">Go to family sign-in</a></p>` : "";
-  return `  <section class="section" aria-labelledby="lock-title">
-    <div class="wrap stack">
-      <div class="note sf-lock" role="status">
+    ? `<p class="card-actions"><a class="btn btn--primary" id="sf-signin" href="${signIn}?next=${encodeURIComponent(pagePath)}">Sign in</a></p>` +
+      (keepHash ? `
+          <script>(function(){var a=document.getElementById("sf-signin");if(location.hash)a.href="/family?next="+encodeURIComponent("${pagePath}"+location.hash);})();</script>` : "")
+    : viewer === "other" ? `<p class="card-actions"><a class="btn btn--outline" href="${signIn}">Go to family sign-in</a></p>` : "";
+  return `<div class="note sf-lock" role="status">
         <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
         <div class="stack" style="gap:8px">
-          <h2 class="h3" id="lock-title">${esc(text[0])}</h2>
+          <h3 class="h3" id="lock-title">${esc(text[0])}</h3>
           <p>${esc(text[1])}</p>
           ${button}
         </div>
-      </div>
+      </div>`;
+}
+
+function familiesOnly(viewer: Exclude<StaffViewer, "allowed">, what: string, pagePath: string) {
+  return `  <section class="section" aria-labelledby="lock-title">
+    <div class="wrap stack">
+      ${lockNote(viewer, what, pagePath).replace('<h3 class="h3" id="lock-title">', '<h2 class="h3" id="lock-title">').replace("</h3>", "</h2>")}
     </div>
   </section>
 `;
+}
+
+/** The home page's Family documents section, for someone who may not see the documents. */
+export function lockDocuments(html: string, viewer: Exclude<StaffViewer, "allowed">) {
+  const start = html.indexOf('<section id="documents"');
+  if (start < 0) return html;
+  const end = html.indexOf("</section>", start) + "</section>".length;
+  const section = `<section id="documents" class="section section--tint" aria-labelledby="docs-title">
+    <div class="wrap stack" style="gap:24px">
+      <div class="sec-head">
+        <h2 class="h2" id="docs-title">Family documents</h2>
+      </div>
+      ${lockNote(viewer, "the family documents", "/#documents", false)}
+    </div>
+  </section>`;
+  return html.slice(0, start) + section + html.slice(end);
 }
 
 export function renderStaffPage(school: School, links: Link[], people: ContactPerson[], page: StaffPage, cards: StaffCard[], viewer: StaffViewer) {

@@ -122,6 +122,8 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   $('#wk2').innerHTML = w2.length ? w2.map(e => weekItem(e, false)).join('') : '<li class="empty-note">Nothing on the calendar next week.</li>';
 
   // ---- Documents ----
+  // Only signed-in families and staff get the list; others see a sign-in notice instead.
+  if ($('#cats')) {
   const DAY_MS = 864e5;
   const isNew = (it) => it.added && (today - parse(it.added)) / DAY_MS <= 30;
   const icon = (it) => it.type === 'ext' ? 'i-ext' : it.type === 'web' ? 'i-arrow' : 'i-dl';
@@ -150,6 +152,7 @@ const NOTICES = PORTAL.notices;     // notices written by the school (override t
   };
   renderDocs();
   $('#doc-filter').addEventListener('input', (e) => renderDocs(e.target.value));
+  }
 
   // ---- Calendar ----
   const FILTERS = [['all','All events'],['noschool','No school & early dismissal'],['faith','Faith'],['academic','Academic'],['community','Community'],['health','Health']];
