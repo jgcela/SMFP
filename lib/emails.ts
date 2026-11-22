@@ -123,6 +123,31 @@ export const emails = {
       after: [`After that, sign in at ${o}/admin with this email and your password.`],
     }),
 
+  // FACTS: the school invites a parent to see their children on the portal.
+  factsInvite: (s: MailSchool, o: string, to: string, link: string) =>
+    mail(s, o, to, "facts_invite", `Your family account on the ${s.name} portal`, {
+      preheader: `Create your account. The link works for 7 days.`,
+      title: "Create your family account",
+      paras: [
+        `${s.name} invites you to its family portal, where you can see your children and send absences and requests to the school.`,
+        "Choose your password to create your account. The link works for 7 days, and only once.",
+      ],
+      button: { label: "Create my account", href: link },
+      after: ["If you were not expecting this email, you can ignore it. No account is created until you open the link."],
+    }),
+
+  factsConfirm: (s: MailSchool, o: string, to: string, link: string) =>
+    mail(s, o, to, "facts_confirm", `Confirm your access on the ${s.name} portal`, {
+      preheader: `Confirm with your password. The link works for 7 days.`,
+      title: "Confirm access to your children",
+      paras: [
+        `${s.name} wants to link your existing portal account to your children's records.`,
+        "Open the link and enter the password of your account to confirm. Nothing changes until you do. The link works for 7 days, and only once.",
+      ],
+      button: { label: "Confirm access", href: link },
+      after: [IGNORE],
+    }),
+
   resetPassword: (s: MailSchool, o: string, to: string, link: string) =>
     mail(s, o, to, "reset_password", `Reset your password — ${s.name}`, {
       preheader: "This link works for 1 hour.",

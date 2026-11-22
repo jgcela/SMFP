@@ -74,7 +74,8 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
 
   return (
     <>
-      <Head title="Families" lead={<>Families create their account at <strong>/family/register</strong> with the school code. They can sign in only after you approve them.</>} />
+      <Head title="Families" lead={<>Families create their account at <strong>/family/register</strong> with the school code. They can sign in only after you approve them.</>}
+        actions={<SLink className="btn btn--outline" href="/admin/families/facts">FACTS access</SLink>} />
       <div className="adm-card">
         {msg && <p className={`adm-msg ${msg.err ? "adm-msg--err" : "adm-msg--ok"}`} role="status">{msg.text}</p>}
         <div className="fam-tabs" role="tablist" aria-label="Families by status">

@@ -201,3 +201,12 @@ The staff area (/admin) and "My family" (/family) share one look: a sidebar (a "
 - At most 8 emails per address and per computer every 15 minutes.
 - A "Family sign-in" button sits in the public header on every page, on computers and phones, and leads to /family. When a family is signed in it shows the family's name instead (`/api/me`, `public/header.js`). When the links and buttons do not fit on one line, the header switches to the Menu button instead of breaking links onto two lines.
 - Migration: `db/migrations/2026-11-20-step9-email.sql`.
+
+## Acceso FACTS (importador CSV e invitaciones)
+
+- `/admin/families/facts`: importar el informe "Parents Web" de FACTS (vista previa, luego Apply en una sola transacción; reimportar el mismo archivo no cambia nada), lista de padres FACTS (Needs email / Invited / Invitation expired / Active) con campo de correo y "Resend", e importador de un CSV con `Parent Individual ID` + `Email`.
+- Solo se leen `Student ID (System)`, `Parent Individual ID`, `Family ID` y `Has access to Parents Web`. Nombres, grado y Family Order no se guardan.
+- `/family/invite?token=…`: el adulto crea su cuenta o confirma la existente con su contraseña. El enlace dura 7 días y sirve una vez.
+- Quién ve a qué alumno se decide solo en `lib/student-access.ts`. Un niño con `children.facts_id` lo ven solo los adultos con cuenta verificada y "Yes" en FACTS.
+- Migración: `db/migrations/2026-11-22-facts-access.sql` (solo tablas nuevas y un índice).
+- Pruebas (base desechable): `TEST_DATABASE_URL=… npx tsx scripts/test-facts-access.ts`.

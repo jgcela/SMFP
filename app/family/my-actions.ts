@@ -1,12 +1,14 @@
 "use server";
 // What an approved family can do on "My family". Every action reads the family
 // from the session (currentFamily) and only touches rows of that family.
-// Children are added by the school (later they will come from FACTS), not here.
+// Children are added by the school, not here. Which children an adult may act for
+// is decided only by lib/student-access.ts (FACTS access for FACTS students).
 import { revalidatePath } from "next/cache";
 import { checkPhone } from "../../lib/contact";
 import { db } from "../../lib/db";
 import { currentFamily, type Family } from "../../lib/family";
 import { ABSENCE_REASONS, checkDate, checkRange, REQUEST_TYPES } from "../../lib/my-family";
+import { childForAdult } from "../../lib/student-access";
 
 export type MyResult = { ok?: string; error?: string; field?: string };
 
@@ -51,7 +53,7 @@ export async function reportAbsence(fd: FormData): Promise<MyResult> {
     const to = String(fd.get("date_to") || from);
     const reason = String(fd.get("reason") ?? "");
     const note = text(fd, "note", 1000);
-    const [child] = await db()<{ name: string }[]>`select name from children where id = ${childId} and family_id = ${f.id} and not left_school`;
+    const child = await childForAdult(db(), { familyId: f.id, userId: f.userId, schoolId: f.schoolId }, childId);
     if (!child) return { error: "Choose which child will be absent.", field: "child_id" };
     const e = checkRange(from, to);
     if (e) return { error: e, field: "date_from" };
@@ -78,7 +80,7 @@ export async function makeRequest(fd: FormData): Promise<MyResult> {
     if (!message) return { error: "Write the message for the school.", field: "message" };
     let childName = "";
     if (childId) {
-      const [c] = await db()<{ name: string }[]>`select name from children where id = ${childId} and family_id = ${f.id} and not left_school`;
+      const c = await childForAdult(db(), { familyId: f.id, userId: f.userId, schoolId: f.schoolId }, childId);
       if (!c) return { error: "Choose a child from your list, or “Whole family”.", field: "child_id" };
       childName = c.name;
     }

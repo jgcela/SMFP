@@ -2,6 +2,7 @@
 // The public portal does not need any of this.
 import { db } from "../../lib/db";
 import { familyOfUser, type Family } from "../../lib/family";
+import { visibleChildren } from "../../lib/student-access";
 import { formatRange, todayIn, when, type SubmissionRow } from "../../lib/my-family";
 import { currentStaff } from "../../lib/staff";
 import { AdminTop } from "../admin/chrome";
@@ -18,9 +19,8 @@ async function load(f: Family) {
     db()<Details[]>`
       select parent_names as "parentNames", phone, contact2_name as "contact2Name", contact2_phone as "contact2Phone", contact2_relation as "contact2Relation"
       from families where id = ${f.id}`,
-    db()<ChildRow[]>`
-      select id, name, grade, teacher
-      from children where family_id = ${f.id} and not left_school order by id`,
+    // Only the children this adult may see (lib/student-access.ts).
+    visibleChildren(db(), { familyId: f.id, userId: f.userId, schoolId: f.schoolId }),
     db()<SubmissionRow[]>`
       select id, kind, category, child_name as "childName", date_from::text as "dateFrom", date_to::text as "dateTo",
         message, status, created_at::text as "createdAt", status_at::text as "statusAt"
@@ -36,7 +36,7 @@ async function load(f: Family) {
     sentAt: when(s.createdAt, tz),
     changedAt: s.statusAt ? when(s.statusAt, tz) : "",
   }));
-  return { details, children: [...children], sent: rows, today: todayIn(tz), tomorrow: todayIn(tz, 1) };
+  return { details, children: children.map(({ id, name, grade, teacher }): ChildRow => ({ id, name, grade, teacher })), sent: rows, today: todayIn(tz), tomorrow: todayIn(tz, 1) };
 }
 
 export default async function FamilyPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -69,7 +69,7 @@ export default async function FamilyPage({ searchParams }: { searchParams: Promi
           {next.startsWith("/volunteer") && <p className="adm-msg adm-msg--ok">Sign in with your family account to sign up for volunteer opportunities. You will go back to the Volunteer page.</p>}
           {next.startsWith("/staff-favorites") && <p className="adm-msg adm-msg--ok">Sign in with your family account to see the staff favorites. You will go back to that page.</p>}
           {next.startsWith("/wishlists") && <p className="adm-msg adm-msg--ok">Sign in with your family account to see the teacher wishlists. You will go back to that page.</p>}
-          <FamilySignInForm next={next} notice={sp.password === "reset" ? "Your new password is saved. Sign in with it." : undefined} />
+          <FamilySignInForm next={next} notice={sp.password === "reset" ? "Your new password is saved. Sign in with it." : sp.invite === "done" ? "Your account is ready and linked to your children. Sign in with your email and password." : undefined} />
         </div>
       </main>
     </>
