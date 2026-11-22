@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LookSwitcher } from "../look";
 import { panelVars } from "../../lib/panel-theme";
 import "../portal.css";
 import "../admin/admin.css";
@@ -20,6 +21,7 @@ export default async function FamilyLayout({ children }: { children: React.React
   return (
     <body className="adm sp" style={school ? panelVars(school.theme) : undefined}>
       <SchoolProvider value={{ name: school?.name ?? "", categories: school?.theme.categories ?? {}, base: school?.base ?? "" }}>{children}</SchoolProvider>
+      <LookSwitcher />
     </body>
   );
 }

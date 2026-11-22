@@ -1,5 +1,6 @@
 // The Volunteer page (step 6b): built from the school's volunteer opportunities.
 // Open to everyone; families who signed in can sign up from it.
+import { withLook } from "../../lib/look";
 import { db } from "../../lib/db";
 import { familyOfUser } from "../../lib/family";
 import { todayIn } from "../../lib/my-family";
@@ -30,5 +31,5 @@ export async function GET(req: Request) {
   const m = new URL(req.url).searchParams.get("m") ?? "";
   const notice = m in SIGNUP_MESSAGE ? SIGNUP_MESSAGE[m as keyof typeof SIGNUP_MESSAGE] : undefined;
   const html = renderVolunteerPage(school, links, contacts, extra, [...opps], { signedIn, mine, notice, today: todayIn(extra.timezone || "UTC") });
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-store" } });
+  return new Response(await withLook(html), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-store" } });
 }

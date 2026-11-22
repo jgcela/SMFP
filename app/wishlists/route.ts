@@ -1,5 +1,6 @@
 // Teacher wishlists (step 6d): built from the school's wishlists. Only families the
 // school approved (and its staff) see them; anyone else gets a sign-in notice.
+import { withLook } from "../../lib/look";
 import { loadPortal, schoolSlug, moduleOn } from "../../lib/portal";
 import { renderWishlistPage } from "../../lib/render";
 import { staffAnchors } from "../../lib/staff-favorites";
@@ -22,5 +23,5 @@ export async function GET() {
   // "Favorite things" goes to the teacher's card, when it is on the Staff favorites page.
   const anchors = staffAnchors([...cards], staffPage.teams);
   const html = renderWishlistPage(school, links, contacts, page, [...lists], viewer, anchors);
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-store" } });
+  return new Response(await withLook(html), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-store" } });
 }
