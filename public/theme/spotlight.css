@@ -300,9 +300,11 @@ html[data-theme="spotlight"]{
   & .sp-side{top:16px;bottom:16px;left:16px;width:256px;border-radius:28px;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.9);box-shadow:0 20px 50px -30px rgba(14,22,38,.45)}
   & .sp-brand-id strong{font:800 19px/22px var(--hs-display);letter-spacing:-.02em}
   & .sp-group a{position:relative;z-index:1;border-radius:999px;transition:color .25s}
-  & .sp-group a[aria-current=page]{background:transparent;color:var(--p-on-ink);font-weight:600}
-  & .kit-pill{position:absolute;z-index:0;border-radius:999px;background:var(--p-ink);box-shadow:0 10px 24px -12px var(--p-ink);pointer-events:none;transition:opacity .2s}
-  html:not(.kit-on) & .sp-group a[aria-current=page]{background:var(--p-ink)}
+  /* The current section always paints its own dark pill, so its text never
+     depends on JavaScript. .kit-pill is only the travelling copy that slides
+     from the previous section and hides once it lands. */
+  & .sp-group a[aria-current=page]{background:var(--p-ink);color:var(--p-on-ink);font-weight:600;box-shadow:0 10px 24px -12px var(--p-ink)}
+  & .kit-pill{position:absolute;z-index:0;border-radius:999px;background:var(--p-ink);pointer-events:none;opacity:0}
   & .sp-group a[aria-current=page] .sp-ic{color:var(--p-accent)}
   & .sp .adm-main{padding:40px 40px 72px 304px}
   & .sp-head h1{font:800 clamp(40px,4.4vw,64px)/.95 var(--hs-display);letter-spacing:-.05em;color:var(--p-ink)}

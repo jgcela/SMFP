@@ -262,16 +262,22 @@
       if (!pill) { pill = document.createElement("span"); pill.className = "kit-pill"; pill.setAttribute("aria-hidden", "true"); side.appendChild(pill); }
       const place = (animateIt) => {
         const a = $('.sp-group a[aria-current="page"]', side);
-        if (!a || !a.offsetParent) { pill.style.opacity = "0"; return; }
+        pill.style.opacity = "0";
+        if (!a || !a.offsetParent) return;
         const rs = side.getBoundingClientRect(), ra = a.getBoundingClientRect();
         const to = { top: ra.top - rs.top + side.scrollTop, left: ra.left - rs.left, width: ra.width, height: ra.height };
-        const prev = JSON.parse(sessionStorage.getItem("kit-pill") || "null");
-        try { sessionStorage.setItem("kit-pill", JSON.stringify(to)); } catch {}
-        pill.style.opacity = "1";
-        Object.assign(pill.style, { top: to.top + "px", left: to.left + "px", width: to.width + "px", height: to.height + "px" });
-        if (animateIt && prev && !reduce && prev.top !== to.top) {
-          animate(pill, { y: [prev.top - to.top, 0], scaleY: [1.25, 1] }, { type: spring, stiffness: 320, damping: 26 });
-        }
+        let prev = null;
+        try { prev = JSON.parse(sessionStorage.getItem("kit-pill") || "null"); sessionStorage.setItem("kit-pill", JSON.stringify(to)); } catch {}
+        if (!animateIt || !prev || reduce || prev.top === to.top) return;
+        // Slide a copy from the previous section to this one, under the link's
+        // own pill, then hide it: the link stays readable even if this fails.
+        Object.assign(pill.style, { top: to.top + "px", left: to.left + "px", width: to.width + "px", height: to.height + "px", opacity: "1" });
+        a.style.background = "transparent";
+        const done = () => { a.style.background = ""; pill.style.opacity = "0"; };
+        try {
+          animate(pill, { y: [prev.top - to.top, 0], scaleY: [1.25, 1] }, { type: spring, stiffness: 320, damping: 26 }).then(done, done);
+        } catch { done(); }
+        setTimeout(done, 900);
       };
       place(true);
       new MutationObserver(() => place(true)).observe(side, { subtree: true, attributes: true, attributeFilter: ["aria-current"] });
