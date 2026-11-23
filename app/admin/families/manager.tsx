@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FamilyStatus } from "../../../lib/family";
 import { changeFamilyCode, setFamilyStatus, type FamilyResult } from "./actions";
-import { Head, SLink } from "../ui";
+import { Head, SearchField, SLink } from "../ui";
 
 export type FamilyRow = {
   id: number; name: string; email: string; status: FamilyStatus; createdAt: string; decidedAt: string | null; decidedBy: string;
@@ -90,8 +90,8 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
           ))}
         </div>
         {families.length > 10 && (
-          <div className="adm-f" style={{ marginTop: 12 }}>
-            <label>Search<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Family name or email" /></label>
+          <div className="sp-tools" style={{ marginTop: 12 }}>
+            <SearchField label="Search families" value={q} onChange={setQ} placeholder="Search by family name or email" />
           </div>
         )}
         <div id="fam-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>

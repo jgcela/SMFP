@@ -102,3 +102,15 @@ export function RowMenu({ label, items }: { label: string; items: MenuItem[] }) 
 export function PencilIcon() {
   return <svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" /></svg>;
 }
+
+// The one search box of the staff panels: a white pill with a magnifier, the
+// label read by screen readers only (the placeholder says what to type).
+export function SearchField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <label className="sp-search">
+      <span className="sr-only">{label}</span>
+      <svg className="sp-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input type="search" placeholder={placeholder ?? label} value={value} onChange={(e) => onChange(e.target.value)} />
+    </label>
+  );
+}

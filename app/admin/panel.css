@@ -136,9 +136,9 @@
 .sp-seg button[aria-pressed=true]{background:var(--p-ink);color:var(--p-on-ink)}
 .sp-search{position:relative;flex:1 1 260px;display:block;min-width:0}
 .sp-search .sp-ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--p-muted);pointer-events:none}
-.sp-search input,.sp .sf-search input{width:100%;box-sizing:border-box;min-height:46px;padding:0 16px 0 44px;border:1px solid var(--p-line);border-radius:999px;background:var(--p-surface);font:400 16px/24px var(--font-text);color:var(--p-text)}
-.sp .sf-search input{padding-left:16px}
-.sp-search input:focus,.sp .sf-search input:focus{outline:3px solid color-mix(in srgb,var(--p-ink) 35%,transparent);outline-offset:0;border-color:var(--p-ink)}
+.sp-search input{-webkit-appearance:none;appearance:none;width:100%;box-sizing:border-box;min-height:46px;padding:0 16px 0 44px;border:1px solid var(--p-line);border-radius:999px;background:var(--p-surface);font:400 16px/24px var(--font-text);color:var(--p-text)}
+.sp-search input::-webkit-search-decoration{-webkit-appearance:none}
+.sp-search input:focus{outline:3px solid color-mix(in srgb,var(--p-ink) 35%,transparent);outline-offset:0;border-color:var(--p-ink)}
 
 /* Rows with a big date on the left */
 .sp-list{list-style:none;margin:0;padding:0}
