@@ -350,3 +350,19 @@ div.adm-msg--warn p{margin:0}
   .yr-item{grid-template-columns:1fr}
   .yr-actions{justify-content:flex-start}
 }
+
+/* Families list: rename in place, invitation, pages */
+.fam-row strong{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fam-edit{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:999px;background:none;color:var(--p-muted);cursor:pointer}
+.fam-edit:hover,.fam-edit:focus-visible{background:var(--p-soft);color:var(--p-ink)}
+.fam-edit svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fam-rename{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fam-rename input,.fam-inv-row input{flex:1 1 220px;min-width:0;min-height:42px;padding:0 14px;border:1px solid var(--p-line);border-radius:var(--sp-r-in,12px);background:var(--p-surface);color:var(--p-text);font:400 16px/24px var(--font-text)}
+.fam-rename input:focus,.fam-inv-row input:focus{outline:3px solid color-mix(in srgb,var(--p-ink) 35%,transparent);border-color:var(--p-ink)}
+.fam-mail{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fam-invite{border:0;background:none;padding:0;color:var(--p-ink);font:600 14px/20px var(--font-brand);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.fam-inv{margin-top:8px;padding:14px 16px;border:1px solid var(--p-line);border-radius:18px;background:color-mix(in srgb,var(--p-soft) 40%,var(--p-surface));display:flex;flex-direction:column;gap:10px}
+.fam-inv .note{margin:0}
+.fam-inv-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fam-inv-row .pid{font:600 14px/20px var(--font-brand);color:var(--p-ink);min-width:150px}
+.fam-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px;color:var(--p-muted);font:600 14px/20px var(--font-brand)}

@@ -55,3 +55,19 @@ export async function changeFamilyCode(): Promise<FamilyResult> {
     return { error: e instanceof Error ? e.message : "Something went wrong. Try again." };
   }
 }
+
+export async function renameFamily(id: number, nameIn: string): Promise<FamilyResult> {
+  try {
+    const staff = await requireStaff();
+    const name = String(nameIn ?? "").replace(/\s+/g, " ").trim();
+    if (!Number.isInteger(id)) return { error: "That change is not possible." };
+    if (!name) return { error: "Write the family name." };
+    if (name.length > 120) return { error: "The name is too long (120 characters at most)." };
+    const [f] = await db()<{ id: number }[]>`update families set name = ${name} where id = ${id} and school_id = ${staff.schoolId} returning id`;
+    if (!f) return { error: "This family is no longer in the list. Reload the page." };
+    revalidatePath("/admin/families");
+    return { ok: `Name saved: ${name}.` };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Something went wrong. Try again." };
+  }
+}
