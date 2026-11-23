@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { Group, Wishlist } from "../../../lib/wishlists";
 import { deleteWishlist, moveWishlist, saveWishlist, setWishlistHidden, type WlResult } from "./actions";
-import { Badge, Head, Initials, PencilIcon, RowMenu } from "../ui";
+import { Badge, Head, Initials, PencilIcon, RowMenu, SearchField } from "../ui";
 
 type Teacher = { id: number; name: string; role: string };
 
@@ -82,7 +82,7 @@ export function WishlistsManager({ lists, groups, teachers }: { lists: Wishlist[
       {editing === "new" && <ListForm groups={groups} teachers={teachers} onDone={done} />}
       {current && <ListForm key={current.id} w={current} groups={groups} teachers={teachers} onDone={done} />}
       {editing === null && (lists.length ? (<>
-        <label className="adm-f sf-search">Find by teacher or grade<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="For example: 2nd grade" /></label>
+        <div className="sp-tools"><SearchField label="Find by teacher or grade" value={q} onChange={setQ} placeholder="Find by teacher or grade, for example: 2nd grade" /></div>
         {sections.length ? sections.map((g) => (
           <section key={g.key || "-"} aria-label={g.label}>
             <h2 className="adm-h2">{g.label} <span className="note">{g.lists.length}</span></h2>

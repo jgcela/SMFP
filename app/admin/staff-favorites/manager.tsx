@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FAVORITE_LABELS, MAX_FAVORITES, PHOTO_ACCEPT, PHOTO_MAX_BYTES, VISIBLE_FAVORITES, type Favorite, type StaffCard, type Team } from "../../../lib/staff-favorites";
 import { deleteStaffCard, moveStaffCard, saveStaffCard, setStaffHidden, startPhotoUpload, type SfResult } from "./actions";
-import { Badge, Head, Initials, PencilIcon, RowMenu } from "../ui";
+import { Badge, Head, Initials, PencilIcon, RowMenu, SearchField } from "../ui";
 
 const photoUrl = (c: StaffCard) => `/staff-favorites/photo/${c.id}?v=${c.version}`;
 
@@ -128,7 +128,7 @@ export function StaffFavoritesManager({ cards, teams, storageReady }: { cards: S
       {editing === "new" && <CardForm teams={teams} storageReady={storageReady} onDone={done} />}
       {current && <CardForm key={current.id} c={current} teams={teams} storageReady={storageReady} onDone={done} />}
       {editing === null && (cards.length ? (<>
-        <label className="adm-f sf-search">Find by name or role<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name or role" /></label>
+        <div className="sp-tools"><SearchField label="Find by name or role" value={q} onChange={setQ} /></div>
         {groups.length ? groups.map((g) => (
           <section key={g.key || "-"} aria-label={g.label}>
             <h2 className="adm-h2">{g.label} <span className="note">{g.cards.length}</span></h2>

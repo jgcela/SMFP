@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useMemo, useRef, useState, useTransition } from "react";
 import { PARENT_STATUS_LABEL, type ParentRow, type ParentStatus } from "../../../../lib/facts-labels";
 import { applyAccess, applyEmails, applyFamilies, inviteParent, previewAccess, previewEmails, previewFamilies, type AccessPreview, type EmailsPreview, type FamiliesPreview, type InviteResult } from "./actions";
-import { Head, SLink } from "../../ui";
+import { Head, SearchField, SLink } from "../../ui";
 
 const n = (x: number | undefined, one: string, many = `${one}s`) => `${x ?? 0} ${(x ?? 0) === 1 ? one : many}`;
 const when = (iso: string | null) =>
@@ -301,8 +301,8 @@ function Parents({ parents }: { parents: ParentRow[] }) {
           </button>
         ))}
       </div>
-      <div className="adm-f" style={{ marginTop: 12 }}>
-        <label>Search by Parent ID or email<input type="search" value={q} onChange={(e) => setQ(e.target.value)} /></label>
+      <div className="sp-tools" style={{ marginTop: 12 }}>
+        <SearchField label="Search by Parent ID or email" value={q} onChange={setQ} />
       </div>
       <div id="facts-panel" role="tabpanel" aria-labelledby={`ptab-${tab}`}>
         {list.length ? (

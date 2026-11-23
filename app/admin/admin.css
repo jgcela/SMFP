@@ -274,7 +274,6 @@
 .adm-doc .what .note a,.adm-head .lead a{color:var(--cerulean)}
 @media (max-width:640px){.vol-3,.vol-link{grid-template-columns:1fr}}
 /* Step 6c: Staff favorites */
-.sf-search{max-width:420px;margin:0 0 8px}
 .adm-doc .what.sf-what{flex-direction:row;align-items:center;gap:12px}
 .sf-what img,.sf-photo-now img{border-radius:50%;object-fit:cover;flex:none}
 .sf-what>span{display:flex;flex-direction:column;gap:2px;min-width:0}
