@@ -2,13 +2,17 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FamilyStatus } from "../../../lib/family";
-import { changeFamilyCode, setFamilyStatus, type FamilyResult } from "./actions";
+import { changeFamilyCode, renameFamily, setFamilyStatus, type FamilyResult } from "./actions";
+import { inviteParent } from "./facts/actions";
 import { Head, SearchField, SLink } from "../ui";
 
 export type FamilyRow = {
-  id: number; name: string; email: string; status: FamilyStatus; createdAt: string; decidedAt: string | null; decidedBy: string;
-  fromFacts?: boolean; kids?: number;
+  id: number; name: string; email: string; status: FamilyStatus; fromFacts: boolean;
+  kids: { name: string; grade: string }[];
+  parents: { id: string; email: string; active: boolean }[];
 };
+
+const PAGE = 20;
 
 type Tab = "pending" | "approved" | "rejected";
 const TABS: { key: Tab; label: string; empty: string }[] = [
@@ -17,9 +21,6 @@ const TABS: { key: Tab; label: string; empty: string }[] = [
   { key: "rejected", label: "Rejected", empty: "No rejected families." },
 ];
 const tabOf = (s: FamilyStatus): Tab => (s === "disabled" ? "approved" : s);
-
-const when = (iso: string) =>
-  new Date(iso.replace(" ", "T").replace(/(\+\d\d)$/, "$1:00")).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
 
 type Confirm = { id: number; status: FamilyStatus; question: string } | null;
 
@@ -46,9 +47,34 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
   };
 
   const [q, setQ] = useState("");
+  const [page, setPage] = useState(0);
+  const [editing, setEditing] = useState<{ id: number; name: string } | null>(null);
+  const [inviting, setInviting] = useState<number | null>(null);
+  const [emails, setEmails] = useState<Record<string, string>>({});
   const needle = q.trim().toLowerCase();
-  const list = families.filter((f) => tabOf(f.status) === tab && (!needle || f.name.toLowerCase().includes(needle) || f.email.toLowerCase().includes(needle)));
+  const all = families.filter((f) => tabOf(f.status) === tab && (!needle || f.name.toLowerCase().includes(needle) || f.email.toLowerCase().includes(needle)
+    || f.kids.some((k) => k.name.toLowerCase().includes(needle))));
+  const pages = Math.max(1, Math.ceil(all.length / PAGE));
+  const at = Math.min(page, pages - 1);
+  const list = all.slice(at * PAGE, at * PAGE + PAGE);
   const count = (t: Tab) => families.filter((f) => tabOf(f.status) === t).length;
+  const search = (v: string) => { setQ(v); setPage(0); };
+  const go = (n: number) => { setPage(n); setConfirm(null); setEditing(null); setInviting(null); document.getElementById("fam-panel")?.scrollIntoView({ block: "start" }); };
+
+  const saveName = async () => {
+    if (!editing) return;
+    setBusy(true);
+    const r = await renameFamily(editing.id, editing.name);
+    show(r); setBusy(false);
+    if (!r.error) { setEditing(null); router.refresh(); }
+  };
+  const invite = async (f: FamilyRow, parentId: string) => {
+    setBusy(true);
+    const r = await inviteParent(parentId, emails[parentId] ?? f.parents.find((p) => p.id === parentId)?.email ?? "");
+    show(r); setBusy(false);
+    if (!r.error) { setInviting(null); router.refresh(); }
+  };
+  const kidsText = (f: FamilyRow) => f.kids.map((k) => (k.grade ? `${k.name} (${k.grade})` : k.name)).join(" · ");
 
   const actions = (f: FamilyRow) => {
     if (confirm?.id === f.id) {
@@ -84,36 +110,78 @@ export function FamiliesManager({ families, code }: { families: FamilyRow[]; cod
         <div className="fam-tabs" role="tablist" aria-label="Families by status">
           {TABS.map((t) => (
             <button key={t.key} type="button" role="tab" id={`tab-${t.key}`} aria-controls="fam-panel" aria-selected={tab === t.key}
-              onClick={() => { setTab(t.key); setConfirm(null); }}>
+              onClick={() => { setTab(t.key); setPage(0); setConfirm(null); setEditing(null); setInviting(null); }}>
               {t.label}<span className={`n${t.key === "pending" && count(t.key) ? " n--hot" : ""}`}>{count(t.key)}</span>
             </button>
           ))}
         </div>
         {families.length > 10 && (
           <div className="sp-tools" style={{ marginTop: 12 }}>
-            <SearchField label="Search families" value={q} onChange={setQ} placeholder="Search by family name or email" />
+            <SearchField label="Search families" value={q} onChange={search} placeholder="Search by family, child or email" />
           </div>
         )}
         <div id="fam-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
-          {list.length ? (
+          {list.length ? (<>
             <ul className="adm-list">
               {list.map((f) => (
-                <li key={f.id} className={`adm-doc${f.status === "disabled" ? " is-hidden" : ""}`}>
+                <li key={f.id} className={`adm-doc fam-row${f.status === "disabled" ? " is-hidden" : ""}`}>
                   <div className="what">
-                    <strong>{f.name}{f.status === "disabled" && <span className="pill pill--muted">Turned off</span>}</strong>
-                    {f.email
-                      ? <span className="note adm-href">{f.email}</span>
-                      : <span className="note">{f.fromFacts ? "No account yet: a parent joins when they accept their FACTS invitation" : "No account"}</span>}
-                    <span className="note">
-                      {f.kids ? <>{f.kids} {f.kids === 1 ? "child" : "children"} · </> : null}
-                      {f.fromFacts ? "Created from FACTS" : "Registered"} {when(f.createdAt)}
-                      {f.decidedAt && f.status !== "pending" && <> · {f.status === "approved" ? "approved" : f.status === "rejected" ? "rejected" : "turned off"} {when(f.decidedAt)}{f.decidedBy && <> by {f.decidedBy}</>}</>}
+                    {editing?.id === f.id ? (
+                      <form className="fam-rename" onSubmit={(e) => { e.preventDefault(); saveName(); }}>
+                        <label className="sr-only" htmlFor={`fam-name-${f.id}`}>Family name</label>
+                        <input id={`fam-name-${f.id}`} autoFocus value={editing.name} maxLength={120} onChange={(e) => setEditing({ id: f.id, name: e.target.value })} />
+                        <button type="submit" className="btn btn--primary" disabled={busy}>Save</button>
+                        <button type="button" className="btn btn--outline" onClick={() => setEditing(null)}>Cancel</button>
+                      </form>
+                    ) : (
+                      <strong>
+                        {f.name}{f.status === "disabled" && <span className="pill pill--muted">Turned off</span>}
+                        <button type="button" className="fam-edit" aria-label={`Edit the name of ${f.name}`} title="Edit name"
+                          onClick={() => { setMsg(null); setInviting(null); setEditing({ id: f.id, name: f.name }); }}>
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+                        </button>
+                      </strong>
+                    )}
+                    <span className="note fam-mail">
+                      {f.email || "(no email)"}
+                      {!f.email && f.parents.some((p) => p.email) && <span>Invited: {f.parents.filter((p) => p.email).map((p) => p.email).join(", ")}</span>}
+                      {!f.email && f.parents.length > 0 && f.status !== "rejected" && (
+                        <button type="button" className="fam-invite" aria-expanded={inviting === f.id}
+                          onClick={() => { setMsg(null); setEditing(null); setInviting(inviting === f.id ? null : f.id); }}>
+                          {f.parents.some((p) => p.email) ? "Send the invitation again" : "Send invitation to create the account"}
+                        </button>
+                      )}
                     </span>
+                    <span className="note">{f.kids.length ? kidsText(f) : "No children yet"}</span>
+                    {inviting === f.id && (
+                      <div className="fam-inv" role="group" aria-label={`Invite a parent of ${f.name}`}>
+                        <p className="note">The parent gets a link to create the account (it works for 7 days, once). Only parents FACTS lets see a child are listed.</p>
+                        {f.parents.map((p) => (
+                          <form key={p.id} className="fam-inv-row" onSubmit={(e) => { e.preventDefault(); invite(f, p.id); }}>
+                            <span className="pid">FACTS Parent ID {p.id}</span>
+                            {p.active ? <span className="note">Already has an account</span> : (<>
+                              <label className="sr-only" htmlFor={`inv-${p.id}`}>Email for Parent ID {p.id}</label>
+                              <input id={`inv-${p.id}`} type="email" placeholder="Parent's email" value={emails[p.id] ?? p.email}
+                                onChange={(e) => setEmails({ ...emails, [p.id]: e.target.value })} />
+                              <button type="submit" className="btn btn--primary" disabled={busy}>Send</button>
+                            </>)}
+                          </form>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="act">{actions(f)}</div>
                 </li>
               ))}
             </ul>
+            {pages > 1 && (
+              <nav className="fam-pager" aria-label="Pages">
+                <button type="button" className="btn btn--outline" onClick={() => go(at - 1)} disabled={at === 0}>Previous</button>
+                <span aria-live="polite">Page {at + 1} of {pages} · {all.length} families</span>
+                <button type="button" className="btn btn--outline" onClick={() => go(at + 1)} disabled={at >= pages - 1}>Next</button>
+              </nav>
+            )}
+            </>
           ) : (
             <p className="adm-empty">{TABS.find((t) => t.key === tab)!.empty}</p>
           )}
