@@ -1,0 +1,23 @@
+{
+  "_note": "Look of the private panels (staff area and My family) for the school in PORTAL_SCHOOL. Imported once into schools.panel_theme; after that the database copy is the one used. categories: one colour per existing calendar category (the pill is a light tint of it).",
+  "shortName": "St. Mary",
+  "markUrl": "assets/favicon.png",
+  "colors": {
+    "page": "#EEF0F9",
+    "surface": "#FFFFFF",
+    "ink": "#16335B",
+    "text": "#2B3445",
+    "muted": "#5B6478",
+    "line": "#E2E5F0",
+    "soft": "#E2E6FB",
+    "accent": "#FCBC40",
+    "link": "#006D8F"
+  },
+  "categories": {
+    "noclasses": "#B3261E",
+    "faith": "#6B3FA0",
+    "academic": "#0B6E99",
+    "community": "#1F7A3F",
+    "health": "#9A6700"
+  }
+}

@@ -1,0 +1,92 @@
+/* Hallmark · look "Sunny day" for the portal's inner pages (Volunteer, Wishlists, Staff favorites, text pages, Messenger) · loaded after portal-2627.css · deal: manual · sweep: manual
+   critique: same look as the home page (app/looks/sunny.css): white header with the navy logo, light sky page heads, Nunito Sans, round buttons, soft cards, light footer. */
+@font-face{font-family:"Nunito Sans Variable";font-style:normal;font-display:swap;font-weight:200 1000;src:url(/assets/fonts/nunito-sans-latin-wght-normal.woff2) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Nunito Sans Variable";font-style:normal;font-display:swap;font-weight:200 1000;src:url(/assets/fonts/nunito-sans-latin-ext-wght-normal.woff2) format("woff2-variations");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+:root{
+  --surface:#FFFFFF; --ink:#22324A; --ink-soft:#3E5068; --line:#DCE7EE; --line-strong:#9CC6D6;
+  --hero-bg:var(--azure); --hero-hover:var(--light-blue); --sun:#FFF4D6; --paper-grey:#F4F8FA;
+  --navy-deep:#0f2643; --navy-raised:#22477a; --navy-hover:#1d3f6e; --gold-deep:#f5ad22;
+  --font-brand:"Nunito Sans Variable",system-ui,sans-serif; --font-text:"Nunito Sans Variable",system-ui,sans-serif;
+  --r-sm:10px; --r-md:18px; --shadow:0 1px 2px rgb(22 51 91 / .06),0 8px 24px rgb(22 51 91 / .08);
+}
+html,body{overflow-x:clip}
+body{color:var(--ink)}
+h1,h2,h3,.card h3,.issue-title,.ev-title{font-weight:800}
+
+/* Labels: sentence case, no tracking; decorative gold bars removed */
+.eyebrow,.caption,.favs dt,.ctile .k,.latest-date .m,.issue-date .w,.hb-side-label,.hb-head .eyebrow{text-transform:none;letter-spacing:0}
+.eyebrow{font:600 15px/20px var(--font-brand);color:var(--cerulean)}
+.caption{font:700 14px/20px var(--font-brand)}
+.favs dt{font:700 13px/18px var(--font-brand)}
+.ctile .k{font:600 14px/20px var(--font-brand)}
+.hb-toc .toc-l1 a{text-transform:none;letter-spacing:0;font-size:13.5px}
+.rule{display:none}
+
+/* Buttons, chips, fields: round */
+.btn,.fchip,.hb-pdf,.hb-toggle{border-radius:var(--r-pill)}
+.btn{min-height:48px;padding:0 22px}
+.btn--primary:hover{background:var(--navy-deep)}
+.btn--gold:hover{background:var(--gold-deep)}
+.btn--outline{border-color:var(--line-strong)}
+.btn-family:hover,.chip-link:hover{background:var(--navy-raised)}
+.field input,.hb-search input{border-radius:var(--r-pill);padding-left:18px;border-color:var(--line-strong)}
+.hb-search input{padding-left:40px}
+.tag,.bday{border-radius:var(--r-pill);padding:0 12px;letter-spacing:0}
+.menu-btn{border-radius:var(--r-pill)}
+
+/* Page heads: light sky instead of navy */
+.page-hero{background:var(--hero-bg);color:var(--ink)}
+.page-hero h1{color:var(--navy);font-weight:900}
+.page-hero .lead{color:var(--ink-soft)}
+.page-hero .crumbs,.page-hero .crumbs a{color:var(--ink-soft)}
+.page-hero .eyebrow{color:var(--cerulean)}
+.page-hero .crumbs a:hover{color:var(--navy)}
+.page-hero.on-navy :focus-visible{outline-color:var(--cerulean)}
+
+/* Cards and panels: soft, borderless, shadowed */
+.card,.step,.latest,.issue,.issue-link,.reader-frame{border:0;border-radius:var(--r-md);box-shadow:var(--shadow)}
+.issue-link:hover{box-shadow:0 0 0 2px var(--gold),var(--shadow)}
+.note,.in-issue,.empty,.vol-note{border-radius:var(--r-md)}
+.section--tint,.reader-section{background:var(--sun)}
+.latest-date{border-radius:var(--r-md)}
+details.more,.favs,.sl-items li{border-top-color:var(--line)}
+.fav-allergy{border-radius:var(--r-sm)}
+.staff-photo{border-radius:50%}
+
+/* Footer tiles */
+.ctile{border-radius:var(--r-md);border-color:var(--navy-raised);background:var(--navy-hover)}
+a.ctile:hover{background:var(--navy-raised)}
+
+/* Handbooks and text pages */
+.hb{background:var(--paper-grey)}
+.hb-paper{border:0;border-radius:var(--r-md);box-shadow:var(--shadow)}
+.hb-toc a{border-radius:var(--r-sm)}
+.prose h2{border-top:0;padding-top:0}
+.prose th{background:var(--azure)}
+.prose blockquote{border-radius:0 var(--r-sm) var(--r-sm) 0}
+@media (max-width:1000px){.hb-paper{border-radius:0;box-shadow:none}}
+
+/* Light header and footer (navy logo) */
+.site-header{background:var(--surface);color:var(--navy);border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgb(22 51 91 / .04)}
+.site-header.on-navy :focus-visible,.site-footer.on-navy :focus-visible{outline-color:var(--cerulean)}
+.util{background:var(--paper-grey);border-bottom:1px solid var(--line)}
+.util a{color:var(--ink-soft)}
+.util a:hover{color:var(--navy)}
+.main-nav a{color:var(--navy);font-weight:600}
+.main-nav a[aria-current="page"]{text-decoration-color:var(--gold)}
+.site-header .btn-family{color:var(--navy);border-color:var(--line-strong);background:var(--surface)}
+.site-header .btn-family:hover{background:var(--azure);color:var(--navy)}
+.menu-btn{color:var(--navy);border-color:var(--line-strong)}
+.mobile-menu:not([hidden]),.site-header.nav-collapsed .mobile-menu:not([hidden]){border-top-color:var(--line)}
+.mobile-menu a,.site-header.nav-collapsed .mobile-menu a{color:var(--navy);border-bottom-color:var(--line)}
+.mobile-menu .sub a,.site-header.nav-collapsed .mobile-menu .sub a{color:var(--ink-soft)}
+.mobile-menu a[aria-current="page"],.site-header.nav-collapsed .mobile-menu a[aria-current="page"]{color:var(--cerulean)}
+.site-footer{background:var(--paper-grey);color:var(--ink);border-top:1px solid var(--line)}
+.site-footer h2,.contact-people h3{color:var(--navy)}
+.ctile{background:var(--surface);border:0;box-shadow:var(--shadow);color:var(--navy)}
+a.ctile:hover{background:var(--surface);color:var(--navy);box-shadow:0 0 0 2px var(--gold),var(--shadow)}
+.ctile .k{color:var(--ink-soft)}
+.contact-people a{color:var(--navy)}
+.legal{border-top-color:var(--line);color:var(--ink-soft)}
+.legal a{color:var(--cerulean)}

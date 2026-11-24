@@ -1,0 +1,35 @@
+// The Volunteer page (step 6b): built from the school's volunteer opportunities.
+// Open to everyone; families who signed in can sign up from it.
+import { withTheme } from "../../lib/theme";
+import { db } from "../../lib/db";
+import { familyOfUser } from "../../lib/family";
+import { todayIn } from "../../lib/my-family";
+import { loadPortal, schoolSlug, moduleOn } from "../../lib/portal";
+import { renderVolunteerPage } from "../../lib/render";
+import { currentStaff } from "../../lib/staff";
+import { loadOpportunities, SIGNUP_MESSAGE } from "../../lib/volunteer-db";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(req: Request) {
+  if (!(await moduleOn("volunteer"))) return new Response("Not found", { status: 404 });
+  const { school, links, contacts } = await loadPortal(await schoolSlug());
+  const [[extra], opps, { user, staff }] = await Promise.all([
+    db()<{ title: string; lead: string; intro: string; timezone: string }[]>`
+      select y.volunteer_title as title, y.volunteer_lead as lead, y.volunteer_intro_html as intro, s.timezone
+      from school_years y join schools s on s.id = y.school_id where y.id = ${school.year_id}`,
+    loadOpportunities(school.year_id),
+    currentStaff(),
+  ]);
+  const family = user ? await familyOfUser(user.id) : null;
+  const signedIn = family?.status === "approved" ? "family" : user && staff ? "other" : null;
+  const mine = new Set<number>();
+  if (signedIn === "family" && family) {
+    const rows = await db()<{ id: number }[]>`select opportunity_id as id from volunteer_signups where family_id = ${family.id}`;
+    rows.forEach((r) => mine.add(r.id));
+  }
+  const m = new URL(req.url).searchParams.get("m") ?? "";
+  const notice = m in SIGNUP_MESSAGE ? SIGNUP_MESSAGE[m as keyof typeof SIGNUP_MESSAGE] : undefined;
+  const html = renderVolunteerPage(school, links, contacts, extra, [...opps], { signedIn, mine, notice, today: todayIn(extra.timezone || "UTC") });
+  return new Response(withTheme(html), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-store" } });
+}
